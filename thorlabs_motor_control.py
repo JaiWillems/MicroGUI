@@ -37,6 +37,7 @@ def defineMotor():
     """
     motorSerialNumber = apt.list_available_devices()[0][1]
     modeMotor = apt.Motor(motorSerialNumber)
+    modeMotor.enable
     #modeMotor.set_velocity_parameters(min_vel=MIN_VELOCITY,
     #                                accn=ACCELERATION,
     #                                max_vel=MAX_VELOCITY)
