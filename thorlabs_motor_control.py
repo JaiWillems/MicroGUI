@@ -10,9 +10,9 @@ import thorlabs_apt as apt
 
 
 TRANSMISSION_POSITION = 0
-REFLECTION_POSITION = 50
-VISIBLE_IMAGE_POSITION = 100
-BEAMSPLITTER_POSITION = 150
+REFLECTION_POSITION = 16.5
+VISIBLE_IMAGE_POSITION = 33
+BEAMSPLITTER_POSITION = 50
 
 MIN_VELOCITY = 0
 MAX_VELOCITY = 10
@@ -37,9 +37,9 @@ def defineMotor():
     """
     motorSerialNumber = apt.list_available_devices()[0][1]
     modeMotor = apt.Motor(motorSerialNumber)
-    modeMotor.set_velocity_parameters(min_vel=MIN_VELOCITY,
-                                    accn=ACCELERATION,
-                                    max_vel=MAX_VELOCITY)
+    #modeMotor.set_velocity_parameters(min_vel=MIN_VELOCITY,
+    #                                accn=ACCELERATION,
+    #                                max_vel=MAX_VELOCITY)
     modeMotor.move_home(True)
 
     return modeMotor
