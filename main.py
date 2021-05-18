@@ -11,10 +11,10 @@ import sys
 # Import file dependencies.
 from gui import GUI
 from controller import Controller
-from thorlabs_motor_control import initMotorTEST
+from thorlabs_motor_control import initMotor
 
 # Define the THORLABS mode stage motor.
-modeMotor = initMotorTEST()
+modeMotor = initMotor()
 
 # Run the GUI.
 app = QApplication([])
