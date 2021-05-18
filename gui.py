@@ -1,182 +1,220 @@
-"""Horizontal IR Microscope main GUI file.
+"""Main GUI display.
 
-Notes
------
-This top level module initiates the GUI for the Far-IR Horizontal Microscope.
+The gui module has both the GUI and MyTableWidget class'
+responsible for creating the main user interface with the FAR-IR Horizontal
+Microscope.
 """
 
-"""GUI visual file.
-
-Notes
------
-This module contains the GUI, ImageView, and MyTableWidget classes which
-combine to form the GUI visual for the FAR-IR Horizontal Microscope.
-
-Class's
--------
-GUI : Object used to create the main GUI interface.
-    cameraWindow : Window containing camera feed and interface.
-    img : Live feed image.
-    updateTime : PyQtGraph ImageItem object.
-    fps : Dynamically changing FPS.
-    image : Current displayed image.
-    WCB : Image capture button.
-    SIFN : Saved image file name line edit widget.
-    tab : MyTableWidget object.
-    xSN : Sample x incremental negative button.
-    xSP : Sample x incremental positive button.
-    xSStep : Sample x step size line edit.
-    xSAbsPos : Sample x absolute position button.
-    xSCn : Sample x continuous negative button.
-    xSStop : Sample x stop button.
-    xSCp : Sample x continuous button.
-    xSSn : Sample x soft negative limit label.
-    xSSp : Sample x soft positive limit label.
-    xSHn : Sample x hard negative limit label.
-    xSHp : Sample x hard positive limit label.
-    ySN : Sample y incremental negative button.
-    ySP : Sample y incremental positive button.
-    ySStep : Sample y step size line edit.
-    ySAbsPos : Sample y absolute position button.
-    ySCn : Sample y continuous negative button.
-    ySStop : Sample y stop button.
-    ySCp : Sample y continuous button.
-    ySSn : Sample y soft negative limit label.
-    ySSp : Sample y soft positive limit label.
-    ySHn : Sample y hard negative limit label.
-    ySHp : Sample y hard positive limit label.
-    zSN : Sample z incremental negative button.
-    zSP : Sample z incremental positive button.
-    zSStep : Sample z step size line edit.
-    zSAbsPos : Sample z absolute position button.
-    zSCn : Sample z continuous negative button.
-    zSStop : Sample z stop button.
-    zSCp : Sample z continuous button.
-    zSSn : Sample z soft negative limit label.
-    zSSp : Sample z soft positive limit label.
-    zSHn : Sample z hard negative limit label.
-    zSHp : Sample z hard positive limit label.
-    xON : Objective x incremental negative button.
-    xOP : Objective x incremental positive button.
-    xOStep : Objective x step size line edit.
-    xOAbsPos : Objective x absolute position button.
-    xOCn : Objective x continuous negative button.
-    xOStop : Objective x stop button.
-    xOCp : Objective x continuous button.
-    xOSn : Objective x soft negative limit label.
-    xOSp : Objective x soft positive limit label.
-    xOHn : Objective x hard negative limit label.
-    xOHp : Objective x hard positive limit label.
-    yON : Objective y incremental negative button.
-    yOP : Objective y incremental positive button.
-    yOStep : Objective y step size line edit.
-    yOAbsPos : Objective y absolute position button.
-    yOCn : Objective y continuous negative button.
-    yOStop : Objective y stop button.
-    yOCp : Objective y continuous button.
-    yOSn : Objective y soft negative limit label.
-    yOSp : Objective y soft positive limit label.
-    yOHn : Objective y hard negative limit label.
-    yOHp : Objective y hard positive limit label.
-    zON : Objective z incremental negative button.
-    zOP : Objective z incremental positive button.
-    zOStep : Objective z step size line edit.
-    zOAbsPos : Objective z absolute position button.
-    zOCn : Objective z continuous negative button.
-    zOStop : Objective z stop button.
-    zOCp : Objective z continuous button.
-    zOSn : Objective z soft negative limit label.
-    zOSp : Objective z soft positive limit label.
-    zOHn : Objective z hard negative limit label.
-    zOHp : Objective z hard positive limit label.
-
-ImageView: Defines PyQtGraph ImageView object for live feed.
-
-MyTableWidget: Defines the GUI table.
-    tabs : QTable Widget.
-    tab1 : Tab 1 QWidget.
-    tab2 : Tab 2 QWidget.
-    tab3 : Tab 3 QWidget.
-    tab4 : Tab 4 QWidget.
-    tab5 : Tab 5 QWidget.
-    xIdleS : Sample x idle label.
-    yIdleS : Sample y idle label.
-    zIdleS : Sample z idle label.
-    xStopS : Sample x stop label.
-    yStopS : Sample y stop label.
-    zStopS : Sample z stop label.
-    xIdleO : Objective x idle label.
-    yIdleO : Objective y idle label.
-    zIdleO : Objective z idle label.
-    xStopO : Objective x stop label.
-    yStopO : Objective y stop label.
-    zStopO : Objective z stop label.
-    RDM1 : Transmission radio button.
-    RDM2 : Reflection radio button.
-    RDM3 : Visible Image radio button.
-    RDM4 : Beamsplitter radio button.
-    xSMM : Sample x min and max label.
-    ySMM : Sample y min and max label.
-    zSMM : Sample z min and max label.
-    xOMM : Objective x min and max label.
-    yOMM : Objective y min and max label.
-    zOMM : Objective z min and max label.
-    xSMin : Sample x minimum soft limit line edit.
-    xSMax : Sample x maximum soft limit line edit.
-    ySMin : Sample y minimum soft limit line edit.
-    ySMax : Sample y maximum soft limit line edit.
-    zSMin : Sample z minimum soft limit line edit.
-    zSMax : Sample z maximum soft limit line edit.
-    xOMin : Objective x minimum soft limit line edit.
-    xOMax : Objective x maximum soft limit line edit.
-    yOMin : Objective y minimum soft limit line edit.
-    yOMax : Objective y maximum soft limit line edit.
-    zOMin : Objective z minimum soft limit line edit.
-    zOMax : Objective z maximum soft limit line edit.
-    SSL : Set soft limits button.
-    SSL : Set extreme soft limits button.
-    xSZero : Sample x zero button.
-    ySZero : Sample y zero button.
-    zSZero : Sample z zero button.
-    xSB : Sample x backlash line edit.
-    ySB : Sample y backlash line edit.
-    zSB : Sample z backlash line edit.
-    xOZero : Objective x zero button.
-    yOZero : Objective y zero button.
-    zOZero : Objective z zero button.
-    xOB : Objective x backlash line edit.
-    yOB : Objective y backlash line edit.
-    zOB : Objective z backlash line edit.
-    SBL : Update backlash values button.
-"""
-
-
-from PyQt5.QtWidgets import QMainWindow, QGridLayout, QVBoxLayout, QWidget,\
-                            QLabel, QPushButton, QLineEdit, QRadioButton,\
-                            QTabWidget
-from PyQt5.QtGui import QPixmap
+# Import package dependencies.
 import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.ptime as ptime
-from PyQt5.QtCore import QRectF, QTimer
 from typing import Any, Dict
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import QRectF, QTimer
+from PyQt5.QtWidgets import QMainWindow, QGridLayout, QVBoxLayout, QWidget,\
+                            QLabel, QPushButton, QLineEdit, QRadioButton,\
+                            QTabWidget
+
+# Import file dependencies.
 from flir_camera_control import getTestImage
 from globals import *
 
 
 class GUI(QMainWindow):
-    """Object used to create the main GUI interface."""
+    """Main GUI window.
+
+    The GUI class creates the main gui window which allows users to monitor
+    and control the main functionality of the microscope.
+
+    Parameters
+    ----------
+    None
+
+    Attributes
+    ----------
+    cameraWindow : QWidget
+        QWidget window containing camera feed and interface.
+    img : pg.ImageItem
+        Live feed image from Blackfly camera.
+    image : nd.array
+        Current image displayed in an array representation.
+    WCB : QPushButton
+        Image capture push button.
+    SIFN : QLineEdit
+        File name to label the live feed image capture.
+    tab : MyTableWidget object
+        The tabular display located on the main GUI window.
+    xSN : QPushButton
+        Negative incrment button for the Sample's x dimension.
+    xSP : QPushButton
+        Positive incrment button for the Sample's x dimension.
+    xSStep : QLineEdit
+        Step size line edit for the sample's x dimension.
+    xSAbsPos : QPushButton
+        Absolute position button for the sample's x dimension.
+    xSMove : QPushButton
+        Move to absolute position button for the sample's x dimension.
+    xSCn : QPushButton
+        Continuous negative motion buttonfor the sample's x dimension.
+    xSStop : QPushButton
+        Stop continuous motion button for the sample's x dimension.
+    xSCp : QPushButton
+        Continuous positive motion buttonfor the sample's x dimension.
+    xSSn : QLineEdit
+        Negative soft limit label for the sample's x dimension.
+    xSSp : QLineEdit
+        Positive soft limit label for the sample's x dimension.
+    xSHn : QLineEdit
+        Negative hard limit label for the sample's x dimension.
+    xSHp : QLineEdit
+        Positive hard limit label for the sample's x dimension.
+    ySN : QPushButton
+        Negative incrment button for the Sample's y dimension.
+    ySP : QPushButton
+        Positive incrment button for the Sample's y dimension.
+    ySStep : QPushButton
+        Step size line edit for the sample's y dimension.
+    ySAbsPos : QPushButton
+        Absolute position button for the sample's y dimension.
+    ySMove : QPushButton
+        Move to absolute position button for the sample's y dimension.
+    ySCn : QPushButton
+        Continuous negative motion buttonfor the sample's y dimension.
+    ySStop : QPushButton
+        Stop continuous motion button for the sample's y dimension.
+    ySCp : QPushButton
+        Continuous positive motion buttonfor the sample's y dimension.
+    ySSn : QLineEdit
+        Negative soft limit label for the sample's y dimension.
+    ySSp : QLineEdit
+        Positive soft limit label for the sample's y dimension.
+    ySHn : QLineEdit
+        Negative hard limit label for the sample's y dimension.
+    ySHp : QLineEdit
+        Positive hard limit label for the sample's y dimension.
+    zSN : QPushButton
+        Negative incrment button for the Sample's z dimension.
+    zSP : QPushButton
+        Positive incrment button for the Sample's z dimension.
+    zSStep : QLineEdit
+        Step size line edit for the sample's z dimension.
+    zSAbsPos : QPushButton
+        Absolute position button for the sample's z dimension.
+    zSMove : QPushButton
+        Move to absolute position button for the sample's z dimension.
+    zSCn : QPushButton
+        Continuous negative motion buttonfor the sample's z dimension.
+    zSStop : QPushButton
+        Stop continuous motion button for the sample's z dimension.
+    zSCp : QPushButton
+        Continuous positive motion buttonfor the sample's z dimension.
+    zSSn : QLineEdit
+        Negative soft limit label for the sample's z dimension.
+    zSSp : QLineEdit
+        Positive soft limit label for the sample's z dimension.
+    zSHn : QLineEdit
+        Negative hard limit label for the sample's z dimension.
+    zSHp : QLineEdit
+        Positive hard limit label for the sample's z dimension.
+    xON : QPushButton
+        Negative incrment button for the objective' x dimension.
+    xOP : QPushButton
+        Positive incrment button for the objective' x dimension.
+    xOStep : QLineEdit
+        Step size line edit for the objective's x dimension.
+    xOAbsPos : QPushButton
+        Absolute position button for the objective's x dimension.
+    xOMove : QPushButton
+        Move to absolute position button for the objective's x dimension.
+    xOCn : QPushButton
+        Continuous negative motion buttonfor the objective's x dimension.
+    xOStop : QPushButton
+        Stop continuous motion button for the objective's x dimension.
+    xOCp : QPushButton
+        Continuous positive motion buttonfor the objective's x dimension.
+    xOSn : QLineEdit
+        Negative soft limit label for the objective's x dimension.
+    xOSp : QLineEdit
+        Positive soft limit label for the objective's x dimension.
+    xOHn : QLineEdit
+        Negative hard limit label for the objective's x dimension.
+    xOHp : QLineEdit
+        Positive hard limit label for the objective's x dimension.
+    yON : QPushButton
+        Negative incrment button for the objective' y dimension.
+    yOP : QPushButton
+        Positive incrment button for the objective' y dimension.
+    yOStep : QLineEdit
+        Step size line edit for the objective's y dimension.
+    yOAbsPos : QPushButton
+        Absolute position button for the objective's y dimension.
+    yOMove : QPushButton
+        Move to absolute position button for the objective's y dimension.
+    yOCn : QPushButton
+        Continuous negative motion buttonfor the objective's y dimension.
+    yOStop : QPushButton
+        Stop continuous motion button for the objective's y dimension.
+    yOCp : QPushButton
+        Continuous poditive motion buttonfor the objective's y dimension.
+    yOSn : QLineEdit
+        Negative soft limit label for the objective's y dimension.
+    yOSp : QLineEdit
+        Positive soft limit label for the objective's y dimension.
+    yOHn : QLineEdit
+        Negative hard limit label for the objective's y dimension.
+    yOHp : QLineEdit
+        Positive hard limit label for the objective's y dimension.
+    zON : QPushButton
+        Negative incrment button for the objective' z dimension.
+    zOP : QPushButton
+        Positive incrment button for the objective' z dimension.
+    zOStep : QLineEdit
+        Step size line edit for the objective's z dimension.
+    zOAbsPos : QPushButton
+        Absolute position button for the objective's z dimension.
+    zOMove : QPushButton
+        Move to absolute position button for the objective's z dimension.
+    zOCn : QPushButton
+        Continuous negative motion buttonfor the objective's z dimension.
+    zOStop : QPushButton
+        Stop continuous motion button for the objective's z dimension.
+    zOCp : QPushButton
+        Continuous positive motion buttonfor the objective's z dimension.
+    zOSn : QLineEdit
+        Negative soft limit label for the objective's z dimension.
+    zOSp : QLineEdit
+        Positive hard limit label for the objective's z dimension.
+    zOHn : QLineEdit
+        Negative hard limit label for the objective's z dimension.
+    zOHp : QLineEdit
+        Positive hard limit label for the objective's z dimension.
+
+    Methods
+    -------
+    getDiagramWindow()
+        Creates the diagram window.
+    getCameraWindow()
+        Creates the camera window.
+    getTabularWindow()
+        Creates the table window.
+    getSampleWindow()
+        Creates the sample window.
+    getObjectiveWindow()
+        Creates the objective window.
+    """
 
     def __init__(self) -> None:
         """Initialize the GUI."""
 
         super().__init__()
 
+        # Define main GUI window.
         self.setWindowTitle("Horizontal Microscope Control")
         self.setFixedWidth(1300)
         self.setFixedHeight(525)
 
-        # Create main display.
+        # Add sub-windows to main window layout.
         self.layout = QGridLayout()
         self.layout.addWidget(self.getDiagramWindow(), 0, 0, 2, 1)
         self.layout.addWidget(self.getCameraWindow(), 0, 1, 2, 1)
@@ -184,6 +222,7 @@ class GUI(QMainWindow):
         self.layout.addWidget(self.getSampleWindow(), 2, 0, 1, 3)
         self.layout.addWidget(self.getObjectiveWindow(), 3, 0, 1, 3)
 
+        # Set main window layout.
         self.centralWidget = QWidget(self)
         self.setCentralWidget(self.centralWidget)
         self.centralWidget.setLayout(self.layout)
@@ -191,8 +230,7 @@ class GUI(QMainWindow):
         self.show()
 
     def getDiagramWindow(self) -> QLabel:
-        """
-        Generate diagram window.
+        """Create diagram window.
 
         Parameters
         ----------
@@ -209,8 +247,7 @@ class GUI(QMainWindow):
         return window
 
     def getCameraWindow(self) -> QWidget:
-        """
-        Generate camera window.
+        """Create camera window.
 
         Parameters
         ----------
@@ -222,8 +259,7 @@ class GUI(QMainWindow):
             Window representing the live feed and interactive widgets.
         """
         def updateData() -> None:
-            """
-            GUpdate live feed.
+            """Update live feed display.
 
             Parameters
             ----------
@@ -232,31 +268,40 @@ class GUI(QMainWindow):
             Returns
             -------
             None
+
+            Notes
+            -----
+            The red cross hair is added by changing the central three rows and
+            columns of pixels in the image to red (RGB=[225, 0, 0]).
             """
+            # Get new image.
             self.image = getTestImage()
             height = self.image.shape[0]
             width = self.image.shape[1]
 
             # Generate cross hairs
             xLine = np.full((3, width, 3), [225, 0, 0])
-            self.image[height // 2 - 1 : height // 2 + 2, :] = xLine
             yLine = np.full((height, 3, 3), [225, 0, 0])
+            self.image[height // 2 - 1 : height // 2 + 2, :] = xLine
             self.image[:, width // 2 - 1 : width // 2 + 2] = yLine
 
+            # Update image.
             self.img.setImage(self.image)
             QTimer.singleShot(1, updateData)
 
+            # Initialize timer.
             now = ptime.time()
             fps2 = 1.0 / (now - self.updateTime)
             self.updateTime = now
             self.fps = self.fps * 0.9 + fps2 * 0.1
         
+        # Configure camera window.
         self.cameraWindow = QWidget()
         pg.setConfigOptions(antialias=True)
-
         win = pg.GraphicsLayoutWidget()
         self.img = pg.ImageItem(border='w')
 
+        # Create viewing box.
         view = win.addViewBox()
         view.setAspectLocked(True)
         view.addItem(self.img)
@@ -269,11 +314,10 @@ class GUI(QMainWindow):
 
         layout = QGridLayout()
 
+        # Create, modify, and place image capture button and line-edit.
         self.WCB = QPushButton("Image Capture")
         self.SIFN = QLineEdit("File Name")
-
         self.WCB.setStyleSheet("background-color: lightgrey")
-
         layout.addWidget(win, 0, 0, 1, 2)
         layout.addWidget(self.WCB, 1, 0, 1, 1)
         layout.addWidget(self.SIFN, 1, 1, 1, 1)
@@ -283,8 +327,7 @@ class GUI(QMainWindow):
         return self.cameraWindow
 
     def getTabularWindow(self) -> QWidget:
-        """
-        Generates tabular window.
+        """Create tabular window.
 
         Parameters
         ----------
@@ -299,8 +342,7 @@ class GUI(QMainWindow):
         return self.tab
 
     def getSampleWindow(self) -> QWidget:
-        """
-        Generate sample window.
+        """Create sample window.
 
         Parameters
         ----------
@@ -314,6 +356,7 @@ class GUI(QMainWindow):
         window = QWidget()
         layout = QGridLayout()
 
+        # Set column labels.
         layout.addWidget(QLabel("<b>Axis</b>"), 0, 0, 1, 1)
         layout.addWidget(QLabel("<b>Increment Position</b>"), 0, 1, 1, 2)
         layout.addWidget(QLabel("<b>Step Size</b>"), 0, 3, 1, 1)
@@ -325,6 +368,7 @@ class GUI(QMainWindow):
         #   X Sample Axis
         # ---------------------------------------------------------------------
 
+        # Create interactive widgets.
         self.xSN = QPushButton("-")
         self.xSP = QPushButton("+")
         self.xSStep = QLineEdit("0")
@@ -338,6 +382,7 @@ class GUI(QMainWindow):
         self.xSHn = QLabel("Hard -")
         self.xSHp = QLabel("Hard +")
 
+        # Style interactive widgets.
         self.xSN.setStyleSheet("background-color: lightgrey")
         self.xSP.setStyleSheet("background-color: lightgrey")
         self.xSMove.setStyleSheet("background-color: lightgrey")
@@ -349,6 +394,7 @@ class GUI(QMainWindow):
         self.xSHn.setStyleSheet("border: 1px solid black;")
         self.xSHp.setStyleSheet("border: 1px solid black;")
 
+        # Organize widgets on layout.
         layout.addWidget(QLabel("X:"), 1, 0, 1, 1)
         layout.addWidget(self.xSN, 1, 1, 1, 1)
         layout.addWidget(self.xSP, 1, 2, 1, 1)
@@ -367,6 +413,7 @@ class GUI(QMainWindow):
         #   Y Sample Axis
         # ---------------------------------------------------------------------
 
+        # Create interactive widgets.
         self.ySN = QPushButton("-")
         self.ySP = QPushButton("+")
         self.ySStep = QLineEdit("0")
@@ -380,6 +427,7 @@ class GUI(QMainWindow):
         self.ySHn = QLabel("Hard -")
         self.ySHp = QLabel("Hard +")
 
+        # Style interactive widgets.
         self.ySN.setStyleSheet("background-color: lightgrey")
         self.ySP.setStyleSheet("background-color: lightgrey")
         self.ySMove.setStyleSheet("background-color: lightgrey")
@@ -391,6 +439,7 @@ class GUI(QMainWindow):
         self.ySHn.setStyleSheet("border: 1px solid black;")
         self.ySHp.setStyleSheet("border: 1px solid black;")
 
+        # Organize widgets on layout.
         layout.addWidget(QLabel("Y:"), 2, 0, 1, 1)
         layout.addWidget(self.ySN, 2, 1, 1, 1)
         layout.addWidget(self.ySP, 2, 2, 1, 1)
@@ -409,6 +458,7 @@ class GUI(QMainWindow):
         #   Z Sample Axis
         # ---------------------------------------------------------------------
 
+        # Create interactive widgets.
         self.zSN = QPushButton("-")
         self.zSP = QPushButton("+")
         self.zSStep = QLineEdit("0")
@@ -422,6 +472,7 @@ class GUI(QMainWindow):
         self.zSHn = QLabel("Hard -")
         self.zSHp = QLabel("Hard +")
 
+        # Style interactive widgets.
         self.zSN.setStyleSheet("background-color: lightgrey")
         self.zSP.setStyleSheet("background-color: lightgrey")
         self.zSMove.setStyleSheet("background-color: lightgrey")
@@ -433,6 +484,7 @@ class GUI(QMainWindow):
         self.zSHn.setStyleSheet("border: 1px solid black;")
         self.zSHp.setStyleSheet("border: 1px solid black;")
 
+        # Organize widgets on layout.
         layout.addWidget(QLabel("Z:"), 3, 0, 1, 1)
         layout.addWidget(self.zSN, 3, 1, 1, 1)
         layout.addWidget(self.zSP, 3, 2, 1, 1)
@@ -447,12 +499,12 @@ class GUI(QMainWindow):
         layout.addWidget(self.zSHn, 3, 11, 1, 1)
         layout.addWidget(self.zSHp, 3, 12, 1, 1)
 
+        # Set window layout.
         window.setLayout(layout)
         return window
 
     def getObjectiveWindow(self) -> QWidget:
-        """
-        Generate objective window.
+        """Create objective window.
 
         Parameters
         ----------
@@ -466,6 +518,7 @@ class GUI(QMainWindow):
         window = QWidget()
         layout = QGridLayout()
 
+        # Set column labels.
         layout.addWidget(QLabel("<b>Axis</b>"), 0, 0, 1, 1)
         layout.addWidget(QLabel("<b>Increment Position</b>"), 0, 1, 1, 2)
         layout.addWidget(QLabel("<b>Step Size</b>"), 0, 3, 1, 1)
@@ -477,6 +530,7 @@ class GUI(QMainWindow):
         #   X Objective Axis
         # ---------------------------------------------------------------------
 
+        # Create interactive widgets.
         self.xON = QPushButton("-")
         self.xOP = QPushButton("+")
         self.xOStep = QLineEdit("0")
@@ -490,6 +544,7 @@ class GUI(QMainWindow):
         self.xOHn = QLabel("Hard -")
         self.xOHp = QLabel("Hard +")
 
+        # Style interactive widgets.
         self.xON.setStyleSheet("background-color: lightgrey")
         self.xOP.setStyleSheet("background-color: lightgrey")
         self.xOMove.setStyleSheet("background-color: lightgrey")
@@ -501,6 +556,7 @@ class GUI(QMainWindow):
         self.xOHn.setStyleSheet("border: 1px solid black;")
         self.xOHp.setStyleSheet("border: 1px solid black;")
 
+        # Organize widgets on layout.
         layout.addWidget(QLabel("X:"), 1, 0, 1, 1)
         layout.addWidget(self.xON, 1, 1, 1, 1)
         layout.addWidget(self.xOP, 1, 2, 1, 1)
@@ -519,6 +575,7 @@ class GUI(QMainWindow):
         #   Y Objectivs Axis
         # ---------------------------------------------------------------------
 
+        # Create interactive widgets.
         self.yON = QPushButton("-")
         self.yOP = QPushButton("+")
         self.yOStep = QLineEdit("0")
@@ -532,6 +589,7 @@ class GUI(QMainWindow):
         self.yOHn = QLabel("Hard -")
         self.yOHp = QLabel("Hard +")
 
+        # Style interactive widgets.
         self.yON.setStyleSheet("background-color: lightgrey")
         self.yOP.setStyleSheet("background-color: lightgrey")
         self.yOMove.setStyleSheet("background-color: lightgrey")
@@ -543,6 +601,7 @@ class GUI(QMainWindow):
         self.yOHn.setStyleSheet("border: 1px solid black;")
         self.yOHp.setStyleSheet("border: 1px solid black;")
 
+        # Organize widgets on layout.
         layout.addWidget(QLabel("Y:"), 2, 0, 1, 1)
         layout.addWidget(self.yON, 2, 1, 1, 1)
         layout.addWidget(self.yOP, 2, 2, 1, 1)
@@ -561,6 +620,7 @@ class GUI(QMainWindow):
         #   Z Objective Axis
         # ---------------------------------------------------------------------
 
+        # Create interactive widgets.
         self.zON = QPushButton("-")
         self.zOP = QPushButton("+")
         self.zOStep = QLineEdit("0")
@@ -574,6 +634,7 @@ class GUI(QMainWindow):
         self.zOHn = QLabel("Hard -")
         self.zOHp = QLabel("Hard +")
 
+        # Style interactive widgets.
         self.zON.setStyleSheet("background-color: lightgrey")
         self.zOP.setStyleSheet("background-color: lightgrey")
         self.zOMove.setStyleSheet("background-color: lightgrey")
@@ -585,6 +646,7 @@ class GUI(QMainWindow):
         self.zOHn.setStyleSheet("border: 1px solid black;")
         self.zOHp.setStyleSheet("border: 1px solid black;")
 
+        # Organize widgets on layout.
         layout.addWidget(QLabel("Z:"), 3, 0, 1, 1)
         layout.addWidget(self.zON, 3, 1, 1, 1)
         layout.addWidget(self.zOP, 3, 2, 1, 1)
@@ -599,20 +661,138 @@ class GUI(QMainWindow):
         layout.addWidget(self.zOHn, 3, 11, 1, 1)
         layout.addWidget(self.zOHp, 3, 12, 1, 1)
 
+        # Set window layout.
         window.setLayout(layout)
         return window
 
 
-class ImageView(pg.ImageView):
-    """ImageView object"""
-
-    def __init__(self, *args: tuple, **kwargs: Dict[str, any]):
-        """Initialize ImageView object"""
-        pg.ImageView.__init__(self, *args, **kwargs)
-
-
 class MyTableWidget(QWidget):
-    """
+    """GUI table window.
+
+    The MytableWidget class creates the table widget which extends the
+    functionality of the main gui window.
+
+    Parameters
+    ----------
+    parent : Any
+        Defines parent object of the MyTableWidget object.
+    
+    Attributes
+    ----------
+    tabs : QTabWidget
+        Points to the object defining the table window.
+    tab1 : QWidget
+        Status tab of the table window.
+    tab2 : QWidget
+        Mode tab of the table window.
+    tab3 : QWidget
+        Specifications tab of the table window.
+    tab4 : QWidget
+        Limits tab of the table window.
+    tab5 : QWidget
+        Calibration tab of the table window.
+    xIdleS : QLabel
+        Idle label for the sample's x dimension.
+    yIdleS : QLabel
+        Idle label for the sample's y dimension.
+    zIdleS : QLabel
+        Idle label for the sample's z dimension.
+    xStopS : QLabel
+        In-Motion label for the sample's x dimension.
+    yStopS : QLabel
+        In-Motion label for the sample's y dimension.
+    zStopS : QLabel
+        In-Motion label for the sample's z dimension.
+    xIdleO : QLabel
+        Idle label for the objective's x dimension.
+    yIdleO : QLabel
+        Idle label for the objective's y dimension.
+    zIdleO : QLabel
+        Idle label for the objective's z dimension.
+    xStopO : QLabel
+        In-Motion label for the objective's x dimension.
+    yStopO : QLabel
+        In-Motion label for the objective's y dimension.
+    zStopO : QLabel
+        In-Motion label for the objective's z dimension.
+    RDM1 : QRadioButton
+        Transmission mode radio button.
+    RDM2 : QRadioButton
+        Reflection mode radio button.
+    RDM3 : QRadioButton
+        Visible Image mode radio button.
+    RDM4 : QRadioButton
+        Beamsplitter mode radio button.
+    xSMM : QLabel
+        Minimum and maximum label for the sample's x dimension.
+    ySMM : QLabel
+        Minimum and maximum label for the sample's y dimension.
+    zSMM : QLabel
+        Minimum and maximum label for the sample's z dimension.
+    xOMM : QLabel
+        Minimum and maximum label for the objective's x dimension.
+    yOMM : QLabel
+        Minimum and maximum label for the objective's y dimension.
+    zOMM : QLabel
+        Minimum and maximum label for the objective's z dimension.
+    xSMin : QLineEdit
+        Soft limit minimum for the sample's x dimension.
+    xSMax : QLineEdit
+        Soft limit maximum for the sample's x dimension.
+    ySMin : QLineEdit
+        Soft limit minimum for the sample's y dimension.
+    ySMax : QLineEdit
+        Soft limit maximum for the sample's y dimension.
+    zSMin : QLineEdit
+        Soft limit minimum for the sample's z dimension.
+    zSMax : QLineEdit
+        Soft limit maximum for the sample's z dimension.
+    xOMin : QLineEdit
+        Soft limit minimum for the objective's x dimension.
+    xOMax : QLineEdit
+        Soft limit maximum for the objective's x dimension.
+    yOMin : QLineEdit
+        Soft limit minimum for the objective's y dimension.
+    yOMax : QLineEdit
+        Soft limit maximum for the objective's y dimension.
+    zOMin : QLineEdit
+        Soft limit minimum for the objective's z dimension.
+    zOMax : QLineEdit
+        Soft limit maximum for the objective's z dimension.
+    SSL : QPushButton
+        Set soft limits button.
+    SSL : QPushButton
+        Set extreme soft limits button.
+    xSZero : QPushButton
+        Button to zero the sample's x dimension.
+    ySZero : QPushButton
+        Button to zero the sample's y dimension.
+    zSZero : QPushButton
+        Button to zero the sample's z dimension.
+    xSB : QLineEdit
+        Backlash input for the sample's x dimension.
+    ySB : QLineEdit
+        Backlash input for the sample's y dimension.
+    zSB : QLineEdit
+        Backlash input for the sample's z dimension.
+    xOZero : QPushButton
+        Button to zero the objective's x dimension.
+    yOZero : QPushButton
+        Button to zero the objective's y dimension.
+    zOZero : QPushButton
+        Button to zero the objective's z dimension.
+    xOB : QLineEdit
+        Backlash input for the objective's x dimension.
+    yOB : QLineEdit
+        Backlash input for the objective's y dimension.
+    zOB : QLineEdit
+        Backlash input for the objective's z dimension.
+    SBL : QPushButton
+        Update all backlash values button.
+    
+    Methods
+    -------
+    None
     """
 
     def __init__(self, parent: Any) -> None:
@@ -621,6 +801,7 @@ class MyTableWidget(QWidget):
         super(QWidget, self).__init__(parent)
         self.layout = QVBoxLayout(self)
 
+        # Define tab windows.
         self.tabs = QTabWidget()
         self.tab1 = QWidget()
         self.tab2 = QWidget()
@@ -630,6 +811,7 @@ class MyTableWidget(QWidget):
 
         self.tabs.resize(3000, 1000)
 
+        # Add tabs to window layout.
         self.tabs.addTab(self.tab1, "Status")
         self.tabs.addTab(self.tab2, "Mode")
         self.tabs.addTab(self.tab3, "Specifications")
@@ -640,9 +822,10 @@ class MyTableWidget(QWidget):
         #   Tab 1
         # ---------------------------------------------------------------------
 
+        # Define tab layout.
         self.tab1.layout = QGridLayout(self)
 
-        # Sample widgets.
+        # Define interactive sample widgets.
         self.xIdleS = QLabel("IDLE")
         self.yIdleS = QLabel("IDLE")
         self.zIdleS = QLabel("IDLE")
@@ -650,6 +833,7 @@ class MyTableWidget(QWidget):
         self.yStopS = QLabel("In Motion")
         self.zStopS = QLabel("In Motion")
 
+        # Style interactive sample widgets.
         self.xIdleS.setStyleSheet("border: 1px solid black;")
         self.yIdleS.setStyleSheet("border: 1px solid black;")
         self.zIdleS.setStyleSheet("border: 1px solid black;")
@@ -657,6 +841,7 @@ class MyTableWidget(QWidget):
         self.yStopS.setStyleSheet("border: 1px solid black;")
         self.zStopS.setStyleSheet("border: 1px solid black;")
 
+        # Organize sample widgets in the tab layout.
         self.tab1.layout.addWidget(QLabel("<b>Sample</b>"), 0, 1, 1, 3)
         self.tab1.layout.addWidget(QLabel("X:"), 1, 1, 1, 1)
         self.tab1.layout.addWidget(QLabel("Y:"), 2, 1, 1, 1)
@@ -668,7 +853,7 @@ class MyTableWidget(QWidget):
         self.tab1.layout.addWidget(self.yStopS, 2, 3, 1, 1)
         self.tab1.layout.addWidget(self.zStopS, 3, 3, 1, 1)
 
-        # Objective widgets.
+        # Interactive objective widgets.
         self.xIdleO = QLabel("IDLE")
         self.yIdleO = QLabel("IDLE")
         self.zIdleS = QLabel("IDLE")
@@ -676,6 +861,7 @@ class MyTableWidget(QWidget):
         self.yStopO = QLabel("In Motion")
         self.zStopO = QLabel("In Motion")
 
+        # Style interactive sample widgets.
         self.xIdleO.setStyleSheet("border: 1px solid black;")
         self.yIdleO.setStyleSheet("border: 1px solid black;")
         self.zIdleS.setStyleSheet("border: 1px solid black;")
@@ -683,6 +869,7 @@ class MyTableWidget(QWidget):
         self.yStopO.setStyleSheet("border: 1px solid black;")
         self.zStopO.setStyleSheet("border: 1px solid black;")
 
+        # Organize sample widgets in the tab layout.
         self.tab1.layout.addWidget(QLabel("<b>Objective</b>"), 0, 4, 1, 3)
         self.tab1.layout.addWidget(QLabel("X:"), 1, 4, 1, 1)
         self.tab1.layout.addWidget(QLabel("Y:"), 2, 4, 1, 1)
@@ -694,37 +881,44 @@ class MyTableWidget(QWidget):
         self.tab1.layout.addWidget(self.yStopO, 2, 6, 1, 1)
         self.tab1.layout.addWidget(self.zStopO, 3, 6, 1, 1)
 
+        # Set tab layout.
         self.tab1.setLayout(self.tab1.layout)
 
         # ---------------------------------------------------------------------
         #   Tab 2
         # ---------------------------------------------------------------------
 
+        # Define tab layout.
         self.tab2.layout = QVBoxLayout()
 
+        # Define mode select buttons.
         self.RDM1 = QRadioButton("Transmission")
         self.RDM2 = QRadioButton("Reflection")
         self.RDM3 = QRadioButton("Visible Image")
         self.RDM4 = QRadioButton("Beamsplitter")
 
+        # Organize widgets on tab layout.
         self.tab2.layout.addWidget(self.RDM1)
         self.tab2.layout.addWidget(self.RDM2)
         self.tab2.layout.addWidget(self.RDM3)
         self.tab2.layout.addWidget(self.RDM4)
 
+        # Set tab layout.
         self.tab2.setLayout(self.tab2.layout)
 
         # ---------------------------------------------------------------------
         #   Tab 3
         # ---------------------------------------------------------------------
 
+        # Define tab layout.
         self.tab3.layout = QGridLayout()
 
-        # Sample widgets.
+        # Define interactive sample widgets.
         self.xSMM = QLabel(f"{XSMIN_HARD_LIMIT} to {XSMAX_HARD_LIMIT}")
         self.ySMM = QLabel(f"{YSMIN_HARD_LIMIT} to {YSMAX_HARD_LIMIT}")
         self.zSMM = QLabel(f"{ZSMIN_HARD_LIMIT} to {ZSMAX_HARD_LIMIT}")
 
+        # Organize sample widgets in the tab layout.
         self.tab3.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 2)
         self.tab3.layout.addWidget(QLabel("<i>Min to Max</i>"), 1, 1, 1, 1)
         self.tab3.layout.addWidget(QLabel("X:"), 2, 0, 1, 1)
@@ -734,11 +928,12 @@ class MyTableWidget(QWidget):
         self.tab3.layout.addWidget(self.ySMM, 3, 1, 1, 1)
         self.tab3.layout.addWidget(self.zSMM, 4, 1, 1, 1)
 
-        # Objective widgets.
+        # Define interactive objective widgets.
         self.xOMM = QLabel(f"{XOMIN_HARD_LIMIT} to {XOMAX_HARD_LIMIT}")
         self.yOMM = QLabel(f"{YOMIN_HARD_LIMIT} to {YOMAX_HARD_LIMIT}")
         self.zOMM = QLabel(f"{ZOMIN_HARD_LIMIT} to {ZOMAX_HARD_LIMIT}")
 
+        # Organize objective widgets in the tab layout.
         self.tab3.layout.addWidget(QLabel("<b>Objective</b>"), 0, 2, 1, 2)
         self.tab3.layout.addWidget(QLabel("<i>Min to Max</i>"), 1, 3, 1, 1)
         self.tab3.layout.addWidget(QLabel("X:"), 2, 2, 1, 1)
@@ -748,15 +943,17 @@ class MyTableWidget(QWidget):
         self.tab3.layout.addWidget(self.yOMM, 3, 3, 1, 1)
         self.tab3.layout.addWidget(self.zOMM, 4, 3, 1, 1)
 
+        # Set tab layout.
         self.tab3.setLayout(self.tab3.layout)
 
         # ---------------------------------------------------------------------
         #   Tab 4
         # ---------------------------------------------------------------------
 
+        # Define tab layout.
         self.tab4.layout = QGridLayout()
 
-        # Sample widgets.
+        # Define interactive sample widgets.
         self.xSMin = QLineEdit("0")
         self.ySMin = QLineEdit("0")
         self.zSMin = QLineEdit("0")
@@ -764,6 +961,7 @@ class MyTableWidget(QWidget):
         self.ySMax = QLineEdit("0")
         self.zSMax = QLineEdit("0")
 
+        # Organize sample widgets in the tab layout.
         self.tab4.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 3)
         self.tab4.layout.addWidget(QLabel("<i>Min</i>"), 1, 1, 1, 1)
         self.tab4.layout.addWidget(QLabel("<i>Max</i>"), 1, 2, 1, 1)
@@ -777,7 +975,7 @@ class MyTableWidget(QWidget):
         self.tab4.layout.addWidget(self.ySMax, 3, 2, 1, 1)
         self.tab4.layout.addWidget(self.zSMax, 4, 2, 1, 1)
 
-        # Objective widgets.
+        # Define interactive objective widgets.
         self.xOMin = QLineEdit("0")
         self.yOMin = QLineEdit("0")
         self.zOMin = QLineEdit("0")
@@ -785,6 +983,7 @@ class MyTableWidget(QWidget):
         self.yOMax = QLineEdit("0")
         self.zOMax = QLineEdit("0")
 
+        # Organize objective widgets in the tab layout.
         self.tab4.layout.addWidget(QLabel("<b>Objective</b>"), 0, 3, 1, 3)
         self.tab4.layout.addWidget(QLabel("<i>Min</i>"), 1, 4, 1, 1)
         self.tab4.layout.addWidget(QLabel("<i>Max</i>"), 1, 5, 1, 1)
@@ -798,25 +997,25 @@ class MyTableWidget(QWidget):
         self.tab4.layout.addWidget(self.yOMax, 3, 5, 1, 1)
         self.tab4.layout.addWidget(self.zOMax, 4, 5, 1, 1)
 
-        # Additional widgets.
+        # Define, style, and organize additional interactive widgets.
         self.SSL = QPushButton("Set Soft Limits")
         self.SESL = QPushButton("Set Extreme Soft Limits")
-
         self.SSL.setStyleSheet("background-color: lightgrey")
         self.SESL.setStyleSheet("background-color: lightgrey")
-
         self.tab4.layout.addWidget(self.SSL, 5, 0, 1, 3)
         self.tab4.layout.addWidget(self.SESL, 5, 4, 1, 3)
 
+        # Set tab layout.
         self.tab4.setLayout(self.tab4.layout)
 
         # ---------------------------------------------------------------------
         #   Tab 5
         # ---------------------------------------------------------------------
 
+        # Define tab layout.
         self.tab5.layout = QGridLayout()
 
-        # Sample widgets.
+        # Define interactive sample widgets.
         self.xSZero = QPushButton("ZERO")
         self.ySZero = QPushButton("ZERO")
         self.zSZero = QPushButton("ZERO")
@@ -824,10 +1023,12 @@ class MyTableWidget(QWidget):
         self.ySB = QLineEdit(str(YS_BACKLASH))
         self.zSB = QLineEdit(str(ZS_BACKLASH))
 
+        # Style interactive sample widgets.
         self.xSZero.setStyleSheet("background-color: lightgrey")
         self.ySZero.setStyleSheet("background-color: lightgrey")
         self.zSZero.setStyleSheet("background-color: lightgrey")
 
+        # Organize sample widgets in the tab layout.
         self.tab5.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 3)
         self.tab5.layout.addWidget(QLabel("<i>Backlash</i>"), 1, 2, 1, 1)
         self.tab5.layout.addWidget(QLabel("X:"), 2, 0, 1, 1)
@@ -840,7 +1041,7 @@ class MyTableWidget(QWidget):
         self.tab5.layout.addWidget(self.ySB, 3, 2, 1, 1)
         self.tab5.layout.addWidget(self.zSB, 4, 2, 1, 1)
 
-        # Objective widgets.
+        # Define interactive objective widgets.
         self.xOZero = QPushButton("ZERO")
         self.yOZero = QPushButton("ZERO")
         self.zOZero = QPushButton("ZERO")
@@ -848,10 +1049,12 @@ class MyTableWidget(QWidget):
         self.yOB = QLineEdit(str(YO_BACKLASH))
         self.zOB = QLineEdit(str(ZO_BACKLASH))
 
+        # Style interactive objective widgets.
         self.xOZero.setStyleSheet("background-color: lightgrey")
         self.yOZero.setStyleSheet("background-color: lightgrey")
         self.zOZero.setStyleSheet("background-color: lightgrey")
 
+        # Organize objective widgets in the tab layout.
         self.tab5.layout.addWidget(QLabel("<b>Objective</b>"), 0, 3, 1, 3)
         self.tab5.layout.addWidget(QLabel("<i>Backlash</i>"), 1, 5, 1, 1)
         self.tab5.layout.addWidget(QLabel("X:"), 2, 3, 1, 1)
@@ -864,12 +1067,14 @@ class MyTableWidget(QWidget):
         self.tab5.layout.addWidget(self.yOB, 3, 5, 1, 1)
         self.tab5.layout.addWidget(self.zOB, 4, 5, 1, 1)
 
-        # Other widgets.
+        # Define, style, and organize additional interactive widgets.
         self.SBL = QPushButton("Update Backlash Values")
         self.SBL.setStyleSheet("background-color: lightgrey")
         self.tab5.layout.addWidget(self.SBL, 5, 0, 1, 6)
 
+        # Set tab layout.
         self.tab5.setLayout(self.tab5.layout)
 
+        # Set window layout.
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)

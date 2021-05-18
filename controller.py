@@ -5,8 +5,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from functools import partial
-from thorlabs_motor_control import changeModeTEST
+from thorlabs_motor_control import changeMode
 from globals import *
+from epics import caput
 
 
 class Controller:
@@ -115,7 +116,7 @@ class Controller:
             Motor controlling the mode stage.
         """
         modeDict = {"Transmission": 1, "Reflection": 2, "Visible Image": 3, "Beamsplitter": 4}
-        changeModeTEST(mode=modeDict[radioButton.text()], modeMotor=modeMotor)
+        changeMode(mode=modeDict[radioButton.text()], modeMotor=modeMotor)
 
     def incPos(self, object, axis, direction, step):
         """
@@ -136,6 +137,7 @@ class Controller:
         # MAKE CHANGES TO MOTORS
         self.updateAbsPos(object, axis, direction, step)
         self.setRelPos(object, axis)
+        self.moveToPos(object, axis)
 
         #-SIMULATION-----------------------------------------------------------
         Object = {0: 'Sample', 1: 'Objective'}
@@ -186,8 +188,7 @@ class Controller:
             float(QLineEdit.text()) defines the absolute position to use.
         """
         self.setRelPos(object, axis)
-
-        # Move Motor
+        self.moveToPos(object, axis)
         
         #-SIMULATION-----------------------------------------------------------
         Object = {0: 'Sample', 1: 'Objective'}
@@ -346,9 +347,6 @@ class Controller:
         GL[relPosStr] = 0
         lineEdit[(object, axis)].setText("0")
 
-        #-SIMULATION-----------------------------------------------------------
-        self.printPositions()
-        #----------------------------------------------------------------------
     
     def setRelPos(self, object, axis):
         """
@@ -376,16 +374,8 @@ class Controller:
 
         GL[relPos[(object, axis)]] = float(lineEdit[(object, axis)].text())
 
-    #-SIMULATION---------------------------------------------------------------
-        self.printPositions()
 
-    def printPositions(self):
+    def moveToPos(self, object, axis):
         """
         """
-        print(f"XS_BASE_POSITION: {XS_BASE_POSITION}, XS_RELATIVE_POSITION: {XS_RELATIVE_POSITION}")
-        print(f"YS_BASE_POSITION: {YS_BASE_POSITION}, YS_RELATIVE_POSITION: {YS_RELATIVE_POSITION}")
-        print(f"ZS_BASE_POSITION: {ZS_BASE_POSITION}, ZS_RELATIVE_POSITION: {ZS_RELATIVE_POSITION}")
-        print(f"XO_BASE_POSITION: {XO_BASE_POSITION}, XO_RELATIVE_POSITION: {XO_RELATIVE_POSITION}")
-        print(f"YO_BASE_POSITION: {YO_BASE_POSITION}, YO_RELATIVE_POSITION: {YO_RELATIVE_POSITION}")
-        print(f"ZO_BASE_POSITION: {ZO_BASE_POSITION}, ZO_RELATIVE_POSITION: {ZO_RELATIVE_POSITION}")
-    #--------------------------------------------------------------------------
+        pass

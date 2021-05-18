@@ -1,5 +1,5 @@
 """
-Interface with THORLABS motors.
+THORLAB motor integration.
 
 This script allows a user to interface with the THORLAB motor that defines the
 horizontal microscope mode.
@@ -9,17 +9,13 @@ horizontal microscope mode.
 import thorlabs_apt as apt
 
 
-TRANSMISSION_POSITION = 0
-REFLECTION_POSITION = 16.5
-VISIBLE_IMAGE_POSITION = 33
-BEAMSPLITTER_POSITION = 50
-
-MIN_VELOCITY = 0
-MAX_VELOCITY = 10
-ACCELERATION = 3
+TRANSMISSION_POSITION = 36
+REFLECTION_POSITION = 47
+VISIBLE_IMAGE_POSITION = 0
+BEAMSPLITTER_POSITION = 18
 
 
-def defineMotor():
+def initMotor():
     """
     Defines and instantiates the mode motor.
 
@@ -38,12 +34,10 @@ def defineMotor():
     motorSerialNumber = apt.list_available_devices()[0][1]
     modeMotor = apt.Motor(motorSerialNumber)
     modeMotor.enable
-    #modeMotor.set_velocity_parameters(min_vel=MIN_VELOCITY,
-    #                                accn=ACCELERATION,
-    #                                max_vel=MAX_VELOCITY)
     modeMotor.move_home(True)
 
     return modeMotor
+
 
 def changeMode(mode, modeMotor):
     """
@@ -51,7 +45,7 @@ def changeMode(mode, modeMotor):
 
     This function allows users to change the microscopes mode of operation by
     altering THORLAB motor placement.
-    
+
     Parameters
     ----------
     mode : int
@@ -62,7 +56,7 @@ def changeMode(mode, modeMotor):
     Returns
     -------
     None
-    
+
     Usage
     -----
     Must have initiated motor type using defineMotor().
@@ -75,7 +69,7 @@ def changeMode(mode, modeMotor):
         x = VISIBLE_IMAGE_POSITION
     else:
         x = BEAMSPLITTER_POSITION
-    
+
     modeMotor.move_to(value=x, blocking=False)
 
 
@@ -84,19 +78,5 @@ def changeMode(mode, modeMotor):
 # -----------------------------------------------------------------------------
 
 
-def defineMotorTEST():
-    """
-    """
+def initMotorTEST():
     return None
-
-def changeModeTEST(mode, modeMotor):
-    """
-    """
-    if mode == 1:
-        print("Moving to Transmission Mode")
-    elif mode == 2:
-        print("Moving to Reflection Mode")
-    elif mode == 3:
-        print("Moving to Visible Image Mode")
-    else:
-        print("Moving to Beamsplitter Mode")

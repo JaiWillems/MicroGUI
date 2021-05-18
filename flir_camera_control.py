@@ -66,24 +66,3 @@ def getDisplay():
         plt.pause(0.001)
 
         plt.clf()
-
-
-global FIGURE
-FIGURE = plt.figure(1)
-
-def display():
-    """
-    """
-    while 1:
-            # Getting the image data as a numpy array
-            image_data = getTestImage()
-
-            # Draws an image on the current figure
-            plt.imshow(image_data, cmap='gray')
-
-                        # Interval in plt.pause(interval) determines how fast the images are displayed in a GUI
-                        # Interval is in seconds.
-            plt.pause(0.001)
-
-                        # Clear current reference of a figure. This will improve display speed significantly
-            plt.clf()
