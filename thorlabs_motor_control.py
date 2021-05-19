@@ -87,3 +87,4 @@ def changeMode(mode, modeMotor):
 
 def initMotorTEST():
     return None
+ 
