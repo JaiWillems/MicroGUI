@@ -1,8 +1,8 @@
+"""FLIR (Point Grey) camera integration.
 
-
-# -----------------------------------------------------------------------------
-#   Imports
-# -----------------------------------------------------------------------------
+The flir_camera_control module allows the user to interface with the Blackfly
+USB3 camera located within the main GUI display.
+"""
 
 
 from simple_pyspin import Camera
@@ -10,21 +10,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-# -----------------------------------------------------------------------------
-#   Parameters
-# -----------------------------------------------------------------------------
-
-
-IMAGE_INTERVAL = 0.001
-
-
-# -----------------------------------------------------------------------------
-#   Control Code
-# -----------------------------------------------------------------------------
-
-
 def getImages():
-    """
+    """Capture image.
+
+    This function interfaces with a compatible and connected FLIR camera to
+    capture an image and return the image data.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    nd.array
+        Multi-dimensional Numpy array encoding the captured image information.
     """
     with Camera() as cam:
 

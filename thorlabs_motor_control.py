@@ -1,5 +1,4 @@
-"""
-THORLAB motor integration.
+"""THORLAB motor integration.
 
 This script allows a user to interface with the THORLAB motor that defines the
 horizontal microscope mode.
