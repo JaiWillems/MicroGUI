@@ -65,4 +65,3 @@ def getDisplay():
         plt.pause(0.001)
 
         plt.clf()
-
