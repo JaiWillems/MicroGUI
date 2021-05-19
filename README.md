@@ -22,3 +22,8 @@ $ pip install --user <PySpin_ehl_file>
 
 # Run
 To run the microgui project, ensure you are running on the FAR-IR desktop (either directly or remotely) and run the main.py file.
+
+# Conditions on Use
+In addition to having dependencies installed, various points of consideration should be made to ensure proper operation of the microgui.
+* All hardware should be connected before program initiation.
+* Thorlabs Kinesis software should not be operational when instantiating the program.
