@@ -1,3 +1,11 @@
+"""Global variables for the microgui project.
+
+The globals module defines global variables used throughout the various modules
+of the microgui project. These variables act as placeholders for system
+parameters, both constant and variable.
+"""
+
+# Define and instantiate hard limit constants.
 global XSMIN_HARD_LIMIT
 global XSMAX_HARD_LIMIT
 global YSMIN_HARD_LIMIT
@@ -24,6 +32,7 @@ YOMAX_HARD_LIMIT = 1000
 ZOMIN_HARD_LIMIT = -1000
 ZOMAX_HARD_LIMIT = 1000
 
+# Define and instantiate soft limit variables.
 global XSMIN_SOFT_LIMIT
 global XSMAX_SOFT_LIMIT
 global YSMIN_SOFT_LIMIT
@@ -50,6 +59,7 @@ YOMAX_SOFT_LIMIT = 1000
 ZOMIN_SOFT_LIMIT = -1000
 ZOMAX_SOFT_LIMIT = 1000
 
+# Define and instantiate backlash variables.
 global XS_BACKLASH
 global YS_BACKLASH
 global ZS_BACKLASH
@@ -64,6 +74,7 @@ XO_BACKLASH = 0
 YO_BACKLASH = 0
 ZO_BACKLASH = 0
 
+# Define and instantiate base position variables.
 global XS_BASE_POSITION
 global YS_BASE_POSITION
 global ZS_BASE_POSITION
@@ -78,6 +89,7 @@ XO_BASE_POSITION = 0
 YO_BASE_POSITION = 0
 ZO_BASE_POSITION = 0
 
+# Define and instantiate relative position variables.
 global XS_RELATIVE_POSITION
 global YS_RELATIVE_POSITION
 global ZS_RELATIVE_POSITION
@@ -92,9 +104,14 @@ XO_RELATIVE_POSITION = 0
 YO_RELATIVE_POSITION = 0
 ZO_RELATIVE_POSITION = 0
 
-# Process Variables
-# Horizontal -> x, vertical -> y, focus -> z.
+# -----------------------------------------------------------------------------
+# Axis definition for sample and objective stages:                            -
+#  - axisHorizontal -> x,                                                     -
+#  - vertical -> y, and                                                       -
+#  - focus -> z.                                                              -
+# -----------------------------------------------------------------------------
 
+# Define and initantiate process variables for the sample's x dimension.
 global XSN
 global XSP
 global XSSTEP
@@ -123,6 +140,7 @@ XSHP = "SMTR1601-1-R10-28:cw"
 XSZERO = "fihr:SMTR1601-1-R10-28:setAsZero"
 XSB = "fihr:SMTR1601-1-R10-28:step:backlash"
 
+# Define and initantiate process variables for the sample's y dimension.
 global YSN
 global YSP
 global YSSTEP
@@ -151,6 +169,7 @@ YSHP = "SMTR1601-1-R10-29:cw"
 YSZERO = "fihr:SMTR1601-1-R10-29:setAsZero"
 YSB = "fihr:SMTR1601-1-R10-29:step:backlash"
 
+# Define and initantiate process variables for the sample's z dimension.
 global ZSN
 global ZSP
 global ZSSTEP
@@ -179,6 +198,7 @@ ZSHP = "SMTR1601-1-R10-30:cw"
 ZSZERO = "fihr:SMTR1601-1-R10-30:setAsZero"
 ZSB = "fihr:SMTR1601-1-R10-30:step:backlash"
 
+# Define and initantiate process variables for the objective's x dimension.
 global XON
 global XOP
 global XOSTEP
@@ -207,6 +227,7 @@ XOHP = "SMTR1601-1-R10-27:cw"
 XOZERO = "obj:SMTR1601-1-R10-27:setAsZero"
 XOB = "obj:SMTR1601-1-R10-27:step:backlash"
 
+# Define and initantiate process variables for the objective's y dimension.
 global YON
 global YOP
 global YOSTEP
@@ -235,6 +256,7 @@ YOHP = "SMTR1601-1-R10-31:cw"
 YOZERO = "obj:SMTR1601-1-R10-31:setAsZero"
 YOB = "obj:SMTR1601-1-R10-31:step:backlash"
 
+# Define and initantiate process variables for the objective's z dimension.
 global ZON
 global ZOP
 global ZOSTEP
