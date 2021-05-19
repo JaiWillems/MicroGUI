@@ -31,7 +31,14 @@ def initMotor():
     -------
     modeMotor : Motor object defined by thorlabs_apt.
     """
-    motorSerialNumber = apt.list_available_devices()[0][1]
+    devices = apt.list_available_devices()
+
+    try:
+        motorSerialNumber = devices[0][1]
+    except:
+        raise Exception("No motor detected. Ensure the device is connected.")
+
+    # Initialize motor if detected.
     modeMotor = apt.Motor(motorSerialNumber)
     modeMotor.enable
     modeMotor.move_home(True)
@@ -59,8 +66,9 @@ def changeMode(mode, modeMotor):
 
     Usage
     -----
-    Must have initiated motor type using defineMotor().
+    Must have initiated motor type using initMotor().
     """
+    # Set move_to position based on mode.
     if mode == 1:
         x = TRANSMISSION_POSITION
     elif mode == 2:

@@ -282,8 +282,8 @@ class GUI(QMainWindow):
             # Generate cross hairs
             xLine = np.full((3, width, 3), [225, 0, 0])
             yLine = np.full((height, 3, 3), [225, 0, 0])
-            self.image[height // 2 - 1 : height // 2 + 2, :] = xLine
-            self.image[:, width // 2 - 1 : width // 2 + 2] = yLine
+            self.image[height // 2 - 1:height // 2 + 2, :] = xLine
+            self.image[:, width // 2 - 1:width // 2 + 2] = yLine
 
             # Update image.
             self.img.setImage(self.image)
@@ -294,7 +294,7 @@ class GUI(QMainWindow):
             fps2 = 1.0 / (now - self.updateTime)
             self.updateTime = now
             self.fps = self.fps * 0.9 + fps2 * 0.1
-        
+
         # Configure camera window.
         self.cameraWindow = QWidget()
         pg.setConfigOptions(antialias=True)
@@ -676,7 +676,7 @@ class MyTableWidget(QWidget):
     ----------
     parent : Any
         Defines parent object of the MyTableWidget object.
-    
+
     Attributes
     ----------
     tabs : QTabWidget
@@ -789,7 +789,7 @@ class MyTableWidget(QWidget):
         Backlash input for the objective's z dimension.
     SBL : QPushButton
         Update all backlash values button.
-    
+
     Methods
     -------
     None
