@@ -72,6 +72,7 @@ class Controller:
         Control sequence to update the relative position global variables.
     """
 
+
     def __init__(self, gui: GUI, modeMotor: Any) -> None:
         """Initialize the Controller."""
         self.gui = gui
