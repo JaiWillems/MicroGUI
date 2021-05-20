@@ -2,6 +2,8 @@
 
 The controller module brings life to the GUI defined through the gui module by
 connecting widgets up to control sequences that bring about change.
+
+TEST
 """
 
 
