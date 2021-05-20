@@ -2,8 +2,6 @@
 
 The controller module brings life to the GUI defined through the gui module by
 connecting widgets up to control sequences that bring about change.
-
-TEST
 """
 
 
@@ -73,6 +71,7 @@ class Controller:
     setRelPos(object, axis)
         Control sequence to update the relative position global variables.
     """
+
 
     def __init__(self, gui: GUI, modeMotor: Any) -> None:
         """Initialize the Controller."""
