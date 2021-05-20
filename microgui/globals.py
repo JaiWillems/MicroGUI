@@ -115,6 +115,7 @@ ZO_RELATIVE_POSITION = 0
 global XSN
 global XSP
 global XSSTEP
+global XSABSPOS
 global XSMOVE
 global XSCN
 global XSSTOP
@@ -129,6 +130,7 @@ global XSB
 XSN = "fihr:SMTR1601-1-R10-28:step:moveDeltaIn"
 XSP = "fihr:SMTR1601-1-R10-28:step:moveDeltaOut"
 XSSTEP = "fihr:SMTR1601-1-R10-28:step:delta"
+XSABSPOS = "fihr:SMTR1601-1-R10-28:step:c:target"
 XSMOVE = "fihr:SMTR1601-1-R10-28:step:c:moveTo"
 XSCN = "SMTR1601-1-R10-28:step"
 XSSTOP = "SMTR1601-1-R10-28:emergStop"
@@ -144,6 +146,7 @@ XSB = "fihr:SMTR1601-1-R10-28:step:backlash"
 global YSN
 global YSP
 global YSSTEP
+global YSABSPOS
 global YSMOVE
 global YSCN
 global YSSTOP
@@ -158,6 +161,7 @@ global YSB
 YSN = "fihr:SMTR1601-1-R10-29:step:moveDeltaOut"
 YSP = "fihr:SMTR1601-1-R10-29:step:moveDeltaIn"
 YSSTEP = "fihr:SMTR1601-1-R10-29:step:delta"
+YSABSPOS = "fihr:SMTR1601-1-R10-29:step:c:target"
 YSMOVE = "fihr:SMTR1601-1-R10-29:step:c:moveTo"
 YSCN = "SMTR1601-1-R10-29:step"
 YSSTOP = "SMTR1601-1-R10-29:emergStop"
@@ -173,6 +177,7 @@ YSB = "fihr:SMTR1601-1-R10-29:step:backlash"
 global ZSN
 global ZSP
 global ZSSTEP
+global ZSABSPOS
 global ZSMOVE
 global ZSCN
 global ZSSTOP
@@ -187,6 +192,7 @@ global ZSB
 ZSN = "fihr:SMTR1601-1-R10-30:step:moveDeltaOut"
 ZSP = "fihr:SMTR1601-1-R10-30:step:moveDeltaIn"
 ZSSTEP = "fihr:SMTR1601-1-R10-30:step:delta"
+ZSABSPOS = "fihr:SMTR1601-1-R10-30:step:c:target"
 ZSMOVE = "fihr:SMTR1601-1-R10-30:step:c:moveTo"
 ZSCN = "SMTR1601-1-R10-30:step"
 ZSSTOP = "SMTR1601-1-R10-30:emergStop"
@@ -202,6 +208,7 @@ ZSB = "fihr:SMTR1601-1-R10-30:step:backlash"
 global XON
 global XOP
 global XOSTEP
+global XOABSPOS
 global XOMOVE
 global XOCN
 global XOSTOP
@@ -216,6 +223,7 @@ global XOB
 XON = "obj:SMTR1601-1-R10-27:step:moveDeltaIn"
 XOP = "obj:SMTR1601-1-R10-27:step:moveDeltaOut"
 XOSTEP = "obj:SMTR1601-1-R10-27:step:delta"
+XOABSPOS = "fihr:SMTR1601-1-R10-27:step:c:target"
 XSMOVE = "obj:SMTR1601-1-R10-27:step:c:moveTo"
 XOCN = "SMTR1601-1-R10-27:step"
 XOSTOP = "SMTR1601-1-R10-27:emergStop"
@@ -231,6 +239,7 @@ XOB = "obj:SMTR1601-1-R10-27:step:backlash"
 global YON
 global YOP
 global YOSTEP
+global YOABSPOS
 global YOMOVE
 global YOCN
 global YOSTOP
@@ -245,6 +254,7 @@ global YOB
 YON = "obj:SMTR1601-1-R10-31:step:moveDeltaIn"
 YOP = "obj:SMTR1601-1-R10-31:step:moveDeltaOut"
 YOSTEP = "obj:SMTR1601-1-R10-31:step:delta"
+YOABSPOS = "fihr:SMTR1601-1-R10-31:step:c:target"
 YSMOVE = "obj:SMTR1601-1-R10-31:step:c:moveTo"
 YOCN = "SMTR1601-1-R10-31:step"
 YOSTOP = "SMTR1601-1-R10-31:emergStop"
@@ -260,6 +270,7 @@ YOB = "obj:SMTR1601-1-R10-31:step:backlash"
 global ZON
 global ZOP
 global ZOSTEP
+global ZOABSPOS
 global ZOMOVE
 global ZOCN
 global ZOSTOP
@@ -274,6 +285,7 @@ global ZOB
 ZON = "obj:SMTR1601-1-R10-32:step:moveDeltaOut"
 ZOP = "obj:SMTR1601-1-R10-32:step:moveDeltaIn"
 ZOSTEP = "obj:SMTR1601-1-R10-32:step:delta"
+ZOABSPOS = "fihr:SMTR1601-1-R10-32:step:c:target"
 ZSMOVE = "obj:SMTR1601-1-R10-32:step:c:moveTo"
 ZOCN = "SMTR1601-1-R10-32:step"
 ZOSTOP = "SMTR1601-1-R10-32:emergStop"
