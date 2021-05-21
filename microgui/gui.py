@@ -238,7 +238,7 @@ class GUI(QMainWindow):
 
         Returns
         -------
-        window : QLabel
+        QLabel
             Window representing the diagram display.
         """
         window = QLabel()
@@ -255,7 +255,7 @@ class GUI(QMainWindow):
 
         Returns
         -------
-        window : QWidget
+        QWidget
             Window representing the live feed and interactive widgets.
         """
         def updateData() -> None:
@@ -335,7 +335,7 @@ class GUI(QMainWindow):
 
         Returns
         -------
-        tab : MyTableWidget(QWidget)
+        MyTableWidget(QWidget)
             Object representing the tabular widget.
         """
         self.tab = MyTableWidget(self)
@@ -350,7 +350,7 @@ class GUI(QMainWindow):
 
         Returns
         -------
-        window : QWidget
+        QWidget
             Window representing the sample interactive widgets.
         """
         window = QWidget()
@@ -512,7 +512,7 @@ class GUI(QMainWindow):
 
         Returns
         -------
-        window : QWidget
+        QWidget
             Window representing the objective interactive widgets.
         """
         window = QWidget()

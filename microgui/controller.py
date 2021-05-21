@@ -282,6 +282,10 @@ class Controller:
         axis : {"X", "Y", "Z"}
             Defines the motor axis as x, y, or z using "X", "Y", "Z",
             respectively.
+
+        Returns
+        -------
+        None
         """
         self.setRelPos(object, axis)
         self.moveToPos(object, axis)

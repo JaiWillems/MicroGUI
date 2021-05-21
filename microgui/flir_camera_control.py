@@ -22,7 +22,7 @@ def getImage():
 
     Returns
     -------
-    nd.array
+    np.ndarray
         Multi-dimensional Numpy array encoding the captured image information.
     """
     with Camera() as cam:
@@ -34,14 +34,3 @@ def getImage():
         cam.stop()
 
     return image
-
-
-# -----------------------------------------------------------------------------
-#   Simulation
-# -----------------------------------------------------------------------------
-
-
-def getTestImage():
-    """
-    """
-    return np.random.randint(0, 255, size=(400, 200, 3)).astype('uint8')
