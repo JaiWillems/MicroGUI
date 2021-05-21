@@ -27,7 +27,7 @@ def getImages():
     """
     with Camera() as cam:
 
-        cam.PixelFormat = "RGB"
+        cam.PixelFormat = "RGB8"
 
         cam.start()
         image = cam.get_array()
