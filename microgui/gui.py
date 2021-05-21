@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import QMainWindow, QGridLayout, QVBoxLayout, QWidget,\
                             QTabWidget
 
 # Import file dependencies.
-from flir_camera_control import getTestImage
+from flir_camera_control import getImage
 from globals import *
 
 
@@ -275,7 +275,7 @@ class GUI(QMainWindow):
             columns of pixels in the image to red (RGB=[225, 0, 0]).
             """
             # Get new image.
-            self.image = getTestImage()
+            self.image = getImage()
             height = self.image.shape[0]
             width = self.image.shape[1]
 

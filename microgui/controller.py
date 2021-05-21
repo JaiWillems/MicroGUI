@@ -72,7 +72,6 @@ class Controller:
         Control sequence to update the relative position global variables.
     """
 
-
     def __init__(self, gui: GUI, modeMotor: Any) -> None:
         """Initialize the Controller."""
         self.gui = gui
@@ -269,8 +268,7 @@ class Controller:
         self.setRelPos(object, axis)
         self.moveToPos(object, axis)
     
-    def absMove(self, object: Literal[0, 1], axis: Literal[0, 1, 2], pos:
-                QLineEdit) -> None:
+    def absMove(self, object: Literal[0, 1], axis: Literal[0, 1, 2]) -> None:
         """Move sample or objective motor to specified position.
 
         This method moves the motor defined by 'object' and 'axis' to the
@@ -284,8 +282,6 @@ class Controller:
         axis : {"X", "Y", "Z"}
             Defines the motor axis as x, y, or z using "X", "Y", "Z",
             respectively.
-        pos : QLineEdit
-            float(QLineEdit.text()) defines the absolute position to use.
         """
         self.setRelPos(object, axis)
         self.moveToPos(object, axis)
@@ -351,7 +347,7 @@ class Controller:
         """
         GL = globals()
 
-        pvName = GL(f"{axis}{object}MOVE")
+        pvName = GL[f"{axis}{object}MOVE"]
 
         caput(pvName, 1)
         caput(pvName, 0)
