@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def getImages():
+def getImage():
     """Capture image.
 
     This function interfaces with a compatible and connected FLIR camera to
