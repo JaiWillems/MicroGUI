@@ -287,7 +287,7 @@ class GUI(QMainWindow):
             display[:, width // 2 - 1:width // 2 + 2] = yLine
 
             # Update image.
-            self.img.setImage(display)
+            self.img.setImage(np.rot90(display, 3))
             QTimer.singleShot(1, updateData)
 
             # Initialize timer.
