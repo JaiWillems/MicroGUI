@@ -238,7 +238,7 @@ class GUI(QMainWindow):
 
         Returns
         -------
-        window : QLabel
+        QLabel
             Window representing the diagram display.
         """
         window = QLabel()
@@ -255,7 +255,7 @@ class GUI(QMainWindow):
 
         Returns
         -------
-        window : QWidget
+        QWidget
             Window representing the live feed and interactive widgets.
         """
         def updateData() -> None:
@@ -275,18 +275,19 @@ class GUI(QMainWindow):
             columns of pixels in the image to red (RGB=[225, 0, 0]).
             """
             # Get new image.
-            self.image = getImage()
+            self.image = np.copy(getImage())
             height = self.image.shape[0]
             width = self.image.shape[1]
 
             # Generate cross hairs
             xLine = np.full((3, width, 3), [225, 0, 0])
             yLine = np.full((height, 3, 3), [225, 0, 0])
-            self.image[height // 2 - 1:height // 2 + 2, :] = xLine
-            self.image[:, width // 2 - 1:width // 2 + 2] = yLine
+            display = self.image
+            display[height // 2 - 1:height // 2 + 2, :] = xLine
+            display[:, width // 2 - 1:width // 2 + 2] = yLine
 
             # Update image.
-            self.img.setImage(self.image)
+            self.img.setImage(display)
             QTimer.singleShot(1, updateData)
 
             # Initialize timer.
@@ -335,7 +336,7 @@ class GUI(QMainWindow):
 
         Returns
         -------
-        tab : MyTableWidget(QWidget)
+        MyTableWidget(QWidget)
             Object representing the tabular widget.
         """
         self.tab = MyTableWidget(self)
@@ -350,7 +351,7 @@ class GUI(QMainWindow):
 
         Returns
         -------
-        window : QWidget
+        QWidget
             Window representing the sample interactive widgets.
         """
         window = QWidget()
@@ -389,10 +390,10 @@ class GUI(QMainWindow):
         self.xSCn.setStyleSheet("background-color: lightgrey")
         self.xSStop.setStyleSheet("background-color: red")
         self.xSCp.setStyleSheet("background-color: lightgrey")
-        self.xSSn.setStyleSheet("border: 1px solid black;")
-        self.xSSp.setStyleSheet("border: 1px solid black;")
-        self.xSHn.setStyleSheet("border: 1px solid black;")
-        self.xSHp.setStyleSheet("border: 1px solid black;")
+        self.xSSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xSSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xSHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xSHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("X:"), 1, 0, 1, 1)
@@ -434,10 +435,10 @@ class GUI(QMainWindow):
         self.ySCn.setStyleSheet("background-color: lightgrey")
         self.ySStop.setStyleSheet("background-color: red")
         self.ySCp.setStyleSheet("background-color: lightgrey")
-        self.ySSn.setStyleSheet("border: 1px solid black;")
-        self.ySSp.setStyleSheet("border: 1px solid black;")
-        self.ySHn.setStyleSheet("border: 1px solid black;")
-        self.ySHp.setStyleSheet("border: 1px solid black;")
+        self.ySSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.ySSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.ySHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.ySHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Y:"), 2, 0, 1, 1)
@@ -479,10 +480,10 @@ class GUI(QMainWindow):
         self.zSCn.setStyleSheet("background-color: lightgrey")
         self.zSStop.setStyleSheet("background-color: red")
         self.zSCp.setStyleSheet("background-color: lightgrey")
-        self.zSSn.setStyleSheet("border: 1px solid black;")
-        self.zSSp.setStyleSheet("border: 1px solid black;")
-        self.zSHn.setStyleSheet("border: 1px solid black;")
-        self.zSHp.setStyleSheet("border: 1px solid black;")
+        self.zSSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zSSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zSHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zSHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Z:"), 3, 0, 1, 1)
@@ -512,7 +513,7 @@ class GUI(QMainWindow):
 
         Returns
         -------
-        window : QWidget
+        QWidget
             Window representing the objective interactive widgets.
         """
         window = QWidget()
@@ -551,10 +552,10 @@ class GUI(QMainWindow):
         self.xOCn.setStyleSheet("background-color: lightgrey")
         self.xOStop.setStyleSheet("background-color: red")
         self.xOCp.setStyleSheet("background-color: lightgrey")
-        self.xOSn.setStyleSheet("border: 1px solid black;")
-        self.xOSp.setStyleSheet("border: 1px solid black;")
-        self.xOHn.setStyleSheet("border: 1px solid black;")
-        self.xOHp.setStyleSheet("border: 1px solid black;")
+        self.xOSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xOSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xOHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("X:"), 1, 0, 1, 1)
@@ -596,10 +597,10 @@ class GUI(QMainWindow):
         self.yOCn.setStyleSheet("background-color: lightgrey")
         self.yOStop.setStyleSheet("background-color: red")
         self.yOCp.setStyleSheet("background-color: lightgrey")
-        self.yOSn.setStyleSheet("border: 1px solid black;")
-        self.yOSp.setStyleSheet("border: 1px solid black;")
-        self.yOHn.setStyleSheet("border: 1px solid black;")
-        self.yOHp.setStyleSheet("border: 1px solid black;")
+        self.yOSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.yOSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.yOHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.yOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Y:"), 2, 0, 1, 1)
@@ -641,10 +642,10 @@ class GUI(QMainWindow):
         self.zOCn.setStyleSheet("background-color: lightgrey")
         self.zOStop.setStyleSheet("background-color: red")
         self.zOCp.setStyleSheet("background-color: lightgrey")
-        self.zOSn.setStyleSheet("border: 1px solid black;")
-        self.zOSp.setStyleSheet("border: 1px solid black;")
-        self.zOHn.setStyleSheet("border: 1px solid black;")
-        self.zOHp.setStyleSheet("border: 1px solid black;")
+        self.zOSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zOSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zOHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Z:"), 3, 0, 1, 1)
@@ -834,12 +835,12 @@ class MyTableWidget(QWidget):
         self.zStopS = QLabel("In Motion")
 
         # Style interactive sample widgets.
-        self.xIdleS.setStyleSheet("border: 1px solid black;")
-        self.yIdleS.setStyleSheet("border: 1px solid black;")
-        self.zIdleS.setStyleSheet("border: 1px solid black;")
-        self.xStopS.setStyleSheet("border: 1px solid black;")
-        self.yStopS.setStyleSheet("border: 1px solid black;")
-        self.zStopS.setStyleSheet("border: 1px solid black;")
+        self.xIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.yIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xStopS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.yStopS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zStopS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize sample widgets in the tab layout.
         self.tab1.layout.addWidget(QLabel("<b>Sample</b>"), 0, 1, 1, 3)
@@ -862,12 +863,12 @@ class MyTableWidget(QWidget):
         self.zStopO = QLabel("In Motion")
 
         # Style interactive sample widgets.
-        self.xIdleO.setStyleSheet("border: 1px solid black;")
-        self.yIdleO.setStyleSheet("border: 1px solid black;")
-        self.zIdleS.setStyleSheet("border: 1px solid black;")
-        self.xStopO.setStyleSheet("border: 1px solid black;")
-        self.yStopO.setStyleSheet("border: 1px solid black;")
-        self.zStopO.setStyleSheet("border: 1px solid black;")
+        self.xIdleO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.yIdleO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xStopO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.yStopO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zStopO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize sample widgets in the tab layout.
         self.tab1.layout.addWidget(QLabel("<b>Objective</b>"), 0, 4, 1, 3)

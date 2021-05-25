@@ -126,6 +126,7 @@ global XSHN
 global XSHP
 global XSZERO
 global XSB
+global XSSTATE
 
 XSN = "fihr:SMTR1601-1-R10-28:step:moveDeltaIn"
 XSP = "fihr:SMTR1601-1-R10-28:step:moveDeltaOut"
@@ -141,6 +142,7 @@ XSHN = "SMTR1601-1-R10-28:ccw"
 XSHP = "SMTR1601-1-R10-28:cw"
 XSZERO = "fihr:SMTR1601-1-R10-28:setAsZero"
 XSB = "fihr:SMTR1601-1-R10-28:step:backlash"
+XSSTATE = "SMTR1601-1-R10-28:state"
 
 # Define and initantiate process variables for the sample's y dimension.
 global YSN
@@ -157,6 +159,7 @@ global YSHN
 global YSHP
 global YSZERO
 global YSB
+global YSSTATE
 
 YSN = "fihr:SMTR1601-1-R10-29:step:moveDeltaOut"
 YSP = "fihr:SMTR1601-1-R10-29:step:moveDeltaIn"
@@ -172,6 +175,7 @@ YSHN = "SMTR1601-1-R10-29:ccw"
 YSHP = "SMTR1601-1-R10-29:cw"
 YSZERO = "fihr:SMTR1601-1-R10-29:setAsZero"
 YSB = "fihr:SMTR1601-1-R10-29:step:backlash"
+YSSTATE = "SMTR1601-1-R10-29:state"
 
 # Define and initantiate process variables for the sample's z dimension.
 global ZSN
@@ -188,6 +192,7 @@ global ZSHN
 global ZSHP
 global ZSZERO
 global ZSB
+global ZSSTATE
 
 ZSN = "fihr:SMTR1601-1-R10-30:step:moveDeltaOut"
 ZSP = "fihr:SMTR1601-1-R10-30:step:moveDeltaIn"
@@ -203,6 +208,7 @@ ZSHN = "SMTR1601-1-R10-30:ccw"
 ZSHP = "SMTR1601-1-R10-30:cw"
 ZSZERO = "fihr:SMTR1601-1-R10-30:setAsZero"
 ZSB = "fihr:SMTR1601-1-R10-30:step:backlash"
+ZSSTATE = "SMTR1601-1-R10-30:state"
 
 # Define and initantiate process variables for the objective's x dimension.
 global XON
@@ -219,6 +225,7 @@ global XOHN
 global XOHP
 global XOZERO
 global XOB
+global XOSTATE
 
 XON = "obj:SMTR1601-1-R10-27:step:moveDeltaIn"
 XOP = "obj:SMTR1601-1-R10-27:step:moveDeltaOut"
@@ -234,6 +241,7 @@ XOHN = "SMTR1601-1-R10-27:ccw"
 XOHP = "SMTR1601-1-R10-27:cw"
 XOZERO = "obj:SMTR1601-1-R10-27:setAsZero"
 XOB = "obj:SMTR1601-1-R10-27:step:backlash"
+XOSTATE = "SMTR1601-1-R10-27:state"
 
 # Define and initantiate process variables for the objective's y dimension.
 global YON
@@ -250,6 +258,7 @@ global YOHN
 global YOHP
 global YOZERO
 global YOB
+global YOSTATE
 
 YON = "obj:SMTR1601-1-R10-31:step:moveDeltaIn"
 YOP = "obj:SMTR1601-1-R10-31:step:moveDeltaOut"
@@ -265,6 +274,7 @@ YOHN = "SMTR1601-1-R10-31:ccw"
 YOHP = "SMTR1601-1-R10-31:cw"
 YOZERO = "obj:SMTR1601-1-R10-31:setAsZero"
 YOB = "obj:SMTR1601-1-R10-31:step:backlash"
+YOSTATE = "SMTR1601-1-R10-31:state"
 
 # Define and initantiate process variables for the objective's z dimension.
 global ZON
@@ -281,6 +291,7 @@ global ZOHN
 global ZOHP
 global ZOZERO
 global ZOB
+global ZOSTATE
 
 ZON = "obj:SMTR1601-1-R10-32:step:moveDeltaOut"
 ZOP = "obj:SMTR1601-1-R10-32:step:moveDeltaIn"
@@ -296,3 +307,4 @@ ZOHN = "SMTR1601-1-R10-32:cw"
 ZOHP = "SMTR1601-1-R10-32:ccw"
 ZOZERO = "obj:SMTR1601-1-R10-32:setAsZero"
 ZOB = "obj:SMTR1601-1-R10-32:step:backlash"
+ZOSTATE = "SMTR1601-1-R10-32:state"

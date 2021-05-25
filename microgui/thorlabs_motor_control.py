@@ -28,7 +28,8 @@ def initMotor():
 
     Returns
     -------
-    modeMotor : Motor object defined by thorlabs_apt.
+    Motor
+        Motor object defined by thorlabs_apt.
     """
     devices = apt.list_available_devices()
 
@@ -40,7 +41,11 @@ def initMotor():
     # Initialize motor if detected.
     modeMotor = apt.Motor(motorSerialNumber)
     modeMotor.enable
-    modeMotor.move_home(True)
+
+    try:
+        modeMotor.move_home(True)
+    except:
+        raise Exception("Motor cannot be homed.")
 
     return modeMotor
 
@@ -63,9 +68,9 @@ def changeMode(mode, modeMotor):
     -------
     None
 
-    Usage
+    Notes
     -----
-    Must have initiated motor type using initMotor().
+    modeMotor must have been initiated using initMotor().
     """
     # Set move_to position based on mode.
     if mode == 1:
@@ -77,14 +82,4 @@ def changeMode(mode, modeMotor):
     else:
         x = BEAMSPLITTER_POSITION
 
-    modeMotor.move_to(value=x, blocking=False)
-
-
-# -----------------------------------------------------------------------------
-#   Simulation
-# -----------------------------------------------------------------------------
-
-
-def initMotorTEST():
-    return None
- 
+    modeMotor.move_to(value=x, blocking=False) 
