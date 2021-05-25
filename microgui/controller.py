@@ -267,6 +267,7 @@ class Controller:
         self.updateAbsPos(object, axis, direction, step)
         self.setRelPos(object, axis)
         self.moveToPos(object, axis)
+        self.checkLimits(object, axis)
     
     def absMove(self, object: Literal[0, 1], axis: Literal[0, 1, 2]) -> None:
         """Move sample or objective motor to specified position.
@@ -289,6 +290,7 @@ class Controller:
         """
         self.setRelPos(object, axis)
         self.moveToPos(object, axis)
+        self.checkLimits(object, axis)
     
     def continuousMotion(self, object: Literal["S", "O"], axis:
                          Literal["X", "Y", "Z"], type:
@@ -328,6 +330,8 @@ class Controller:
         else:
             pvName = GL[f"{axis}{object}STOP"]
             caput(pvName, 1)
+            self.setRelPos(object, axis)
+            self.checkLimits(object, axis)
 
     def moveToPos(self, object: Literal["S", "O"], axis:
                   Literal["X", "Y", "Z"]) -> None:
@@ -349,10 +353,28 @@ class Controller:
         -------
         None
         """
+        lineEdit = {(0, 0): self.gui.xSAbsPos, (1, 0): self.gui.xOAbsPos,
+                    (0, 1): self.gui.ySAbsPos, (1, 1): self.gui.yOAbsPos,
+                    (0, 2): self.gui.zSAbsPos, (1, 2): self.gui.zOAbsPos}
+        
+        currentVal = float(lineEdit[(object, axis)])
+
         GL = globals()
+        minSoftLim = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
+        maxSoftLim = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
+        minHardLim = GL[f"{axis}{object}MIN_HARD_LIMIT"]
+        maxHardLim = GL[f"{axis}{object}MAX_HARD_LIMIT"]
 
+        if currentVal < minSoftLim:
+            lineEdit[(object, axis)].setText(minSoftLim)
+        elif maxSoftLim < currentVal:
+            lineEdit[(object, axis)].setText(maxSoftLim)
+        elif currentVal < minHardLim:
+            lineEdit[(object, axis)].setText(minHardLim)
+        elif maxHardLim < currentVal:
+            lineEdit[(object, axis)].setText(maxHardLim)
+        
         pvName = GL[f"{axis}{object}MOVE"]
-
         caput(pvName, 1)
         caput(pvName, 0)
 
@@ -417,9 +439,8 @@ class Controller:
         -------
         None
         """
+        GL = globals()
         if buttonID:
-            GL = globals()
-
             # Set soft limits to hard limits.
             XSMIN_SOFT_LIMIT = GL["XSMIN_HARD_LIMIT"]
             XSMAX_SOFT_LIMIT = GL["XSMAX_HARD_LIMIT"]
@@ -450,18 +471,89 @@ class Controller:
 
         else:
             # Set soft limits to inputted values
-            XSMIN_SOFT_LIMIT = float(self.gui.tab.xSMin.text())
-            XSMAX_SOFT_LIMIT = float(self.gui.tab.xSMax.text())
-            YSMIN_SOFT_LIMIT = float(self.gui.tab.ySMin.text())
-            YSMAX_SOFT_LIMIT = float(self.gui.tab.ySMax.text())
-            ZSMIN_SOFT_LIMIT = float(self.gui.tab.zSMin.text())
-            ZSMAX_SOFT_LIMIT = float(self.gui.tab.zSMax.text())
-            XOMIN_SOFT_LIMIT = float(self.gui.tab.xOMin.text())
-            XOMAX_SOFT_LIMIT = float(self.gui.tab.xOMax.text())
-            YOMIN_SOFT_LIMIT = float(self.gui.tab.yOMin.text())
-            YOMAX_SOFT_LIMIT = float(self.gui.tab.yOMax.text())
-            ZOMIN_SOFT_LIMIT = float(self.gui.tab.zOMin.text())
-            ZOMAX_SOFT_LIMIT = float(self.gui.tab.zOMax.text())
+            xsmin = float(self.gui.tab.xSMin.text())
+            if xsmin < GL["XSMIN_HARD_LIMIT"]:
+                XSMIN_SOFT_LIMIT = GL["XSMIN_HARD_LIMIT"]
+                self.gui.tab.xSMin.setText(XSMIN_SOFT_LIMIT)
+            else:
+                XSMIN_SOFT_LIMIT = xsmin
+
+            xsmax = float(self.gui.tab.xSMax.text())
+            if xsmax > GL["XSMAX_HARD_LIMIT"]:
+                XSMAX_SOFT_LIMIT = GL["XSMAX_HARD_LIMIT"]
+                self.gui.tab.xSMax.setText(XSMAX_SOFT_LIMIT)
+            else:
+                XSMAX_SOFT_LIMIT = xsmax
+            
+            ysmin = float(self.gui.tab.ySMin.text())
+            if ysmin < GL["YSMIN_HARD_LIMIT"]:
+                YSMIN_SOFT_LIMIT = GL["YSMIN_HARD_LIMIT"]
+                self.gui.tab.ySMin.setText(YSMIN_SOFT_LIMIT)
+            else:
+                YSMIN_SOFT_LIMIT = ysmin
+
+            ysmax = float(self.gui.tab.ySMax.text())
+            if ysmax > GL["YSMAX_HARD_LIMIT"]:
+                YSMAX_SOFT_LIMIT = GL["YSMAX_HARD_LIMIT"]
+                self.gui.tab.ySMax.setText(YSMAX_SOFT_LIMIT)
+            else:
+                YSMAX_SOFT_LIMIT = ysmax
+            
+            zsmin = float(self.gui.tab.zSMin.text())
+            if zsmin < GL["ZSMIN_HARD_LIMIT"]:
+                ZSMIN_SOFT_LIMIT = GL["ZSMIN_HARD_LIMIT"]
+                self.gui.tab.zSMin.setText(ZSMIN_SOFT_LIMIT)
+            else:
+                ZSMIN_SOFT_LIMIT = zsmin
+
+            zsmax = float(self.gui.tab.zSMax.text())
+            if zsmax > GL["ZSMAX_HARD_LIMIT"]:
+                ZSMAX_SOFT_LIMIT = GL["ZSMAX_HARD_LIMIT"]
+                self.gui.tab.zSMax.setText(ZSMAX_SOFT_LIMIT)
+            else:
+                ZSMAX_SOFT_LIMIT = zsmax
+            
+            xomin = float(self.gui.tab.xOMin.text())
+            if xomin < GL["XOMIN_HARD_LIMIT"]:
+                XOMIN_SOFT_LIMIT = GL["XOMIN_HARD_LIMIT"]
+                self.gui.tab.xOMin.setText(XOMIN_SOFT_LIMIT)
+            else:
+                XOMIN_SOFT_LIMIT = xomin
+
+            xomax = float(self.gui.tab.xOMax.text())
+            if xomax > GL["XOMAX_HARD_LIMIT"]:
+                XOMAX_SOFT_LIMIT = GL["XOMAX_HARD_LIMIT"]
+                self.gui.tab.xOMax.setText(XOMAX_SOFT_LIMIT)
+            else:
+                XOMAX_SOFT_LIMIT = xomax
+            
+            yomin = float(self.gui.tab.yOMin.text())
+            if yomin < GL["YOMIN_HARD_LIMIT"]:
+                YOMIN_SOFT_LIMIT = GL["YOMIN_HARD_LIMIT"]
+                self.gui.tab.yOMin.setText(YOMIN_SOFT_LIMIT)
+            else:
+                YOMIN_SOFT_LIMIT = yomin
+
+            yomax = float(self.gui.tab.yOMax.text())
+            if yomax > GL["YOMAX_HARD_LIMIT"]:
+                YOMAX_SOFT_LIMIT = GL["YOMAX_HARD_LIMIT"]
+                self.gui.tab.yOMax.setText(YOMAX_SOFT_LIMIT)
+            else:
+                YOMAX_SOFT_LIMIT = yomax
+            
+            zomin = float(self.gui.tab.zOMin.text())
+            if zomin < GL["ZOMIN_HARD_LIMIT"]:
+                ZOMIN_SOFT_LIMIT = GL["ZOMIN_HARD_LIMIT"]
+                self.gui.tab.zOMin.setText(ZOMIN_SOFT_LIMIT)
+            else:
+                ZOMIN_SOFT_LIMIT = zomin
+
+            zomax = float(self.gui.tab.zOMax.text())
+            if zomax > GL["ZOMAX_HARD_LIMIT"]:
+                ZOMAX_SOFT_LIMIT = GL["ZOMAX_HARD_LIMIT"]
+                self.gui.tab.zOMax.setText(ZOMAX_SOFT_LIMIT)
+            else:
+                ZOMAX_SOFT_LIMIT = zomax
 
     def updateBacklash(self) -> None:
         """Update backlash variables.
@@ -559,3 +651,107 @@ class Controller:
         pvName = GL[f"{axis}{object}ABSPOS"]
         movePos = GL[f"{axis}{object}_BASE_POSITION"] + GL[f"{axis}{object}_Relative_POSITION"]
         caput(pvName, movePos)
+    
+    def checkLimits(self, object: Literal["S", "O"], axis:
+                Literal["X", "Y", "Z"]) -> None:
+        """Check and set sample and objective limit labels.
+
+        Parameters
+        ----------
+        object : {"S", "O"}
+            Defines the stage as either sample or orbjective using "S" and "O",
+            respectively.
+        axis : {"X", "Y", "Z"}
+            Defines the motor axis as x, y, or z using "X", "Y", "Z",
+            respectively.
+
+        Returns
+        -------
+        None
+        """
+        GL = globals()
+
+        lineEdit = {(0, 0): self.gui.xSAbsPos, (1, 0): self.gui.xOAbsPos,
+                    (0, 1): self.gui.ySAbsPos, (1, 1): self.gui.yOAbsPos,
+                    (0, 2): self.gui.zSAbsPos, (1, 2): self.gui.zOAbsPos}
+        
+        limitLabels = {(0, 0, 0): self.gui.xSSn, (0, 0, 1): self.gui.xSSp,
+                       (0, 0, 2): self.gui.xSHn, (0, 0, 3): self.gui.xSHp,
+                       (0, 1, 0): self.gui.ySSn, (0, 1, 1): self.gui.ySSp,
+                       (0, 1, 2): self.gui.ySHn, (0, 1, 3): self.gui.ySHp,
+                       (0, 2, 0): self.gui.zSSn, (0, 2, 1): self.gui.zSSp,
+                       (0, 2, 2): self.gui.zSHn, (0, 2, 3): self.gui.zSHp,
+                       (1, 0, 0): self.gui.xSSn, (1, 0, 1): self.gui.xSSp,
+                       (1, 0, 2): self.gui.xSHn, (1, 0, 3): self.gui.xSHp,
+                       (1, 1, 0): self.gui.ySSn, (1, 1, 1): self.gui.ySSp,
+                       (1, 1, 2): self.gui.ySHn, (1, 1, 3): self.gui.ySHp,
+                       (1, 2, 0): self.gui.zSSn, (1, 2, 1): self.gui.zSSp,
+                       (1, 2, 2): self.gui.zSHn, (1, 2, 3): self.gui.zSHp}
+        
+        minSoftLim = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
+        maxSoftLim = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
+        minHardLim = GL[f"{axis}{object}MIN_HARD_LIMIT"]
+        maxHardLim = GL[f"{axis}{object}MAX_HARD_LIMIT"]
+
+        newPos = float(lineEdit[(object, axis)].text())
+
+        if newPos < minSoftLim:
+            limitLabels[(object, axis, 0)].setStyleSheet("background-color: green; border: 1px solid black;")
+            limitLabels[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        elif maxSoftLim < newPos:
+            limitLabels[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+            limitLabels[(object, axis, 1)].setStyleSheet("background-color: green; border: 1px solid black;")
+        else:
+            limitLabels[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+            limitLabels[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+
+        if newPos < minHardLim:
+            limitLabels[(object, axis, 3)].setStyleSheet("background-color: green; border: 1px solid black;")
+            limitLabels[(object, axis, 4)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        elif maxHardLim < newPos:
+            limitLabels[(object, axis, 3)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+            limitLabels[(object, axis, 4)].setStyleSheet("background-color: green; border: 1px solid black;")
+        else:
+            limitLabels[(object, axis, 3)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+            limitLabels[(object, axis, 4)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+
+    def checkMotorMotion(self, object: Literal["S", "O"], axis:
+                Literal["X", "Y", "Z"]) -> None:
+        """Check motor motion.
+        
+        This method monitors the motion of the active motor and sets the sample
+        and objective motor status labels.
+
+        Parameters
+        ----------
+        object : {"S", "O"}
+            Defines the stage as either sample or orbjective using "S" and "O",
+            respectively.
+        axis : {"X", "Y", "Z"}
+            Defines the motor axis as x, y, or z using "X", "Y", "Z",
+            respectively.
+
+        Returns
+        -------
+        None
+        """
+        GL = globals()
+
+        motionLabels = {(0, 0, 0): self.gui.xIdleS, (0, 0, 1): self.gui.xStopS,
+                        (0, 1, 0): self.gui.yIdleS, (0, 1, 1): self.gui.yStopS,
+                        (0, 2, 0): self.gui.zIdleS, (0, 2, 1): self.gui.zStopS,
+                        (1, 0, 0): self.gui.xIdleO, (1, 0, 1): self.gui.xStopO,
+                        (1, 1, 0): self.gui.yIdleO, (1, 1, 1): self.gui.yStopO,
+                        (1, 2, 0): self.gui.zIdleO, (1, 2, 1): self.gui.zStopO}
+        
+        motionLabels[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        motionLabels[(object, axis, 1)].setStyleSheet("background-color: green; border: 1px solid black;")
+
+        pvName = GL[f"{object}{axis}STATE"]
+        state = caget(pvName)
+        while state == 0:#########################################################Assumed that 0 indicated motion
+            state = caget(pvName)
+
+        motionLabels[(object, axis, 0)].setStyleSheet("background-color: green; border: 1px solid black;")
+        motionLabels[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+
