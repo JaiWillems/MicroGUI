@@ -97,12 +97,12 @@ class Controller:
         None
         """
         # Set step line edits to current PV values.
-        self.gui.xSSTEP.setText(caget(self.GL["XSSTEP"]))
-        self.gui.ySSTEP.setText(caget(self.GL["YSSTEP"]))
-        self.gui.zSSTEP.setText(caget(self.GL["ZSSTEP"]))
-        self.gui.xOSTEP.setText(caget(self.GL["XOSTEP"]))
-        self.gui.yOSTEP.setText(caget(self.GL["YOSTEP"]))
-        self.gui.zOSTEP.setText(caget(self.GL["ZOSTEP"]))
+        self.gui.xSStep.setText(caget(self.GL["XSSTEP"]))
+        self.gui.ySStep.setText(caget(self.GL["YSSTEP"]))
+        self.gui.zSStep.setText(caget(self.GL["ZSSTEP"]))
+        self.gui.xOStep.setText(caget(self.GL["XOSTEP"]))
+        self.gui.yOStep.setText(caget(self.GL["YOSTEP"]))
+        self.gui.zOStep.setText(caget(self.GL["ZOSTEP"]))
 
         # Set absolute position line edits to current PV values.
         self.gui.xSAbsPos.setText(caget(self.GL["XSABSPOS"]))
