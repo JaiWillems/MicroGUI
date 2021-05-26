@@ -43,7 +43,7 @@ def initMotor():
     modeMotor.enable
 
     try:
-        modeMotor.move_home(True)
+        modeMotor.move_home()
     except:
         raise Exception("Motor cannot be homed.")
 

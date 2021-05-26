@@ -6,8 +6,6 @@ USB3 camera located within the main GUI display.
 
 
 from simple_pyspin import Camera
-import matplotlib.pyplot as plt
-import numpy as np
 
 
 def getImage():

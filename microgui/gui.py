@@ -51,8 +51,8 @@ class GUI(QMainWindow):
         Positive incrment button for the Sample's x dimension.
     xSStep : QLineEdit
         Step size line edit for the sample's x dimension.
-    xSAbsPos : QPushButton
-        Absolute position button for the sample's x dimension.
+    xSAbsPos : QLineEdit
+        Absolute position line edit for the sample's x dimension.
     xSMove : QPushButton
         Move to absolute position button for the sample's x dimension.
     xSCn : QPushButton
@@ -75,8 +75,8 @@ class GUI(QMainWindow):
         Positive incrment button for the Sample's y dimension.
     ySStep : QPushButton
         Step size line edit for the sample's y dimension.
-    ySAbsPos : QPushButton
-        Absolute position button for the sample's y dimension.
+    ySAbsPos : QLineEdit
+        Absolute position line edit for the sample's y dimension
     ySMove : QPushButton
         Move to absolute position button for the sample's y dimension.
     ySCn : QPushButton
@@ -99,8 +99,8 @@ class GUI(QMainWindow):
         Positive incrment button for the Sample's z dimension.
     zSStep : QLineEdit
         Step size line edit for the sample's z dimension.
-    zSAbsPos : QPushButton
-        Absolute position button for the sample's z dimension.
+    zSAbsPos : QLineEdit
+        Absolute position line edit for the sample's z dimension
     zSMove : QPushButton
         Move to absolute position button for the sample's z dimension.
     zSCn : QPushButton
@@ -123,8 +123,8 @@ class GUI(QMainWindow):
         Positive incrment button for the objective' x dimension.
     xOStep : QLineEdit
         Step size line edit for the objective's x dimension.
-    xOAbsPos : QPushButton
-        Absolute position button for the objective's x dimension.
+    xOAbsPos : QLineEdit
+        Absolute position line edit for the objective's x dimension
     xOMove : QPushButton
         Move to absolute position button for the objective's x dimension.
     xOCn : QPushButton
@@ -147,8 +147,8 @@ class GUI(QMainWindow):
         Positive incrment button for the objective' y dimension.
     yOStep : QLineEdit
         Step size line edit for the objective's y dimension.
-    yOAbsPos : QPushButton
-        Absolute position button for the objective's y dimension.
+    yOAbsPos : QLineEdit
+        Absolute position line edit for the objective's y dimension
     yOMove : QPushButton
         Move to absolute position button for the objective's y dimension.
     yOCn : QPushButton
@@ -171,8 +171,8 @@ class GUI(QMainWindow):
         Positive incrment button for the objective' z dimension.
     zOStep : QLineEdit
         Step size line edit for the objective's z dimension.
-    zOAbsPos : QPushButton
-        Absolute position button for the objective's z dimension.
+    zOAbsPos : QLineEdit
+        Absolute position line edit for the objective's z dimension
     zOMove : QPushButton
         Move to absolute position button for the objective's z dimension.
     zOCn : QPushButton
@@ -282,12 +282,11 @@ class GUI(QMainWindow):
             # Generate cross hairs
             xLine = np.full((3, width, 3), [225, 0, 0])
             yLine = np.full((height, 3, 3), [225, 0, 0])
-            display = self.image
-            display[height // 2 - 1:height // 2 + 2, :] = xLine
-            display[:, width // 2 - 1:width // 2 + 2] = yLine
+            self.image[height // 2 - 1:height // 2 + 2, :] = xLine
+            self.image[:, width // 2 - 1:width // 2 + 2] = yLine
 
             # Update image.
-            self.img.setImage(display)
+            self.img.setImage(np.rot90(self.image, 3))
             QTimer.singleShot(1, updateData)
 
             # Initialize timer.
