@@ -82,10 +82,10 @@ class Controller:
         self.connectSignals()
     
     def monitorPVs(self) -> None:
-        """Configure and initiallize PV's.
+        """Configure and initiallize PVs.
 
         This method initializes the line-edits to the PV values on program
-        startup. Additionally, it connects PV's that need monitoring to
+        startup. Additionally, it connects PVs that need monitoring to
         callback functions.
 
         Parameters
@@ -96,29 +96,31 @@ class Controller:
         -------
         None
         """
+        print("Configuring and Initializing PVs.")
+
         # Set step line edits to current PV values.
-        self.gui.xSStep.setText(caget(self.GL["XSSTEP"]))
-        self.gui.ySStep.setText(caget(self.GL["YSSTEP"]))
-        self.gui.zSStep.setText(caget(self.GL["ZSSTEP"]))
-        self.gui.xOStep.setText(caget(self.GL["XOSTEP"]))
-        self.gui.yOStep.setText(caget(self.GL["YOSTEP"]))
-        self.gui.zOStep.setText(caget(self.GL["ZOSTEP"]))
+        self.gui.xSStep.setText(str(caget(self.GL["XSSTEP"])))
+        self.gui.ySStep.setText(str(caget(self.GL["YSSTEP"])))
+        self.gui.zSStep.setText(str(caget(self.GL["ZSSTEP"])))
+        self.gui.xOStep.setText(str(caget(self.GL["XOSTEP"])))
+        self.gui.yOStep.setText(str(caget(self.GL["YOSTEP"])))
+        self.gui.zOStep.setText(str(caget(self.GL["ZOSTEP"])))
 
         # Set absolute position line edits to current PV values.
-        self.gui.xSAbsPos.setText(caget(self.GL["XSABSPOS"]))
-        self.gui.ySAbsPos.setText(caget(self.GL["YSABSPOS"]))
-        self.gui.zSAbsPos.setText(caget(self.GL["ZSABSPOS"]))
-        self.gui.xOAbsPos.setText(caget(self.GL["XOABSPOS"]))
-        self.gui.yOAbsPos.setText(caget(self.GL["YOABSPOS"]))
-        self.gui.zOAbsPos.setText(caget(self.GL["ZOABSPOS"]))
+        self.gui.xSAbsPos.setText(str(caget(self.GL["XSABSPOS"])))
+        self.gui.ySAbsPos.setText(str(caget(self.GL["YSABSPOS"])))
+        self.gui.zSAbsPos.setText(str(caget(self.GL["ZSABSPOS"])))
+        self.gui.xOAbsPos.setText(str(caget(self.GL["XOABSPOS"])))
+        self.gui.yOAbsPos.setText(str(caget(self.GL["YOABSPOS"])))
+        self.gui.zOAbsPos.setText(str(caget(self.GL["ZOABSPOS"])))
 
         # Set backlash line edits to current PV values.
-        self.gui.xSB.setText(caget(self.GL["XSB"]))
-        self.gui.ySB.setText(caget(self.GL["YSB"]))
-        self.gui.zSB.setText(caget(self.GL["ZSB"]))
-        self.gui.xOB.setText(caget(self.GL["XOB"]))
-        self.gui.yOB.setText(caget(self.GL["YOB"]))
-        self.gui.zOB.setText(caget(self.GL["ZOB"]))
+        self.gui.xSB.setText(str(caget(self.GL["XSB"])))
+        self.gui.ySB.setText(str(caget(self.GL["YSB"])))
+        self.gui.zSB.setText(str(caget(self.GL["ZSB"])))
+        self.gui.xOB.setText(str(caget(self.GL["XOB"])))
+        self.gui.yOB.setText(str(caget(self.GL["YOB"])))
+        self.gui.zOB.setText(str(caget(self.GL["ZOB"])))
 
         self.PV_XSABSPOS = PV(pvname=self.gui.GL["XSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
         self.PV_ySABSPOS = PV(pvname=self.gui.GL["YSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
@@ -148,6 +150,8 @@ class Controller:
         -------
         None
         """
+        print("Connecting widgets to control sequences.")
+
         # Save image functionality.
         self.gui.WCB.clicked.connect(partial(self.saveImage, self.gui.SIFN,
                                              self.gui.image))
@@ -270,6 +274,8 @@ class Controller:
         -------
         None
         """
+        print("Save image to local working directory.")
+
         filename = fileName.text() + ".png"
         figure = plt.figure()
         plt.imshow(np.rot90(image, 1))
@@ -292,6 +298,8 @@ class Controller:
         -------
         None
         """
+        print("Changing mode state.")
+
         changeMode(mode=mode, modeMotor=modeMotor)
 
     def incPos(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"],
@@ -319,15 +327,15 @@ class Controller:
         -------
         None
         """
-        caput(self.GL[f"{axis}{object}STEP"], step.text())
+        caput(self.GL[f"{axis}{object}STEP"], float(step.text()))
 
         absPos = caget(self.GL[f"{axis}{object}ABSPOS"])
         incPos = caget(self.GL[f"{axis}{object}STEP"])
 
-        PHL = caget(self.GL[f"{axis}{object}MAX_HARD_LIMIT"])
-        NHL = caget(self.GL[f"{axis}{object}MIN_HARD_LIMIT"])
-        PSL = caget(self.GL[f"{axis}{object}MAX_SOFT_LIMIT"])
-        NSL = caget(self.GL[f"{axis}{object}MIN_SOFT_LIMIT"])
+        PHL = self.GL[f"{axis}{object}MAX_HARD_LIMIT"]
+        NHL = self.GL[f"{axis}{object}MIN_HARD_LIMIT"]
+        PSL = self.GL[f"{axis}{object}MAX_SOFT_LIMIT"]
+        NSL = self.GL[f"{axis}{object}MIN_SOFT_LIMIT"]
 
         if direction == "P" and absPos + incPos > PSL:
             caput(self.GL[f"{axis}{object}ABSPOS"], PSL)
@@ -343,6 +351,9 @@ class Controller:
             caput(self.GL[f"{axis}{object}MOVE"], 1)
         else:
             caput(self.GL[f"{axis}{object}{direction}"], 1)
+        
+        absPos = caget(self.GL[f"{axis}{object}ABSPOS"])
+        print(f"Moving to {axis}{object}ABSPOS = {absPos}")
     
     def absMove(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
         """Move sample or objective motor to specified position.
@@ -369,10 +380,10 @@ class Controller:
 
         absPos = lineEdit[(object, axis)].text()
 
-        PHL = caget(self.GL[f"{axis}{object}MAX_HARD_LIMIT"])
-        NHL = caget(self.GL[f"{axis}{object}MIN_HARD_LIMIT"])
-        PSL = caget(self.GL[f"{axis}{object}MAX_SOFT_LIMIT"])
-        NSL = caget(self.GL[f"{axis}{object}MIN_SOFT_LIMIT"])
+        PHL = self.GL[f"{axis}{object}MAX_HARD_LIMIT"]
+        NHL = self.GL[f"{axis}{object}MIN_HARD_LIMIT"]
+        PSL = self.GL[f"{axis}{object}MAX_SOFT_LIMIT"]
+        NSL = self.GL[f"{axis}{object}MIN_SOFT_LIMIT"]
 
         if absPos > PSL:
             caput(self.GL[f"{axis}{object}ABSPOS"], PSL)
@@ -386,6 +397,9 @@ class Controller:
             caput(self.GL[f"{axis}{object}ABSPOS"], absPos)
         
         caput(self.GL[f"{axis}{object}MOVE"], 1)
+
+        absPos = caget(self.GL[f"{axis}{object}ABSPOS"])
+        print(f"Moving to {axis}{object}ABSPOS = {absPos}")
     
     def continuousMotion(self, object: Literal["S", "O"], axis:
                          Literal["X", "Y", "Z"], type:
