@@ -40,7 +40,9 @@ def initMotor():
 
     # Initialize motor if detected.
     modeMotor = apt.Motor(motorSerialNumber)
-    modeMotor.enable
+    modeMotor.set_move_home_parameters(*modeMotor.get_move_home_parameters)
+    modeMotor.set_velocity_parameters(*modeMotor.get_velocity_parameters)
+    modeMotor.enable()
 
     try:
         modeMotor.move_home()

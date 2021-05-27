@@ -9,12 +9,11 @@ connecting widgets up to control sequences that bring about change.
 import matplotlib.pyplot as plt
 import numpy as np
 from functools import partial
-import epics
-from epics import caput, caget, PV
+from epics import ca, caput, caget, PV
 
 # Import objects for type annotations.
-from typing import Any, Literal
-from PyQt5.QtWidgets import QLineEdit
+from typing import Any, Literal, Dict
+from PyQt5.QtWidgets import QLineEdit, QFileDialog
 from gui import GUI
 
 # Import file dependencies.
@@ -22,9 +21,11 @@ from thorlabs_motor_control import changeMode
 from globals import *
 
 
-epics.ca.find_libca()
+# Set up epics environment.
+ca.find_libca()
 
-class Controller:
+
+class Controller(object):
     """Connect GUI widgets to control sequences.
 
     The Controller class takes interactive widgets such as QPushButton's
@@ -99,8 +100,6 @@ class Controller:
         -------
         None
         """
-        print("Configuring and initializing PVs.")
-
         # Set step line edits to current PV values.
         self.gui.xSStep.setText(str(caget(self.GL["XSSTEP"])))
         self.gui.ySStep.setText(str(caget(self.GL["YSSTEP"])))
@@ -125,19 +124,21 @@ class Controller:
         self.gui.tab.yOB.setText(str(caget(self.GL["YOB"])))
         self.gui.tab.zOB.setText(str(caget(self.GL["ZOB"])))
 
-        self.PV_XSABSPOS = PV(pvname=self.gui.GL["XSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_ySABSPOS = PV(pvname=self.gui.GL["YSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_zSABSPOS = PV(pvname=self.gui.GL["ZSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_XOABSPOS = PV(pvname=self.gui.GL["XOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_yOABSPOS = PV(pvname=self.gui.GL["YOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_zOABSPOS = PV(pvname=self.gui.GL["ZOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_XSABSPOS = PV(pvname=self.GL["XSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_ySABSPOS = PV(pvname=self.GL["YSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_zSABSPOS = PV(pvname=self.GL["ZSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_XOABSPOS = PV(pvname=self.GL["XOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_yOABSPOS = PV(pvname=self.GL["YOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_zOABSPOS = PV(pvname=self.GL["ZOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
 
-        self.PV_XSSTATE = PV(pvname=self.gui.GL["XSSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_YSSTATE = PV(pvname=self.gui.GL["YSSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_ZSSTATE = PV(pvname=self.gui.GL["ZSSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_XOSTATE = PV(pvname=self.gui.GL["XOSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_YOSTATE = PV(pvname=self.gui.GL["YOSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_ZOSTATE = PV(pvname=self.gui.GL["ZOSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_XSSTATE = PV(pvname=self.GL["XSSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_YSSTATE = PV(pvname=self.GL["YSSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_ZSSTATE = PV(pvname=self.GL["ZSSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_XOSTATE = PV(pvname=self.GL["XOSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_YOSTATE = PV(pvname=self.GL["YOSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_ZOSTATE = PV(pvname=self.GL["ZOSTATE"], auto_monitor=True, callback=self.motorStatus)
+
+        print("-*- PVs configured and initialized. -*-")
 
     def connectSignals(self) -> None:
         """Connect widgets and control sequences.
@@ -153,11 +154,8 @@ class Controller:
         -------
         None
         """
-        print("Connecting widgets to control sequences.")
-
         # Save image functionality.
-        self.gui.WCB.clicked.connect(partial(self.saveImage, self.gui.SIFN,
-                                             self.gui.image))
+        self.gui.WCB.clicked.connect(self.saveImage)
 
         # Mode select functionality.
         self.gui.tab.RDM1.pressed.connect(partial(self.modeState, 1,
@@ -196,18 +194,12 @@ class Controller:
                                              self.gui.zOStep))
 
         # Move sample and objective stage to absolute position functionality.
-        self.gui.xSMove.clicked.connect(partial(self.absMove, "S", "X",
-                                                self.gui.xSAbsPos))
-        self.gui.ySMove.clicked.connect(partial(self.absMove, "S", "Y",
-                                                self.gui.ySAbsPos))
-        self.gui.zSMove.clicked.connect(partial(self.absMove, "S", "Z",
-                                                self.gui.zSAbsPos))
-        self.gui.xOMove.clicked.connect(partial(self.absMove, "O", "X",
-                                                self.gui.xOAbsPos))
-        self.gui.yOMove.clicked.connect(partial(self.absMove, "O", "Y",
-                                                self.gui.yOAbsPos))
-        self.gui.zOMove.clicked.connect(partial(self.absMove, "O", "Z",
-                                                self.gui.zOAbsPos))
+        self.gui.xSMove.clicked.connect(partial(self.absMove, "S", "X"))
+        self.gui.ySMove.clicked.connect(partial(self.absMove, "S", "Y"))
+        self.gui.zSMove.clicked.connect(partial(self.absMove, "S", "Z"))
+        self.gui.xOMove.clicked.connect(partial(self.absMove, "O", "X"))
+        self.gui.yOMove.clicked.connect(partial(self.absMove, "O", "Y"))
+        self.gui.zOMove.clicked.connect(partial(self.absMove, "O", "Z"))
 
         # Continuous motion of the sample and objective stages functionality.
         self.gui.xSCn.clicked.connect(partial(self.continuousMotion, "S", "X",
@@ -260,29 +252,30 @@ class Controller:
         self.gui.tab.zOZero.clicked.connect(partial(self.zeroPos, "O", "Z"))
         self.gui.tab.SBL.clicked.connect(self.updateBacklash)
 
-    def saveImage(self, fileName: str, image: np.ndarray) -> None:
+        print("-*- Widgets connected to control sequences. -*-")
+
+    def saveImage(self) -> None:
         """Live stream image capture.
 
-        This method saves a capture of the current live stream to the current
-        working directory with the filename given by "<fileName>.png".
+        This method saves a capture of the current live stream to the chosen
+        directory.
 
         Parameters
         ----------
-        fileName : str
-            Name to save the image capture to.
-        image : np.ndarray
-            Numpy array representing the image data.
+        None
 
         Returns
         -------
         None
         """
-        print("Save image to local working directory.")
-
-        filename = fileName.text() + ".png"
-        figure = plt.figure()
-        plt.imshow(np.rot90(image, 1))
-        figure.savefig(filename)
+        path, _ = QFileDialog.getSaveFileName(self, "Save File",
+                "sample_capture", "Image files (*.jpg *.jpeg *.gif *png)")
+        
+        plt.figure()
+        plt.imshow(np.rot90(self.gui.image, 1))
+        plt.savefig(path)
+        
+        print(f"Image capture saved to: {path}")
 
     def modeState(self, mode: Literal[1, 2, 3, 4], modeMotor: Any) -> None:
         """Change microscope mode.
@@ -301,9 +294,9 @@ class Controller:
         -------
         None
         """
-        print("Changing mode state.")
-
         changeMode(mode=mode, modeMotor=modeMotor)
+
+        print(f"Changing mode to mode {mode}.")
 
     def incPos(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"],
                direction: Literal["N", "P"], step: QLineEdit) -> None:
@@ -356,7 +349,7 @@ class Controller:
             caput(self.GL[f"{axis}{object}{direction}"], 1)
         
         absPos = caget(self.GL[f"{axis}{object}ABSPOS"])
-        print(f"Moving to {axis}{object}ABSPOS = {absPos}")
+        print(f"Incremental movement to {axis}{object}ABSPOS = {absPos}.")
     
     def absMove(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
         """Move sample or objective motor to specified position.
@@ -381,7 +374,7 @@ class Controller:
                     ("S", "Y"): self.gui.ySAbsPos, ("O", "Y"): self.gui.yOAbsPos,
                     ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
 
-        absPos = lineEdit[(object, axis)].text()
+        absPos = float(lineEdit[(object, axis)].text())
 
         PHL = self.GL[f"{axis}{object}MAX_HARD_LIMIT"]
         NHL = self.GL[f"{axis}{object}MIN_HARD_LIMIT"]
@@ -402,7 +395,7 @@ class Controller:
         caput(self.GL[f"{axis}{object}MOVE"], 1)
 
         absPos = caget(self.GL[f"{axis}{object}ABSPOS"])
-        print(f"Moving to {axis}{object}ABSPOS = {absPos}")
+        print(f"Absolute movement to {axis}{object}ABSPOS = {absPos}.")
     
     def continuousMotion(self, object: Literal["S", "O"], axis:
                          Literal["X", "Y", "Z"], type:
@@ -440,9 +433,21 @@ class Controller:
             caput(self.GL[f"{axis}{object}CP"], 0)
             caput(self.GL[f"{axis}{object}STOP"], 1)
             caput(self.GL[f"{axis}{object}STOP"], 0)
+        
+        print(f"Change continuous movement to -> {type}.")
 
-    def updateAbsPos(**kwargs):
-        """
+    def updateAbsPos(self, **kwargs: Dict) -> None:
+        """Update absolute value line edit.
+
+        Parameters
+        ----------
+        **kwargs : Dict
+            Extra arguments to `motorStatus`: refer to PyEpics documentation
+            for a list of all possible arguments for PV callback functions.
+        
+        Returns
+        -------
+        None
         """
         lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos,
                     ("S", "Y"): self.gui.ySAbsPos, ("O", "Y"): self.gui.yOAbsPos,
@@ -451,14 +456,16 @@ class Controller:
         pvname = kwargs["pvname"]
         value = kwargs["value"]
 
-        keys = list(self.gui.GL.keys())
-        vals = list(self.gui.GL.values())
+        keys = list(self.GL.keys())
+        vals = list(self.GL.values())
         pvKey = keys[vals.index(pvname)]
 
         axis = pvKey[0]
         object = pvKey[1]
 
-        lineEdit[(object, axis)].setText(value)
+        lineEdit[(object, axis)].setText(str(value))
+
+        print(f"Updating absolute position line edit to {value}.")
 
     def updateSoftLimits(self, buttonID: Literal[0, 1]) -> None:
         """Update sample and objective soft limits.
@@ -510,86 +517,88 @@ class Controller:
             xsmin = float(self.gui.tab.xSMin.text())
             if xsmin < self.GL["XSMIN_HARD_LIMIT"]:
                 XSMIN_SOFT_LIMIT = self.GL["XSMIN_HARD_LIMIT"]
-                self.gui.tab.xSMin.setText(XSMIN_SOFT_LIMIT)
+                self.gui.tab.xSMin.setText(str(XSMIN_SOFT_LIMIT))
             else:
                 XSMIN_SOFT_LIMIT = xsmin
 
             xsmax = float(self.gui.tab.xSMax.text())
             if xsmax > self.GL["XSMAX_HARD_LIMIT"]:
                 XSMAX_SOFT_LIMIT = self.GL["XSMAX_HARD_LIMIT"]
-                self.gui.tab.xSMax.setText(XSMAX_SOFT_LIMIT)
+                self.gui.tab.xSMax.setText(str(XSMAX_SOFT_LIMIT))
             else:
                 XSMAX_SOFT_LIMIT = xsmax
             
             ysmin = float(self.gui.tab.ySMin.text())
             if ysmin < self.GL["YSMIN_HARD_LIMIT"]:
                 YSMIN_SOFT_LIMIT = self.GL["YSMIN_HARD_LIMIT"]
-                self.gui.tab.ySMin.setText(YSMIN_SOFT_LIMIT)
+                self.gui.tab.ySMin.setText(str(YSMIN_SOFT_LIMIT))
             else:
                 YSMIN_SOFT_LIMIT = ysmin
 
             ysmax = float(self.gui.tab.ySMax.text())
             if ysmax > self.GL["YSMAX_HARD_LIMIT"]:
                 YSMAX_SOFT_LIMIT = self.GL["YSMAX_HARD_LIMIT"]
-                self.gui.tab.ySMax.setText(YSMAX_SOFT_LIMIT)
+                self.gui.tab.ySMax.setText(str(YSMAX_SOFT_LIMIT))
             else:
                 YSMAX_SOFT_LIMIT = ysmax
             
             zsmin = float(self.gui.tab.zSMin.text())
             if zsmin < self.GL["ZSMIN_HARD_LIMIT"]:
                 ZSMIN_SOFT_LIMIT = self.GL["ZSMIN_HARD_LIMIT"]
-                self.gui.tab.zSMin.setText(ZSMIN_SOFT_LIMIT)
+                self.gui.tab.zSMin.setText(str(ZSMIN_SOFT_LIMIT))
             else:
                 ZSMIN_SOFT_LIMIT = zsmin
 
             zsmax = float(self.gui.tab.zSMax.text())
             if zsmax > self.GL["ZSMAX_HARD_LIMIT"]:
                 ZSMAX_SOFT_LIMIT = self.GL["ZSMAX_HARD_LIMIT"]
-                self.gui.tab.zSMax.setText(ZSMAX_SOFT_LIMIT)
+                self.gui.tab.zSMax.setText(str(ZSMAX_SOFT_LIMIT))
             else:
                 ZSMAX_SOFT_LIMIT = zsmax
             
             xomin = float(self.gui.tab.xOMin.text())
             if xomin < self.GL["XOMIN_HARD_LIMIT"]:
                 XOMIN_SOFT_LIMIT = self.GL["XOMIN_HARD_LIMIT"]
-                self.gui.tab.xOMin.setText(XOMIN_SOFT_LIMIT)
+                self.gui.tab.xOMin.setText(str(XOMIN_SOFT_LIMIT))
             else:
                 XOMIN_SOFT_LIMIT = xomin
 
             xomax = float(self.gui.tab.xOMax.text())
             if xomax > self.GL["XOMAX_HARD_LIMIT"]:
                 XOMAX_SOFT_LIMIT = self.GL["XOMAX_HARD_LIMIT"]
-                self.gui.tab.xOMax.setText(XOMAX_SOFT_LIMIT)
+                self.gui.tab.xOMax.setText(str(XOMAX_SOFT_LIMIT))
             else:
                 XOMAX_SOFT_LIMIT = xomax
             
             yomin = float(self.gui.tab.yOMin.text())
             if yomin < self.GL["YOMIN_HARD_LIMIT"]:
                 YOMIN_SOFT_LIMIT = self.GL["YOMIN_HARD_LIMIT"]
-                self.gui.tab.yOMin.setText(YOMIN_SOFT_LIMIT)
+                self.gui.tab.yOMin.setText(str(YOMIN_SOFT_LIMIT))
             else:
                 YOMIN_SOFT_LIMIT = yomin
 
             yomax = float(self.gui.tab.yOMax.text())
             if yomax > self.GL["YOMAX_HARD_LIMIT"]:
                 YOMAX_SOFT_LIMIT = self.GL["YOMAX_HARD_LIMIT"]
-                self.gui.tab.yOMax.setText(YOMAX_SOFT_LIMIT)
+                self.gui.tab.yOMax.setText(str(YOMAX_SOFT_LIMIT))
             else:
                 YOMAX_SOFT_LIMIT = yomax
             
             zomin = float(self.gui.tab.zOMin.text())
             if zomin < self.GL["ZOMIN_HARD_LIMIT"]:
                 ZOMIN_SOFT_LIMIT = self.GL["ZOMIN_HARD_LIMIT"]
-                self.gui.tab.zOMin.setText(ZOMIN_SOFT_LIMIT)
+                self.gui.tab.zOMin.setText(str(ZOMIN_SOFT_LIMIT))
             else:
                 ZOMIN_SOFT_LIMIT = zomin
 
             zomax = float(self.gui.tab.zOMax.text())
             if zomax > self.GL["ZOMAX_HARD_LIMIT"]:
                 ZOMAX_SOFT_LIMIT = self.GL["ZOMAX_HARD_LIMIT"]
-                self.gui.tab.zOMax.setText(ZOMAX_SOFT_LIMIT)
+                self.gui.tab.zOMax.setText(str(ZOMAX_SOFT_LIMIT))
             else:
                 ZOMAX_SOFT_LIMIT = zomax
+            
+        print(f"Updating soft limits, buttonID={buttonID}.")
 
     def updateBacklash(self) -> None:
         """Update backlash variables.
@@ -609,6 +618,8 @@ class Controller:
         caput(self.GL["XOB"], float(self.gui.tab.xOB.text()))
         caput(self.GL["YOB"], float(self.gui.tab.yOB.text()))
         caput(self.GL["ZOB"], float(self.gui.tab.zOB.text()))
+
+        print("Updating backlash values.")
 
     def zeroPos(self, object: Literal["S", "O"], axis:
                 Literal["X", "Y", "Z"]) -> None:
@@ -647,113 +658,33 @@ class Controller:
         # Update absolute position line edit widget to 0.
         lineEdit[(object, axis)].setText("0")
 
-    #def setRelPos(self, object: Literal["S", "O"], axis:
-    #            Literal["X", "Y", "Z"]) -> None:################################################## May be redundant
-    #    """Set the relative position.
+        print(f"Zero'ing the {axis}{object}ABSPOS line edit.")
 
-    #    This method sets the relative position of the stage defined by 'object'
-    #    and 'axis' to that displayed in the corresponding line edit widget.
+    def motorStatus(self, **kwargs: Dict) -> None:
+        """Check and set motor status indicators.
 
-    #    Parameters
-    #    ----------
-    #    object : {"S", "O"}
-    #        Defines the stage as either sample or orbjective using "S" and "O",
-    #        respectively.
-    #    axis : {"X", "Y", "Z"}
-    #        Defines the motor axis as x, y, or z using "X", "Y", "Z",
-    #        respectively.
-
-    #    Returns
-    #    -------
-    #    None
-    #    """
-    #    lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos,
-    #                ("S", "Y"): self.gui.ySAbsPos, ("O", "Y"): self.gui.yOAbsPos,
-    #                ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
-
-        # Set relative position global variable.
-    #    self.GL[f"{axis}{object}_RELATIVE_POSITION"] = float(lineEdit[(object, axis)].text())
-
-    #    pvName = self.GL[f"{axis}{object}ABSPOS"]
-    #    movePos = self.GL[f"{axis}{object}_BASE_POSITION"] + self.GL[f"{axis}{object}_Relative_POSITION"]
-    #    caput(pvName, movePos)
-    
-    #def checkLimits(self, object: Literal["S", "O"], axis:
-    #            Literal["X", "Y", "Z"]) -> None:########################################### May be redundant
-    #    """Check and set sample and objective limit labels.
-
-    #    Parameters
-    #    ----------
-    #    object : {"S", "O"}
-    #        Defines the stage as either sample or orbjective using "S" and "O",
-    #        respectively.
-    #    axis : {"X", "Y", "Z"}
-    #        Defines the motor axis as x, y, or z using "X", "Y", "Z",
-    #        respectively.
-
-    #    Returns
-    #    -------
-    #    None
-    #    """
-    #    lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos,
-    #                ("S", "Y"): self.gui.ySAbsPos, ("O", "Y"): self.gui.yOAbsPos,
-    #                ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
+        Parameters
+        ----------
+        **kwargs : Dict
+            Extra arguments to `motorStatus`: refer to PyEpics documentation
+            for a list of all possible arguments for PV callback functions.
         
-    #    limitLabels = {("S", "X", 0): self.gui.xSSn, ("S", "X", 1): self.gui.xSSp,
-    #                   ("S", "X", 2): self.gui.xSHn, ("S", "X", 3): self.gui.xSHp,
-    #                   ("S", "Y", 0): self.gui.ySSn, ("S", "Y", 1): self.gui.ySSp,
-    #                   ("S", "Y", 2): self.gui.ySHn, ("S", "Y", 3): self.gui.ySHp,
-    #                   ("S", "Z", 0): self.gui.zSSn, ("S", "Z", 1): self.gui.zSSp,
-    #                   ("S", "Z", 2): self.gui.zSHn, ("S", "Z", 3): self.gui.zSHp,
-    #                   ("O", "X", 0): self.gui.xSSn, ("O", "X", 1): self.gui.xSSp,
-    #                   ("O", "X", 2): self.gui.xSHn, ("O", "X", 3): self.gui.xSHp,
-    #                   ("O", "Y", 0): self.gui.ySSn, ("O", "Y", 1): self.gui.ySSp,
-    #                   ("O", "Y", 2): self.gui.ySHn, ("O", "Y", 3): self.gui.ySHp,
-    #                   ("O", "Z", 0): self.gui.zSSn, ("O", "Z", 1): self.gui.zSSp,
-    #                   ("O", "Z", 2): self.gui.zSHn, ("O", "Z", 3): self.gui.zSHp}
-        
-    #    minSoftLim = self.GL[f"{axis}{object}MIN_SOFT_LIMIT"]
-    #    maxSoftLim = self.GL[f"{axis}{object}MAX_SOFT_LIMIT"]
-    #    minHardLim = self.GL[f"{axis}{object}MIN_HARD_LIMIT"]
-    #    maxHardLim = self.GL[f"{axis}{object}MAX_HARD_LIMIT"]
-
-    #    newPos = float(lineEdit[(object, axis)].text())
-
-    #    if newPos < minSoftLim:
-    #        limitLabels[(object, axis, 0)].setStyleSheet("background-color: green; border: 1px solid black;")
-    #        limitLabels[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-    #    elif maxSoftLim < newPos:
-    #        limitLabels[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-    #        limitLabels[(object, axis, 1)].setStyleSheet("background-color: green; border: 1px solid black;")
-    #    else:
-    #        limitLabels[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-    #        limitLabels[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-
-    #    if newPos < minHardLim:
-    #        limitLabels[(object, axis, 3)].setStyleSheet("background-color: green; border: 1px solid black;")
-    #        limitLabels[(object, axis, 4)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-    #    elif maxHardLim < newPos:
-    #        limitLabels[(object, axis, 3)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-    #        limitLabels[(object, axis, 4)].setStyleSheet("background-color: green; border: 1px solid black;")
-    #    else:
-    #        limitLabels[(object, axis, 3)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-    #        limitLabels[(object, axis, 4)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-
-    def motorStatus(**kwargs):
+        Returns
+        -------
+        None
         """
-        """
-        motionLabels = {("S", "X", 0): self.gui.xIdleS, ("S", "X", 1): self.gui.xStopS,
-                        ("S", "Y", 0): self.gui.yIdleS, ("S", "Y", 1): self.gui.yStopS,
-                        ("S", "Z", 0): self.gui.zIdleS, ("S", "Z", 1): self.gui.zStopS,
-                        ("O", "X", 0): self.gui.xIdleO, ("O", "X", 1): self.gui.xStopO,
-                        ("O", "Y", 0): self.gui.yIdleO, ("O", "Y", 1): self.gui.yStopO,
-                        ("O", "Z", 0): self.gui.zIdleO, ("O", "Z", 1): self.gui.zStopO}
+        motionLabels = {("S", "X", 0): self.gui.tab.xIdleS, ("S", "X", 1): self.gui.tab.xStopS,
+                        ("S", "Y", 0): self.gui.tab.yIdleS, ("S", "Y", 1): self.gui.tab.yStopS,
+                        ("S", "Z", 0): self.gui.tab.zIdleS, ("S", "Z", 1): self.gui.tab.zStopS,
+                        ("O", "X", 0): self.gui.tab.xIdleO, ("O", "X", 1): self.gui.tab.xStopO,
+                        ("O", "Y", 0): self.gui.tab.yIdleO, ("O", "Y", 1): self.gui.tab.yStopO,
+                        ("O", "Z", 0): self.gui.tab.zIdleO, ("O", "Z", 1): self.gui.tab.zStopO}
 
         pvname = kwargs["pvname"]
         value = kwargs["value"]
 
-        keys = list(self.gui.GL.keys())
-        vals = list(self.gui.GL.values())
+        keys = list(self.GL.keys())
+        vals = list(self.GL.values())
         pvKey = keys[vals.index(pvname)]
 
         axis = pvKey[0]
@@ -761,9 +692,10 @@ class Controller:
 
         if value == 1:
             motionLabels[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-            motionLabels[(object, axis, 1)].setStyleSheet("background-color: green; border: 1px solid black;")
+            motionLabels[(object, axis, 1)].setStyleSheet("background-color: #49eb34; border: 1px solid black;")
         elif value == 0:
-            motionLabels[(object, axis, 0)].setStyleSheet("background-color: green; border: 1px solid black;")
+            motionLabels[(object, axis, 0)].setStyleSheet("background-color: #49eb34; border: 1px solid black;")
             motionLabels[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
+        print("Checkiing motor status.")
 

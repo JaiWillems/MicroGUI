@@ -10,8 +10,8 @@ import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.ptime as ptime
 from typing import Any, Dict
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import QRectF, QTimer
+from PyQt5.QtGui import QPixmap, QFont
+from PyQt5.QtCore import QRectF, QTimer, Qt
 from PyQt5.QtWidgets import QMainWindow, QGridLayout, QVBoxLayout, QWidget,\
                             QLabel, QPushButton, QLineEdit, QRadioButton,\
                             QTabWidget
@@ -41,8 +41,6 @@ class GUI(QMainWindow):
         Current image displayed in an array representation.
     WCB : QPushButton
         Image capture push button.
-    SIFN : QLineEdit
-        File name to label the live feed image capture.
     tab : MyTableWidget object
         The tabular display located on the main GUI window.
     xSN : QPushButton
@@ -211,8 +209,8 @@ class GUI(QMainWindow):
 
         # Define main GUI window.
         self.setWindowTitle("Horizontal Microscope Control")
-        self.setFixedWidth(1300)
-        self.setFixedHeight(525)
+        self.setFixedWidth(1500)
+        self.setFixedHeight(650)
 
         # Add sub-windows to main window layout.
         self.layout = QGridLayout()
@@ -275,18 +273,19 @@ class GUI(QMainWindow):
             columns of pixels in the image to red (RGB=[225, 0, 0]).
             """
             # Get new image.
-            self.image = np.copy(getImage())
+            self.image = np.copy(np.rot90(getImage()))
             height = self.image.shape[0]
             width = self.image.shape[1]
 
             # Generate cross hairs
-            xLine = np.full((3, width, 3), [225, 0, 0])
-            yLine = np.full((height, 3, 3), [225, 0, 0])
-            self.image[height // 2 - 1:height // 2 + 2, :] = xLine
-            self.image[:, width // 2 - 1:width // 2 + 2] = yLine
+            length = int(0.1 * min(height, width))
+            xLine = np.full((5, 2 * length, 3), [225, 0, 0])
+            yLine = np.full((length * 2, 5, 3), [225, 0, 0])
+            self.image[height // 2 - 2:height // 2 + 3, width // 2 - length:width // 2 + length] = xLine
+            self.image[height // 2 - length:height // 2 + length:, width // 2 - 2:width // 2 + 3] = yLine
 
             # Update image.
-            self.img.setImage(np.rot90(self.image, 3))
+            self.img.setImage(np.rot90(self.image, 2))
             QTimer.singleShot(1, updateData)
 
             # Initialize timer.
@@ -305,7 +304,7 @@ class GUI(QMainWindow):
         view = win.addViewBox()
         view.setAspectLocked(True)
         view.addItem(self.img)
-        view.setRange(QRectF(0, 0, 400, 200))
+        view.setRange(QRectF(300, 0, 700, 1000))
 
         self.updateTime = ptime.time()
         self.fps = 0
@@ -316,11 +315,9 @@ class GUI(QMainWindow):
 
         # Create, modify, and place image capture button and line-edit.
         self.WCB = QPushButton("Image Capture")
-        self.SIFN = QLineEdit("File Name")
         self.WCB.setStyleSheet("background-color: lightgrey")
         layout.addWidget(win, 0, 0, 1, 2)
-        layout.addWidget(self.WCB, 1, 0, 1, 1)
-        layout.addWidget(self.SIFN, 1, 1, 1, 1)
+        layout.addWidget(self.WCB, 1, 0, 1, 2)
 
         self.cameraWindow.setLayout(layout)
 
@@ -356,13 +353,17 @@ class GUI(QMainWindow):
         window = QWidget()
         layout = QGridLayout()
 
+        sampleLab = QLabel("<b><u>Sample Stage</u></b>")
+        sampleLab.setFont(QFont("Times", 9))
+        layout.addWidget(sampleLab, 0, 0, 1, 12)
+
         # Set column labels.
-        layout.addWidget(QLabel("<b>Axis</b>"), 0, 0, 1, 1)
-        layout.addWidget(QLabel("<b>Increment Position</b>"), 0, 1, 1, 2)
-        layout.addWidget(QLabel("<b>Step Size</b>"), 0, 3, 1, 1)
-        layout.addWidget(QLabel("<b>Absolute Position</b>"), 0, 4, 1, 1)
-        layout.addWidget(QLabel("<b>Continual Motion</b>"), 0, 6, 1, 3)
-        layout.addWidget(QLabel("<b>Limits</b>"), 0, 9, 1, 4)
+        layout.addWidget(QLabel("<b>Axis</b>"), 1, 0, 1, 1)
+        layout.addWidget(QLabel("<b>Increment Position</b>"), 1, 1, 1, 2)
+        layout.addWidget(QLabel("<b>Step Size</b>"), 1, 3, 1, 1)
+        layout.addWidget(QLabel("<b>Absolute Position</b>"), 1, 4, 1, 1)
+        layout.addWidget(QLabel("<b>Continual Motion</b>"), 1, 6, 1, 3)
+        layout.addWidget(QLabel("<b>Limits</b>"), 1, 9, 1, 4)
 
         # ---------------------------------------------------------------------
         #   X Sample Axis
@@ -395,19 +396,19 @@ class GUI(QMainWindow):
         self.xSHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
-        layout.addWidget(QLabel("X:"), 1, 0, 1, 1)
-        layout.addWidget(self.xSN, 1, 1, 1, 1)
-        layout.addWidget(self.xSP, 1, 2, 1, 1)
-        layout.addWidget(self.xSStep, 1, 3, 1, 1)
-        layout.addWidget(self.xSAbsPos, 1, 4, 1, 1)
-        layout.addWidget(self.xSMove, 1, 5, 1, 1)
-        layout.addWidget(self.xSCn, 1, 6, 1, 1)
-        layout.addWidget(self.xSStop, 1, 7, 1, 1)
-        layout.addWidget(self.xSCp, 1, 8, 1, 1)
-        layout.addWidget(self.xSSn, 1, 9, 1, 1)
-        layout.addWidget(self.xSSp, 1, 10, 1, 1)
-        layout.addWidget(self.xSHn, 1, 11, 1, 1)
-        layout.addWidget(self.xSHp, 1, 12, 1, 1)
+        layout.addWidget(QLabel("X:"), 2, 0, 1, 1)
+        layout.addWidget(self.xSN, 2, 1, 1, 1)
+        layout.addWidget(self.xSP, 2, 2, 1, 1)
+        layout.addWidget(self.xSStep, 2, 3, 1, 1)
+        layout.addWidget(self.xSAbsPos, 2, 4, 1, 1)
+        layout.addWidget(self.xSMove, 2, 5, 1, 1)
+        layout.addWidget(self.xSCn, 2, 6, 1, 1)
+        layout.addWidget(self.xSStop, 2, 7, 1, 1)
+        layout.addWidget(self.xSCp, 2, 8, 1, 1)
+        layout.addWidget(self.xSSn, 2, 9, 1, 1)
+        layout.addWidget(self.xSSp, 2, 10, 1, 1)
+        layout.addWidget(self.xSHn, 2, 11, 1, 1)
+        layout.addWidget(self.xSHp, 2, 12, 1, 1)
 
         # ---------------------------------------------------------------------
         #   Y Sample Axis
@@ -440,19 +441,19 @@ class GUI(QMainWindow):
         self.ySHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
-        layout.addWidget(QLabel("Y:"), 2, 0, 1, 1)
-        layout.addWidget(self.ySN, 2, 1, 1, 1)
-        layout.addWidget(self.ySP, 2, 2, 1, 1)
-        layout.addWidget(self.ySStep, 2, 3, 1, 1)
-        layout.addWidget(self.ySAbsPos, 2, 4, 1, 1)
-        layout.addWidget(self.ySMove, 2, 5, 1, 1)
-        layout.addWidget(self.ySCn, 2, 6, 1, 1)
-        layout.addWidget(self.ySStop, 2, 7, 1, 1)
-        layout.addWidget(self.ySCp, 2, 8, 1, 1)
-        layout.addWidget(self.ySSn, 2, 9, 1, 1)
-        layout.addWidget(self.ySSp, 2, 10, 1, 1)
-        layout.addWidget(self.ySHn, 2, 11, 1, 1)
-        layout.addWidget(self.ySHp, 2, 12, 1, 1)
+        layout.addWidget(QLabel("Y:"), 3, 0, 1, 1)
+        layout.addWidget(self.ySN, 3, 1, 1, 1)
+        layout.addWidget(self.ySP, 3, 2, 1, 1)
+        layout.addWidget(self.ySStep, 3, 3, 1, 1)
+        layout.addWidget(self.ySAbsPos, 3, 4, 1, 1)
+        layout.addWidget(self.ySMove, 3, 5, 1, 1)
+        layout.addWidget(self.ySCn, 3, 6, 1, 1)
+        layout.addWidget(self.ySStop, 3, 7, 1, 1)
+        layout.addWidget(self.ySCp, 3, 8, 1, 1)
+        layout.addWidget(self.ySSn, 3, 9, 1, 1)
+        layout.addWidget(self.ySSp, 3, 10, 1, 1)
+        layout.addWidget(self.ySHn, 3, 11, 1, 1)
+        layout.addWidget(self.ySHp, 3, 12, 1, 1)
 
         # ---------------------------------------------------------------------
         #   Z Sample Axis
@@ -485,19 +486,19 @@ class GUI(QMainWindow):
         self.zSHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
-        layout.addWidget(QLabel("Z:"), 3, 0, 1, 1)
-        layout.addWidget(self.zSN, 3, 1, 1, 1)
-        layout.addWidget(self.zSP, 3, 2, 1, 1)
-        layout.addWidget(self.zSStep, 3, 3, 1, 1)
-        layout.addWidget(self.zSAbsPos, 3, 4, 1, 1)
-        layout.addWidget(self.zSMove, 3, 5, 1, 1)
-        layout.addWidget(self.zSCn, 3, 6, 1, 1)
-        layout.addWidget(self.zSStop, 3, 7, 1, 1)
-        layout.addWidget(self.zSCp, 3, 8, 1, 1)
-        layout.addWidget(self.zSSn, 3, 9, 1, 1)
-        layout.addWidget(self.zSSp, 3, 10, 1, 1)
-        layout.addWidget(self.zSHn, 3, 11, 1, 1)
-        layout.addWidget(self.zSHp, 3, 12, 1, 1)
+        layout.addWidget(QLabel("Z:"), 4, 0, 1, 1)
+        layout.addWidget(self.zSN, 4, 1, 1, 1)
+        layout.addWidget(self.zSP, 4, 2, 1, 1)
+        layout.addWidget(self.zSStep, 4, 3, 1, 1)
+        layout.addWidget(self.zSAbsPos, 4, 4, 1, 1)
+        layout.addWidget(self.zSMove, 4, 5, 1, 1)
+        layout.addWidget(self.zSCn, 4, 6, 1, 1)
+        layout.addWidget(self.zSStop, 4, 7, 1, 1)
+        layout.addWidget(self.zSCp, 4, 8, 1, 1)
+        layout.addWidget(self.zSSn, 4, 9, 1, 1)
+        layout.addWidget(self.zSSp, 4, 10, 1, 1)
+        layout.addWidget(self.zSHn, 4, 11, 1, 1)
+        layout.addWidget(self.zSHp, 4, 12, 1, 1)
 
         # Set window layout.
         window.setLayout(layout)
@@ -518,13 +519,17 @@ class GUI(QMainWindow):
         window = QWidget()
         layout = QGridLayout()
 
+        objectiveLab = QLabel("<b><u>Objective Stage</u></b>")
+        objectiveLab.setFont(QFont("Times", 9))
+        layout.addWidget(objectiveLab, 0, 0, 1, 13)
+
         # Set column labels.
-        layout.addWidget(QLabel("<b>Axis</b>"), 0, 0, 1, 1)
-        layout.addWidget(QLabel("<b>Increment Position</b>"), 0, 1, 1, 2)
-        layout.addWidget(QLabel("<b>Step Size</b>"), 0, 3, 1, 1)
-        layout.addWidget(QLabel("<b>Absolute Position</b>"), 0, 4, 1, 1)
-        layout.addWidget(QLabel("<b>Continual Motion</b>"), 0, 6, 1, 3)
-        layout.addWidget(QLabel("<b>Limits</b>"), 0, 9, 1, 4)
+        layout.addWidget(QLabel("<b>Axis</b>"), 1, 0, 1, 1)
+        layout.addWidget(QLabel("<b>Increment Position</b>"), 1, 1, 1, 2)
+        layout.addWidget(QLabel("<b>Step Size</b>"), 1, 3, 1, 1)
+        layout.addWidget(QLabel("<b>Absolute Position</b>"), 1, 4, 1, 1)
+        layout.addWidget(QLabel("<b>Continual Motion</b>"), 1, 6, 1, 3)
+        layout.addWidget(QLabel("<b>Limits</b>"), 1, 9, 1, 4)
 
         # ----------------------------------------------------------------------
         #   X Objective Axis
@@ -557,19 +562,19 @@ class GUI(QMainWindow):
         self.xOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
-        layout.addWidget(QLabel("X:"), 1, 0, 1, 1)
-        layout.addWidget(self.xON, 1, 1, 1, 1)
-        layout.addWidget(self.xOP, 1, 2, 1, 1)
-        layout.addWidget(self.xOStep, 1, 3, 1, 1)
-        layout.addWidget(self.xOAbsPos, 1, 4, 1, 1)
-        layout.addWidget(self.xOMove, 1, 5, 1, 1)
-        layout.addWidget(self.xOCn, 1, 6, 1, 1)
-        layout.addWidget(self.xOStop, 1, 7, 1, 1)
-        layout.addWidget(self.xOCp, 1, 8, 1, 1)
-        layout.addWidget(self.xOSn, 1, 9, 1, 1)
-        layout.addWidget(self.xOSp, 1, 10, 1, 1)
-        layout.addWidget(self.xOHn, 1, 11, 1, 1)
-        layout.addWidget(self.xOHp, 1, 12, 1, 1)
+        layout.addWidget(QLabel("X:"), 2, 0, 1, 1)
+        layout.addWidget(self.xON, 2, 1, 1, 1)
+        layout.addWidget(self.xOP, 2, 2, 1, 1)
+        layout.addWidget(self.xOStep, 2, 3, 1, 1)
+        layout.addWidget(self.xOAbsPos, 2, 4, 1, 1)
+        layout.addWidget(self.xOMove, 2, 5, 1, 1)
+        layout.addWidget(self.xOCn, 2, 6, 1, 1)
+        layout.addWidget(self.xOStop, 2, 7, 1, 1)
+        layout.addWidget(self.xOCp, 2, 8, 1, 1)
+        layout.addWidget(self.xOSn, 2, 9, 1, 1)
+        layout.addWidget(self.xOSp, 2, 10, 1, 1)
+        layout.addWidget(self.xOHn, 2, 11, 1, 1)
+        layout.addWidget(self.xOHp, 2, 12, 1, 1)
 
         # ---------------------------------------------------------------------
         #   Y Objectivs Axis
@@ -602,19 +607,19 @@ class GUI(QMainWindow):
         self.yOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
-        layout.addWidget(QLabel("Y:"), 2, 0, 1, 1)
-        layout.addWidget(self.yON, 2, 1, 1, 1)
-        layout.addWidget(self.yOP, 2, 2, 1, 1)
-        layout.addWidget(self.yOStep, 2, 3, 1, 1)
-        layout.addWidget(self.yOAbsPos, 2, 4, 1, 1)
-        layout.addWidget(self.yOMove, 2, 5, 1, 1)
-        layout.addWidget(self.yOCn, 2, 6, 1, 1)
-        layout.addWidget(self.yOStop, 2, 7, 1, 1)
-        layout.addWidget(self.yOCp, 2, 8, 1, 1)
-        layout.addWidget(self.yOSn, 2, 9, 1, 1)
-        layout.addWidget(self.yOSp, 2, 10, 1, 1)
-        layout.addWidget(self.yOHn, 2, 11, 1, 1)
-        layout.addWidget(self.yOHp, 2, 12, 1, 1)
+        layout.addWidget(QLabel("Y:"), 3, 0, 1, 1)
+        layout.addWidget(self.yON, 3, 1, 1, 1)
+        layout.addWidget(self.yOP, 3, 2, 1, 1)
+        layout.addWidget(self.yOStep, 3, 3, 1, 1)
+        layout.addWidget(self.yOAbsPos, 3, 4, 1, 1)
+        layout.addWidget(self.yOMove, 3, 5, 1, 1)
+        layout.addWidget(self.yOCn, 3, 6, 1, 1)
+        layout.addWidget(self.yOStop, 3, 7, 1, 1)
+        layout.addWidget(self.yOCp, 3, 8, 1, 1)
+        layout.addWidget(self.yOSn, 3, 9, 1, 1)
+        layout.addWidget(self.yOSp, 3, 10, 1, 1)
+        layout.addWidget(self.yOHn, 3, 11, 1, 1)
+        layout.addWidget(self.yOHp, 3, 12, 1, 1)
 
         # ---------------------------------------------------------------------
         #   Z Objective Axis
@@ -647,19 +652,19 @@ class GUI(QMainWindow):
         self.zOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
-        layout.addWidget(QLabel("Z:"), 3, 0, 1, 1)
-        layout.addWidget(self.zON, 3, 1, 1, 1)
-        layout.addWidget(self.zOP, 3, 2, 1, 1)
-        layout.addWidget(self.zOStep, 3, 3, 1, 1)
-        layout.addWidget(self.zOAbsPos, 3, 4, 1, 1)
-        layout.addWidget(self.zOMove, 3, 5, 1, 1)
-        layout.addWidget(self.zOCn, 3, 6, 1, 1)
-        layout.addWidget(self.zOStop, 3, 7, 1, 1)
-        layout.addWidget(self.zOCp, 3, 8, 1, 1)
-        layout.addWidget(self.zOSn, 3, 9, 1, 1)
-        layout.addWidget(self.zOSp, 3, 10, 1, 1)
-        layout.addWidget(self.zOHn, 3, 11, 1, 1)
-        layout.addWidget(self.zOHp, 3, 12, 1, 1)
+        layout.addWidget(QLabel("Z:"), 4, 0, 1, 1)
+        layout.addWidget(self.zON, 4, 1, 1, 1)
+        layout.addWidget(self.zOP, 4, 2, 1, 1)
+        layout.addWidget(self.zOStep, 4, 3, 1, 1)
+        layout.addWidget(self.zOAbsPos, 4, 4, 1, 1)
+        layout.addWidget(self.zOMove, 4, 5, 1, 1)
+        layout.addWidget(self.zOCn, 4, 6, 1, 1)
+        layout.addWidget(self.zOStop, 4, 7, 1, 1)
+        layout.addWidget(self.zOCp, 4, 8, 1, 1)
+        layout.addWidget(self.zOSn, 4, 9, 1, 1)
+        layout.addWidget(self.zOSp, 4, 10, 1, 1)
+        layout.addWidget(self.zOHn, 4, 11, 1, 1)
+        layout.addWidget(self.zOHp, 4, 12, 1, 1)
 
         # Set window layout.
         window.setLayout(layout)
@@ -686,9 +691,9 @@ class MyTableWidget(QWidget):
     tab2 : QWidget
         Mode tab of the table window.
     tab3 : QWidget
-        Specifications tab of the table window.
+        Hard Limits tab of the table window.
     tab4 : QWidget
-        Limits tab of the table window.
+        Soft Limits tab of the table window.
     tab5 : QWidget
         Calibration tab of the table window.
     xIdleS : QLabel
@@ -814,8 +819,8 @@ class MyTableWidget(QWidget):
         # Add tabs to window layout.
         self.tabs.addTab(self.tab1, "Status")
         self.tabs.addTab(self.tab2, "Mode")
-        self.tabs.addTab(self.tab3, "Specifications")
-        self.tabs.addTab(self.tab4, "Limits")
+        self.tabs.addTab(self.tab3, "Hard Limits")
+        self.tabs.addTab(self.tab4, "Soft Limits")
         self.tabs.addTab(self.tab5, "Calibration")
 
         # ---------------------------------------------------------------------
@@ -834,6 +839,12 @@ class MyTableWidget(QWidget):
         self.zStopS = QLabel("In Motion")
 
         # Style interactive sample widgets.
+        self.xIdleS.setAlignment(Qt.AlignCenter)
+        self.yIdleS.setAlignment(Qt.AlignCenter)
+        self.zIdleS.setAlignment(Qt.AlignCenter)
+        self.xStopS.setAlignment(Qt.AlignCenter)
+        self.yStopS.setAlignment(Qt.AlignCenter)
+        self.zStopS.setAlignment(Qt.AlignCenter)
         self.xIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
         self.yIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
         self.zIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
@@ -856,15 +867,21 @@ class MyTableWidget(QWidget):
         # Interactive objective widgets.
         self.xIdleO = QLabel("IDLE")
         self.yIdleO = QLabel("IDLE")
-        self.zIdleS = QLabel("IDLE")
+        self.zIdleO = QLabel("IDLE")
         self.xStopO = QLabel("In Motion")
         self.yStopO = QLabel("In Motion")
         self.zStopO = QLabel("In Motion")
 
         # Style interactive sample widgets.
+        self.xIdleO.setAlignment(Qt.AlignCenter)
+        self.yIdleO.setAlignment(Qt.AlignCenter)
+        self.zIdleO.setAlignment(Qt.AlignCenter)
+        self.xStopO.setAlignment(Qt.AlignCenter)
+        self.yStopO.setAlignment(Qt.AlignCenter)
+        self.zStopO.setAlignment(Qt.AlignCenter)
         self.xIdleO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
         self.yIdleO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zIdleO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
         self.xStopO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
         self.yStopO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
         self.zStopO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
@@ -876,7 +893,7 @@ class MyTableWidget(QWidget):
         self.tab1.layout.addWidget(QLabel("Z:"), 3, 4, 1, 1)
         self.tab1.layout.addWidget(self.xIdleO, 1, 5, 1, 1)
         self.tab1.layout.addWidget(self.yIdleO, 2, 5, 1, 1)
-        self.tab1.layout.addWidget(self.zIdleS, 3, 5, 1, 1)
+        self.tab1.layout.addWidget(self.zIdleO, 3, 5, 1, 1)
         self.tab1.layout.addWidget(self.xStopO, 1, 6, 1, 1)
         self.tab1.layout.addWidget(self.yStopO, 2, 6, 1, 1)
         self.tab1.layout.addWidget(self.zStopO, 3, 6, 1, 1)
@@ -902,6 +919,9 @@ class MyTableWidget(QWidget):
         self.tab2.layout.addWidget(self.RDM2)
         self.tab2.layout.addWidget(self.RDM3)
         self.tab2.layout.addWidget(self.RDM4)
+
+        # Check mode when in homed position.
+        self.RDM3.setChecked(True)
 
         # Set tab layout.
         self.tab2.setLayout(self.tab2.layout)
@@ -1005,6 +1025,11 @@ class MyTableWidget(QWidget):
         self.tab4.layout.addWidget(self.SSL, 5, 0, 1, 3)
         self.tab4.layout.addWidget(self.SESL, 5, 4, 1, 3)
 
+        # Add information labels.
+        softLimLabel=QLabel("<i>The motors will move 'backlash' steps past the low limit before moving back to the lower limit.</i>")
+        softLimLabel.setWordWrap(True)
+        self.tab4.layout.addWidget(softLimLabel, 6, 0, 1, 6)
+
         # Set tab layout.
         self.tab4.setLayout(self.tab4.layout)
 
@@ -1071,6 +1096,14 @@ class MyTableWidget(QWidget):
         self.SBL = QPushButton("Update Backlash Values")
         self.SBL.setStyleSheet("background-color: lightgrey")
         self.tab5.layout.addWidget(self.SBL, 5, 0, 1, 6)
+
+        # Add information labels.
+        backlashLabel=QLabel("<i>Backlash is applied when moving negitively. The motor will move 'backlash' steps past the target position before returning to the target position</i>")
+        zeroLabel=QLabel("<i>Zero'ing sets the current position as the datum.</i>")
+        backlashLabel.setWordWrap(True)
+        zeroLabel.setWordWrap(True)
+        self.tab5.layout.addWidget(backlashLabel, 6, 0, 1, 6)
+        self.tab5.layout.addWidget(zeroLabel, 7, 0, 1, 6)
 
         # Set tab layout.
         self.tab5.setLayout(self.tab5.layout)
