@@ -9,6 +9,7 @@ connecting widgets up to control sequences that bring about change.
 import matplotlib.pyplot as plt
 import numpy as np
 from functools import partial
+import epics
 from epics import caput, caget, PV
 
 # Import objects for type annotations.
@@ -20,6 +21,8 @@ from gui import GUI
 from thorlabs_motor_control import changeMode
 from globals import *
 
+
+epics.ca.find_libca()
 
 class Controller:
     """Connect GUI widgets to control sequences.
@@ -96,7 +99,7 @@ class Controller:
         -------
         None
         """
-        print("Configuring and Initializing PVs.")
+        print("Configuring and initializing PVs.")
 
         # Set step line edits to current PV values.
         self.gui.xSStep.setText(str(caget(self.GL["XSSTEP"])))
@@ -115,12 +118,12 @@ class Controller:
         self.gui.zOAbsPos.setText(str(caget(self.GL["ZOABSPOS"])))
 
         # Set backlash line edits to current PV values.
-        self.gui.xSB.setText(str(caget(self.GL["XSB"])))
-        self.gui.ySB.setText(str(caget(self.GL["YSB"])))
-        self.gui.zSB.setText(str(caget(self.GL["ZSB"])))
-        self.gui.xOB.setText(str(caget(self.GL["XOB"])))
-        self.gui.yOB.setText(str(caget(self.GL["YOB"])))
-        self.gui.zOB.setText(str(caget(self.GL["ZOB"])))
+        self.gui.tab.xSB.setText(str(caget(self.GL["XSB"])))
+        self.gui.tab.ySB.setText(str(caget(self.GL["YSB"])))
+        self.gui.tab.zSB.setText(str(caget(self.GL["ZSB"])))
+        self.gui.tab.xOB.setText(str(caget(self.GL["XOB"])))
+        self.gui.tab.yOB.setText(str(caget(self.GL["YOB"])))
+        self.gui.tab.zOB.setText(str(caget(self.GL["ZOB"])))
 
         self.PV_XSABSPOS = PV(pvname=self.gui.GL["XSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
         self.PV_ySABSPOS = PV(pvname=self.gui.GL["YSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
