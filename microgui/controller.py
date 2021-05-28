@@ -275,12 +275,13 @@ class Controller(object):
         -------
         None
         """
-        path, _ = QFileDialog.getSaveFileName(self, "Save File",
+        path, _ = QFileDialog.getSaveFileName(self.gui, "Save File",
                 "sample_capture", "Image files (*.jpg *.jpeg *.gif *png)")
         
         plt.figure()
-        plt.imshow(np.rot90(self.gui.image, 1))
-        plt.savefig(path)
+        plt.imshow(np.rot90(self.gui.image, 3))
+        plt.axis("off")
+        plt.savefig(path, dpi=250, bbox_inches="tight")
         
         print(f"Image capture saved to: {path}")
 
@@ -359,7 +360,7 @@ class Controller(object):
         else:
             caput(self.GL[f"{axis}{object}{direction}"], 1)
         
-        self.setSoftLimitInt(object, axis)
+        self.setSoftLimitInd(object, axis)
         
         absPos = caget(self.GL[f"{axis}{object}ABSPOS"])
         print(f"Incremental movement to {axis}{object}ABSPOS = {absPos}.")
@@ -546,7 +547,7 @@ class Controller(object):
                 self.gui.tab.xSMax.setText(str(self.GL["XSMAX_SOFT_LIMIT"]))
             else:
                 self.GL["XSMAX_SOFT_LIMIT"] = xsmax
-                self.gui.tab.xSMin.setText(str(xsmax))
+                self.gui.tab.xSMax.setText(str(xsmax))
             
             ysmin = float(self.gui.tab.ySMin.text())
             if ysmin < self.GL["YSMIN_HARD_LIMIT"]:
@@ -554,7 +555,7 @@ class Controller(object):
                 self.gui.tab.ySMin.setText(str(self.GL["YSMIN_SOFT_LIMIT"]))
             else:
                 self.GL["YSMIN_SOFT_LIMIT"] = ysmin
-                self.gui.tab.xSMin.setText(str(ysmin))
+                self.gui.tab.ySMin.setText(str(ysmin))
 
             ysmax = float(self.gui.tab.ySMax.text())
             if ysmax > self.GL["YSMAX_HARD_LIMIT"]:
@@ -562,7 +563,7 @@ class Controller(object):
                 self.gui.tab.ySMax.setText(str(self.GL["YSMAX_SOFT_LIMIT"]))
             else:
                 self.GL["YSMAX_SOFT_LIMIT"] = ysmax
-                self.gui.tab.xSMin.setText(str(ysmax))
+                self.gui.tab.ySMax.setText(str(ysmax))
             
             zsmin = float(self.gui.tab.zSMin.text())
             if zsmin < self.GL["ZSMIN_HARD_LIMIT"]:
@@ -570,7 +571,7 @@ class Controller(object):
                 self.gui.tab.zSMin.setText(str(self.GL["ZSMIN_SOFT_LIMIT"]))
             else:
                 self.GL["ZSMIN_SOFT_LIMIT"] = zsmin
-                self.gui.tab.xSMin.setText(str(zsmin))
+                self.gui.tab.zSMin.setText(str(zsmin))
 
             zsmax = float(self.gui.tab.zSMax.text())
             if zsmax > self.GL["ZSMAX_HARD_LIMIT"]:
@@ -578,7 +579,7 @@ class Controller(object):
                 self.gui.tab.zSMax.setText(str(self.GL["ZSMAX_SOFT_LIMIT"]))
             else:
                 self.GL["ZSMAX_SOFT_LIMIT"] = zsmax
-                self.gui.tab.xSMin.setText(str(zsmax))
+                self.gui.tab.zSMzx.setText(str(zsmax))
             
             xomin = float(self.gui.tab.xOMin.text())
             if xomin < self.GL["XOMIN_HARD_LIMIT"]:
@@ -586,7 +587,7 @@ class Controller(object):
                 self.gui.tab.xOMin.setText(str(self.GL["XOMIN_SOFT_LIMIT"]))
             else:
                 self.GL["XOMIN_SOFT_LIMIT"] = xomin
-                self.gui.tab.xSMin.setText(str(xomin))
+                self.gui.tab.xOMin.setText(str(xomin))
 
             xomax = float(self.gui.tab.xOMax.text())
             if xomax > self.GL["XOMAX_HARD_LIMIT"]:
@@ -594,7 +595,7 @@ class Controller(object):
                 self.gui.tab.xOMax.setText(str(self.GL["XOMAX_SOFT_LIMIT"]))
             else:
                 self.GL["XOMAX_SOFT_LIMIT"] = xomax
-                self.gui.tab.xSMin.setText(str(xomax))
+                self.gui.tab.xOMax.setText(str(xomax))
             
             yomin = float(self.gui.tab.yOMin.text())
             if yomin < self.GL["YOMIN_HARD_LIMIT"]:
@@ -602,7 +603,7 @@ class Controller(object):
                 self.gui.tab.yOMin.setText(str(self.GL["YOMIN_SOFT_LIMIT"]))
             else:
                 self.GL["YOMIN_SOFT_LIMIT"] = yomin
-                self.gui.tab.xSMin.setText(str(yomin))
+                self.gui.tab.yOMin.setText(str(yomin))
 
             yomax = float(self.gui.tab.yOMax.text())
             if yomax > self.GL["YOMAX_HARD_LIMIT"]:
@@ -610,7 +611,7 @@ class Controller(object):
                 self.gui.tab.yOMax.setText(str(self.GL["YOMAX_SOFT_LIMIT"]))
             else:
                 self.GL["YOMAX_SOFT_LIMIT"] = yomax
-                self.gui.tab.xSMin.setText(str(yomax))
+                self.gui.tab.yOMax.setText(str(yomax))
             
             zomin = float(self.gui.tab.zOMin.text())
             if zomin < self.GL["ZOMIN_HARD_LIMIT"]:
@@ -618,7 +619,7 @@ class Controller(object):
                 self.gui.tab.zOMin.setText(str(self.GL["ZOMIN_SOFT_LIMIT"]))
             else:
                 self.GL["ZOMIN_SOFT_LIMIT"] = zomin
-                self.gui.tab.xSMin.setText(str(zomin))
+                self.gui.tab.zOMin.setText(str(zomin))
 
             zomax = float(self.gui.tab.zOMax.text())
             if zomax > self.GL["ZOMAX_HARD_LIMIT"]:
@@ -626,9 +627,14 @@ class Controller(object):
                 self.gui.tab.zOMax.setText(str(self.GL["ZOMAX_SOFT_LIMIT"]))
             else:
                 self.GL["ZOMAX_SOFT_LIMIT"] = zomax
-                self.gui.tab.xSMin.setText(str(zomax))
+                self.gui.tab.zOMax.setText(str(zomax))
             
         print(f"Updating soft limits, buttonID={buttonID}.")
+        for object in ["S", "O"]:
+            for axis in ["X", "Y", "Z"]:
+                Min = self.GL[f"{axis}{object}MIN_SOFT_LIMIT"]
+                Max = self.GL[f"{axis}{object}MAX_SOFT_LIMIT"]
+                print(f"XS SL: min -> {Min}, max -> {Max}")
 
     def updateBacklash(self) -> None:
         """Update backlash variables.
@@ -642,12 +648,12 @@ class Controller(object):
         None
         """
         # Set global backlash variables.
-        caput(self.GL["XSB"], int(abs(self.gui.tab.xSB.text())))
-        caput(self.GL["YSB"], int(abs(self.gui.tab.ySB.text())))
-        caput(self.GL["ZSB"], int(abs(self.gui.tab.zSB.text())))
-        caput(self.GL["XOB"], int(abs(self.gui.tab.xOB.text())))
-        caput(self.GL["YOB"], int(abs(self.gui.tab.yOB.text())))
-        caput(self.GL["ZOB"], int(abs(self.gui.tab.zOB.text())))
+        caput(self.GL["XSB"], abs(int(self.gui.tab.xSB.text())))
+        caput(self.GL["YSB"], abs(int(self.gui.tab.ySB.text())))
+        caput(self.GL["ZSB"], abs(int(self.gui.tab.zSB.text())))
+        caput(self.GL["XOB"], abs(int(self.gui.tab.xOB.text())))
+        caput(self.GL["YOB"], abs(int(self.gui.tab.yOB.text())))
+        caput(self.GL["ZOB"], abs(int(self.gui.tab.zOB.text())))
 
         self.gui.tab.xSB.setText(str(caget(self.GL["XSB"])))
         self.gui.tab.ySB.setText(str(caget(self.GL["YSB"])))
@@ -729,12 +735,12 @@ class Controller(object):
 
         if value == 1:
             motionLabels[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-            motionLabels[(object, axis, 1)].setStyleSheet("background-color: #49eb34; border: 1px solid black;")
+            motionLabels[(object, axis, 1)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
         elif value == 0:
-            motionLabels[(object, axis, 0)].setStyleSheet("background-color: #49eb34; border: 1px solid black;")
+            motionLabels[(object, axis, 0)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
             motionLabels[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
-        print("Checkiing motor status.")
+        print(f"Checkiing motor status, motor ident and state => {pvname}, {value}")
 
     def setHardLimitInd(self, **kwargs):
         """
@@ -758,9 +764,9 @@ class Controller(object):
 
         if self.GL[f"{axis}{object}HP"] - 5 < value:
             hardLimits[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-            hardLimits[(object, axis, 1)].setStyleSheet("background-color: #49eb34; border: 1px solid black;")
+            hardLimits[(object, axis, 1)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
         elif value < self.GL[f"{axis}{object}HN"] + 5:
-            hardLimits[(object, axis, 0)].setStyleSheet("background-color: #49eb34; border: 1px solid black;")
+            hardLimits[(object, axis, 0)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
             hardLimits[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
         else:
             hardLimits[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
@@ -779,16 +785,16 @@ class Controller(object):
                       ("O", "Y", 0): self.gui.yOSn, ("O", "Y", 1): self.gui.yOSp,
                       ("O", "Z", 0): self.gui.zOSn, ("O", "Z", 1): self.gui.zOSp}
 
-        value = self.GL[f"{axis}{object}ABSPOS"]
+        value = caget(self.GL[f"{axis}{object}ABSPOS"])
 
-        if self.GL[f"{axis}{object}SP"] - 5 < value:
+        if self.GL[f"{axis}{object}MAX_SOFT_LIMIT"] - 5 < value:
             softLimits[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-            softLimits[(object, axis, 1)].setStyleSheet("background-color: #49eb34; border: 1px solid black;")
-        elif value < self.GL[f"{axis}{object}SN"] + 5:
-            softLimits[(object, axis, 0)].setStyleSheet("background-color: #49eb34; border: 1px solid black;")
+            softLimits[(object, axis, 1)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
+        elif value < self.GL[f"{axis}{object}MIN_SOFT_LIMIT"] + 5:
+            softLimits[(object, axis, 0)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
             softLimits[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
         else:
             softLimits[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
             softLimits[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
         
-        print("Setting hard limit indicators.")
+        print("Setting soft limit indicators.")
