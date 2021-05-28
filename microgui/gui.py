@@ -9,7 +9,7 @@ Microscope.
 import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.ptime as ptime
-from typing import Any, Dict
+from typing import Any
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtCore import QRectF, QTimer, Qt
 from PyQt5.QtWidgets import QMainWindow, QGridLayout, QVBoxLayout, QWidget,\

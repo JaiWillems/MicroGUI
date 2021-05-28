@@ -6,6 +6,7 @@ horizontal microscope mode.
 
 
 import thorlabs_apt as apt
+from thorlabs_apt import Motor
 
 
 TRANSMISSION_POSITION = 36
@@ -14,7 +15,7 @@ VISIBLE_IMAGE_POSITION = 0
 BEAMSPLITTER_POSITION = 18
 
 
-def initMotor():
+def initMotor() -> Motor:
     """
     Defines and instantiates the mode motor.
 
@@ -40,19 +41,19 @@ def initMotor():
 
     # Initialize motor if detected.
     modeMotor = apt.Motor(motorSerialNumber)
-    modeMotor.set_move_home_parameters(*modeMotor.get_move_home_parameters)
-    modeMotor.set_velocity_parameters(*modeMotor.get_velocity_parameters)
+    modeMotor.set_move_home_parameters(*modeMotor.get_move_home_parameters())
+    modeMotor.set_velocity_parameters(*modeMotor.get_velocity_parameters())
     modeMotor.enable()
 
     try:
-        modeMotor.move_home()
+        modeMotor.move_home(True)
     except:
         raise Exception("Motor cannot be homed.")
 
     return modeMotor
 
 
-def changeMode(mode, modeMotor):
+def changeMode(mode: int, modeMotor: Motor) -> None:
     """
     Change THORLAB motor position by pre-set ammount.
 
@@ -65,6 +66,8 @@ def changeMode(mode, modeMotor):
         The mode values correspond to one of the four microscope modes where
         mode=1 -> Transmission mode, mode=2 -> Reflection mode, mode=3 ->
         Visible Image Mode, and mode=4 -> Beamsplitter Mode.
+    modeMotor : Motor
+        Motor object to change the mode of.
 
     Returns
     -------
@@ -76,12 +79,12 @@ def changeMode(mode, modeMotor):
     """
     # Set move_to position based on mode.
     if mode == 1:
-        x = TRANSMISSION_POSITION
+        pos = TRANSMISSION_POSITION
     elif mode == 2:
-        x = REFLECTION_POSITION
+        pos = REFLECTION_POSITION
     elif mode == 3:
-        x = VISIBLE_IMAGE_POSITION
+        pos = VISIBLE_IMAGE_POSITION
     else:
-        x = BEAMSPLITTER_POSITION
+        pos = BEAMSPLITTER_POSITION
 
-    modeMotor.move_to(value=x, blocking=False) 
+    modeMotor.move_to(value=pos, blocking=False) 
