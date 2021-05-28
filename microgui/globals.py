@@ -293,8 +293,8 @@ global ZOZERO
 global ZOB
 global ZOSTATE
 
-ZON = "obj:SMTR1601-1-R10-32:step:moveDeltaOut"
-ZOP = "obj:SMTR1601-1-R10-32:step:moveDeltaIn"
+ZON = "obj:SMTR1601-1-R10-32:step:moveDeltaIn"
+ZOP = "obj:SMTR1601-1-R10-32:step:moveDeltaOut"
 ZOSTEP = "obj:SMTR1601-1-R10-32:step:delta"
 ZOABSPOS = "obj:SMTR1601-1-R10-32:step:c:target"
 ZOMOVE = "obj:SMTR1601-1-R10-32:step:c:moveTo"

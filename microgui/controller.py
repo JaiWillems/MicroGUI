@@ -80,7 +80,6 @@ class Controller(object):
         """Initialize the Controller."""
         self.gui = gui
         self.modeMotor = modeMotor
-        self.GL = globals()
 
         self.monitorPVs()
         self.connectSignals()
@@ -100,50 +99,52 @@ class Controller(object):
         -------
         None
         """
+        GL = globals()
+
         # Set step line edits to current PV values.
-        self.gui.xSStep.setText(str(caget(self.GL["XSSTEP"])))
-        self.gui.ySStep.setText(str(caget(self.GL["YSSTEP"])))
-        self.gui.zSStep.setText(str(caget(self.GL["ZSSTEP"])))
-        self.gui.xOStep.setText(str(caget(self.GL["XOSTEP"])))
-        self.gui.yOStep.setText(str(caget(self.GL["YOSTEP"])))
-        self.gui.zOStep.setText(str(caget(self.GL["ZOSTEP"])))
+        self.gui.xSStep.setText(str(caget(GL["XSSTEP"])))
+        self.gui.ySStep.setText(str(caget(GL["YSSTEP"])))
+        self.gui.zSStep.setText(str(caget(GL["ZSSTEP"])))
+        self.gui.xOStep.setText(str(caget(GL["XOSTEP"])))
+        self.gui.yOStep.setText(str(caget(GL["YOSTEP"])))
+        self.gui.zOStep.setText(str(caget(GL["ZOSTEP"])))
 
         # Set absolute position line edits to current PV values.
-        self.gui.xSAbsPos.setText(str(caget(self.GL["XSABSPOS"])))
-        self.gui.ySAbsPos.setText(str(caget(self.GL["YSABSPOS"])))
-        self.gui.zSAbsPos.setText(str(caget(self.GL["ZSABSPOS"])))
-        self.gui.xOAbsPos.setText(str(caget(self.GL["XOABSPOS"])))
-        self.gui.yOAbsPos.setText(str(caget(self.GL["YOABSPOS"])))
-        self.gui.zOAbsPos.setText(str(caget(self.GL["ZOABSPOS"])))
+        self.gui.xSAbsPos.setText(str(caget(GL["XSABSPOS"])))
+        self.gui.ySAbsPos.setText(str(caget(GL["YSABSPOS"])))
+        self.gui.zSAbsPos.setText(str(caget(GL["ZSABSPOS"])))
+        self.gui.xOAbsPos.setText(str(caget(GL["XOABSPOS"])))
+        self.gui.yOAbsPos.setText(str(caget(GL["YOABSPOS"])))
+        self.gui.zOAbsPos.setText(str(caget(GL["ZOABSPOS"])))
 
         # Set backlash line edits to current PV values.
-        self.gui.tab.xSB.setText(str(caget(self.GL["XSB"])))
-        self.gui.tab.ySB.setText(str(caget(self.GL["YSB"])))
-        self.gui.tab.zSB.setText(str(caget(self.GL["ZSB"])))
-        self.gui.tab.xOB.setText(str(caget(self.GL["XOB"])))
-        self.gui.tab.yOB.setText(str(caget(self.GL["YOB"])))
-        self.gui.tab.zOB.setText(str(caget(self.GL["ZOB"])))
+        self.gui.tab.xSB.setText(str(caget(GL["XSB"])))
+        self.gui.tab.ySB.setText(str(caget(GL["YSB"])))
+        self.gui.tab.zSB.setText(str(caget(GL["ZSB"])))
+        self.gui.tab.xOB.setText(str(caget(GL["XOB"])))
+        self.gui.tab.yOB.setText(str(caget(GL["YOB"])))
+        self.gui.tab.zOB.setText(str(caget(GL["ZOB"])))
 
-        self.PV_XSABSPOS = PV(pvname=self.GL["XSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_ySABSPOS = PV(pvname=self.GL["YSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_zSABSPOS = PV(pvname=self.GL["ZSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_XOABSPOS = PV(pvname=self.GL["XOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_yOABSPOS = PV(pvname=self.GL["YOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_zOABSPOS = PV(pvname=self.GL["ZOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_XSABSPOS = PV(pvname=GL["XSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_ySABSPOS = PV(pvname=GL["YSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_zSABSPOS = PV(pvname=GL["ZSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_XOABSPOS = PV(pvname=GL["XOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_yOABSPOS = PV(pvname=GL["YOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_zOABSPOS = PV(pvname=GL["ZOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
 
-        self.PV_XSSTATE = PV(pvname=self.GL["XSSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_YSSTATE = PV(pvname=self.GL["YSSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_ZSSTATE = PV(pvname=self.GL["ZSSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_XOSTATE = PV(pvname=self.GL["XOSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_YOSTATE = PV(pvname=self.GL["YOSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_ZOSTATE = PV(pvname=self.GL["ZOSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_XSSTATE = PV(pvname=GL["XSSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_YSSTATE = PV(pvname=GL["YSSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_ZSSTATE = PV(pvname=GL["ZSSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_XOSTATE = PV(pvname=GL["XOSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_YOSTATE = PV(pvname=GL["YOSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_ZOSTATE = PV(pvname=GL["ZOSTATE"], auto_monitor=True, callback=self.motorStatus)
 
-        self.PV_XSHN = PV(pvname=self.GL["XSHN"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_XSHP = PV(pvname=self.GL["XSHP"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_YSHN = PV(pvname=self.GL["YSHN"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_YSHP = PV(pvname=self.GL["YSHP"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_ZSHN = PV(pvname=self.GL["ZSHN"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_ZSHP = PV(pvname=self.GL["ZSHP"], auto_monitor=True, callback=self.setHardLimitInd)
+        self.PV_XSHN = PV(pvname=GL["XSHN"], auto_monitor=True, callback=self.setHardLimitInd)
+        self.PV_XSHP = PV(pvname=GL["XSHP"], auto_monitor=True, callback=self.setHardLimitInd)
+        self.PV_YSHN = PV(pvname=GL["YSHN"], auto_monitor=True, callback=self.setHardLimitInd)
+        self.PV_YSHP = PV(pvname=GL["YSHP"], auto_monitor=True, callback=self.setHardLimitInd)
+        self.PV_ZSHN = PV(pvname=GL["ZSHN"], auto_monitor=True, callback=self.setHardLimitInd)
+        self.PV_ZSHP = PV(pvname=GL["ZSHP"], auto_monitor=True, callback=self.setHardLimitInd)
 
         print("-*- PVs configured and initialized. -*-")
 
@@ -257,7 +258,10 @@ class Controller(object):
         self.gui.tab.xOZero.clicked.connect(partial(self.zeroPos, "O", "X"))
         self.gui.tab.yOZero.clicked.connect(partial(self.zeroPos, "O", "Y"))
         self.gui.tab.zOZero.clicked.connect(partial(self.zeroPos, "O", "Z"))
+
         self.gui.tab.SBL.clicked.connect(self.updateBacklash)
+
+        self.gui.tab.globals.clicked.connect(self.displayGlobals)
 
         print("-*- Widgets connected to control sequences. -*-")
 
@@ -331,38 +335,40 @@ class Controller(object):
         -------
         None
         """
-        caput(self.GL[f"{axis}{object}STEP"], float(step.text()))
+        GL = globals()
 
-        absPos = caget(self.GL[f"{axis}{object}ABSPOS"])
-        incPos = caget(self.GL[f"{axis}{object}STEP"])
+        caput(GL[f"{axis}{object}STEP"], float(step.text()))
 
-        PHL = self.GL[f"{axis}{object}MAX_HARD_LIMIT"]
-        NHL = self.GL[f"{axis}{object}MIN_HARD_LIMIT"]
-        PSL = self.GL[f"{axis}{object}MAX_SOFT_LIMIT"]
-        NSL = self.GL[f"{axis}{object}MIN_SOFT_LIMIT"]
+        absPos = caget(GL[f"{axis}{object}ABSPOS"])
+        incPos = caget(GL[f"{axis}{object}STEP"])
+
+        PHL = GL[f"{axis}{object}MAX_HARD_LIMIT"]
+        NHL = GL[f"{axis}{object}MIN_HARD_LIMIT"]
+        PSL = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
+        NSL = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
 
         if direction == "P" and absPos + incPos > PSL:
-            caput(self.GL[f"{axis}{object}ABSPOS"], PSL)
-            caput(self.GL[f"{axis}{object}MOVE"], 1)
-            caput(self.GL[f"{axis}{object}MOVE"], 0)
+            caput(GL[f"{axis}{object}ABSPOS"], PSL)
+            caput(GL[f"{axis}{object}MOVE"], 1)
+            caput(GL[f"{axis}{object}MOVE"], 0)
         elif direction == "P" and absPos + incPos > PHL:
-            caput(self.GL[f"{axis}{object}ABSPOS"], PHL)
-            caput(self.GL[f"{axis}{object}MOVE"], 1)
-            caput(self.GL[f"{axis}{object}MOVE"], 0)
+            caput(GL[f"{axis}{object}ABSPOS"], PHL)
+            caput(GL[f"{axis}{object}MOVE"], 1)
+            caput(GL[f"{axis}{object}MOVE"], 0)
         elif direction == "N" and absPos - incPos < NSL:
-            caput(self.GL[f"{axis}{object}ABSPOS"], NSL)
-            caput(self.GL[f"{axis}{object}MOVE"], 1)
-            caput(self.GL[f"{axis}{object}MOVE"], 0)
+            caput(GL[f"{axis}{object}ABSPOS"], NSL)
+            caput(GL[f"{axis}{object}MOVE"], 1)
+            caput(GL[f"{axis}{object}MOVE"], 0)
         elif direction == "N" and absPos - incPos < NHL:
-            caput(self.GL[f"{axis}{object}ABSPOS"], NHL)
-            caput(self.GL[f"{axis}{object}MOVE"], 1)
-            caput(self.GL[f"{axis}{object}MOVE"], 0)
+            caput(GL[f"{axis}{object}ABSPOS"], NHL)
+            caput(GL[f"{axis}{object}MOVE"], 1)
+            caput(GL[f"{axis}{object}MOVE"], 0)
         else:
-            caput(self.GL[f"{axis}{object}{direction}"], 1)
+            caput(GL[f"{axis}{object}{direction}"], 1)
         
         self.setSoftLimitInd(object, axis)
         
-        absPos = caget(self.GL[f"{axis}{object}ABSPOS"])
+        absPos = caget(GL[f"{axis}{object}ABSPOS"])
         print(f"Incremental movement to {axis}{object}ABSPOS = {absPos}.")
     
     def absMove(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
@@ -384,34 +390,36 @@ class Controller(object):
         -------
         None
         """
+        GL = globals()
+
         lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos,
                     ("S", "Y"): self.gui.ySAbsPos, ("O", "Y"): self.gui.yOAbsPos,
                     ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
 
         absPos = float(lineEdit[(object, axis)].text())
 
-        PHL = self.GL[f"{axis}{object}MAX_HARD_LIMIT"]
-        NHL = self.GL[f"{axis}{object}MIN_HARD_LIMIT"]
-        PSL = self.GL[f"{axis}{object}MAX_SOFT_LIMIT"]
-        NSL = self.GL[f"{axis}{object}MIN_SOFT_LIMIT"]
+        PHL = GL[f"{axis}{object}MAX_HARD_LIMIT"]
+        NHL = GL[f"{axis}{object}MIN_HARD_LIMIT"]
+        PSL = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
+        NSL = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
 
         if absPos > PSL:
-            caput(self.GL[f"{axis}{object}ABSPOS"], PSL)
+            caput(GL[f"{axis}{object}ABSPOS"], PSL)
         elif absPos > PHL:
-            caput(self.GL[f"{axis}{object}ABSPOS"], PHL)
+            caput(GL[f"{axis}{object}ABSPOS"], PHL)
         elif absPos < NSL:
-            caput(self.GL[f"{axis}{object}ABSPOS"], NSL)
+            caput(GL[f"{axis}{object}ABSPOS"], NSL)
         elif absPos < NHL:
-            caput(self.GL[f"{axis}{object}ABSPOS"], NHL)
+            caput(GL[f"{axis}{object}ABSPOS"], NHL)
         else:
-            caput(self.GL[f"{axis}{object}ABSPOS"], absPos)
+            caput(GL[f"{axis}{object}ABSPOS"], absPos)
         
-        caput(self.GL[f"{axis}{object}MOVE"], 1)
-        caput(self.GL[f"{axis}{object}MOVE"], 0)
+        caput(GL[f"{axis}{object}MOVE"], 1)
+        caput(GL[f"{axis}{object}MOVE"], 0)
 
         self.setSoftLimitInd(object, axis)
 
-        absPos = caget(self.GL[f"{axis}{object}ABSPOS"])
+        absPos = caget(GL[f"{axis}{object}ABSPOS"])
         print(f"Absolute movement to {axis}{object}ABSPOS = {absPos}.")
     
     def continuousMotion(self, object: Literal["S", "O"], axis:
@@ -441,15 +449,16 @@ class Controller(object):
         -------
         None
         """
+        GL = globals()
         if type == "CN":
-            caput(self.GL[f"{axis}{object}CN"], self.GL[f"{axis}{object}MIN_SOFT_LIMIT"])
+            caput(GL[f"{axis}{object}CN"], GL[f"{axis}{object}MIN_SOFT_LIMIT"])
         elif type == "CP":
-            caput(self.GL[f"{axis}{object}CP"], self.GL[f"{axis}{object}MAX_SOFT_LIMIT"])
+            caput(GL[f"{axis}{object}CP"], GL[f"{axis}{object}MAX_SOFT_LIMIT"])
         else:
-            caput(self.GL[f"{axis}{object}CN"], 0)
-            caput(self.GL[f"{axis}{object}CP"], 0)
-            caput(self.GL[f"{axis}{object}STOP"], 1)
-            caput(self.GL[f"{axis}{object}STOP"], 0)
+            caput(GL[f"{axis}{object}CN"], 0)
+            caput(GL[f"{axis}{object}CP"], 0)
+            caput(GL[f"{axis}{object}STOP"], 1)
+            caput(GL[f"{axis}{object}STOP"], 0)
         
         self.setSoftLimitInd(object, axis)
         
@@ -475,8 +484,8 @@ class Controller(object):
         pvname = kwargs["pvname"]
         value = kwargs["value"]
 
-        keys = list(self.GL.keys())
-        vals = list(self.GL.values())
+        keys = list(GL.keys())
+        vals = list(GL.values())
         pvKey = keys[vals.index(pvname)]
 
         axis = pvKey[0]
@@ -502,138 +511,140 @@ class Controller(object):
         -------
         None
         """
+        GL = globals()
+
         if buttonID:
             # Set soft limits to hard limits.
-            self.GL["XSMIN_SOFT_LIMIT"] = self.GL["XSMIN_HARD_LIMIT"]
-            self.GL["XSMAX_SOFT_LIMIT"] = self.GL["XSMAX_HARD_LIMIT"]
-            self.GL["YSMIN_SOFT_LIMIT"] = self.GL["YSMIN_HARD_LIMIT"]
-            self.GL["YSMAX_SOFT_LIMIT"] = self.GL["YSMAX_HARD_LIMIT"]
-            self.GL["ZSMIN_SOFT_LIMIT"] = self.GL["ZSMIN_HARD_LIMIT"]
-            self.GL["ZSMAX_SOFT_LIMIT"] = self.GL["ZSMAX_HARD_LIMIT"]
-            self.GL["XOMIN_SOFT_LIMIT"] = self.GL["XOMIN_HARD_LIMIT"]
-            self.GL["XOMAX_SOFT_LIMIT"] = self.GL["XOMAX_HARD_LIMIT"]
-            self.GL["YOMIN_SOFT_LIMIT"] = self.GL["YOMIN_HARD_LIMIT"]
-            self.GL["YOMAX_SOFT_LIMIT"] = self.GL["YOMAX_HARD_LIMIT"]
-            self.GL["ZOMIN_SOFT_LIMIT"] = self.GL["ZOMIN_HARD_LIMIT"]
-            self.GL["ZOMAX_SOFT_LIMIT"] = self.GL["ZOMAX_HARD_LIMIT"]
+            GL["XSMIN_SOFT_LIMIT"] = GL["XSMIN_HARD_LIMIT"]
+            GL["XSMAX_SOFT_LIMIT"] = GL["XSMAX_HARD_LIMIT"]
+            GL["YSMIN_SOFT_LIMIT"] = GL["YSMIN_HARD_LIMIT"]
+            GL["YSMAX_SOFT_LIMIT"] = GL["YSMAX_HARD_LIMIT"]
+            GL["ZSMIN_SOFT_LIMIT"] = GL["ZSMIN_HARD_LIMIT"]
+            GL["ZSMAX_SOFT_LIMIT"] = GL["ZSMAX_HARD_LIMIT"]
+            GL["XOMIN_SOFT_LIMIT"] = GL["XOMIN_HARD_LIMIT"]
+            GL["XOMAX_SOFT_LIMIT"] = GL["XOMAX_HARD_LIMIT"]
+            GL["YOMIN_SOFT_LIMIT"] = GL["YOMIN_HARD_LIMIT"]
+            GL["YOMAX_SOFT_LIMIT"] = GL["YOMAX_HARD_LIMIT"]
+            GL["ZOMIN_SOFT_LIMIT"] = GL["ZOMIN_HARD_LIMIT"]
+            GL["ZOMAX_SOFT_LIMIT"] = GL["ZOMAX_HARD_LIMIT"]
 
             # Update soft limit line edits.
-            self.gui.tab.xSMin.setText(str(self.GL["XSMIN_SOFT_LIMIT"]))
-            self.gui.tab.xSMax.setText(str(self.GL["XSMAX_SOFT_LIMIT"]))
-            self.gui.tab.ySMin.setText(str(self.GL["YSMIN_SOFT_LIMIT"]))
-            self.gui.tab.ySMax.setText(str(self.GL["YSMAX_SOFT_LIMIT"]))
-            self.gui.tab.zSMin.setText(str(self.GL["ZSMIN_SOFT_LIMIT"]))
-            self.gui.tab.zSMax.setText(str(self.GL["ZSMAX_SOFT_LIMIT"]))
-            self.gui.tab.xOMin.setText(str(self.GL["XOMIN_SOFT_LIMIT"]))
-            self.gui.tab.xOMax.setText(str(self.GL["XOMAX_SOFT_LIMIT"]))
-            self.gui.tab.yOMin.setText(str(self.GL["YOMIN_SOFT_LIMIT"]))
-            self.gui.tab.yOMax.setText(str(self.GL["YOMAX_SOFT_LIMIT"]))
-            self.gui.tab.zOMin.setText(str(self.GL["ZOMIN_SOFT_LIMIT"]))
-            self.gui.tab.zOMax.setText(str(self.GL["ZOMAX_SOFT_LIMIT"]))
+            self.gui.tab.xSMin.setText(str(GL["XSMIN_SOFT_LIMIT"]))
+            self.gui.tab.xSMax.setText(str(GL["XSMAX_SOFT_LIMIT"]))
+            self.gui.tab.ySMin.setText(str(GL["YSMIN_SOFT_LIMIT"]))
+            self.gui.tab.ySMax.setText(str(GL["YSMAX_SOFT_LIMIT"]))
+            self.gui.tab.zSMin.setText(str(GL["ZSMIN_SOFT_LIMIT"]))
+            self.gui.tab.zSMax.setText(str(GL["ZSMAX_SOFT_LIMIT"]))
+            self.gui.tab.xOMin.setText(str(GL["XOMIN_SOFT_LIMIT"]))
+            self.gui.tab.xOMax.setText(str(GL["XOMAX_SOFT_LIMIT"]))
+            self.gui.tab.yOMin.setText(str(GL["YOMIN_SOFT_LIMIT"]))
+            self.gui.tab.yOMax.setText(str(GL["YOMAX_SOFT_LIMIT"]))
+            self.gui.tab.zOMin.setText(str(GL["ZOMIN_SOFT_LIMIT"]))
+            self.gui.tab.zOMax.setText(str(GL["ZOMAX_SOFT_LIMIT"]))
 
         else:
             # Set soft limits to inputted values
             xsmin = float(self.gui.tab.xSMin.text())
-            if xsmin < self.GL["XSMIN_HARD_LIMIT"]:
-                self.GL["XSMIN_SOFT_LIMIT"] = self.GL["XSMIN_HARD_LIMIT"]
-                self.gui.tab.xSMin.setText(str(self.GL["XSMIN_SOFT_LIMIT"]))
+            if xsmin < GL["XSMIN_HARD_LIMIT"]:
+                GL["XSMIN_SOFT_LIMIT"] = GL["XSMIN_HARD_LIMIT"]
+                self.gui.tab.xSMin.setText(str(GL["XSMIN_SOFT_LIMIT"]))
             else:
-                self.GL["XSMIN_SOFT_LIMIT"] = xsmin
+                GL["XSMIN_SOFT_LIMIT"] = xsmin
                 self.gui.tab.xSMin.setText(str(xsmin))
 
             xsmax = float(self.gui.tab.xSMax.text())
-            if xsmax > self.GL["XSMAX_HARD_LIMIT"]:
-                self.GL["XSMAX_SOFT_LIMIT"] = self.GL["XSMAX_HARD_LIMIT"]
-                self.gui.tab.xSMax.setText(str(self.GL["XSMAX_SOFT_LIMIT"]))
+            if xsmax > GL["XSMAX_HARD_LIMIT"]:
+                GL["XSMAX_SOFT_LIMIT"] = GL["XSMAX_HARD_LIMIT"]
+                self.gui.tab.xSMax.setText(str(GL["XSMAX_SOFT_LIMIT"]))
             else:
-                self.GL["XSMAX_SOFT_LIMIT"] = xsmax
+                GL["XSMAX_SOFT_LIMIT"] = xsmax
                 self.gui.tab.xSMax.setText(str(xsmax))
             
             ysmin = float(self.gui.tab.ySMin.text())
-            if ysmin < self.GL["YSMIN_HARD_LIMIT"]:
-                self.GL["YSMIN_SOFT_LIMIT"] = self.GL["YSMIN_HARD_LIMIT"]
-                self.gui.tab.ySMin.setText(str(self.GL["YSMIN_SOFT_LIMIT"]))
+            if ysmin < GL["YSMIN_HARD_LIMIT"]:
+                GL["YSMIN_SOFT_LIMIT"] = GL["YSMIN_HARD_LIMIT"]
+                self.gui.tab.ySMin.setText(str(GL["YSMIN_SOFT_LIMIT"]))
             else:
-                self.GL["YSMIN_SOFT_LIMIT"] = ysmin
+                GL["YSMIN_SOFT_LIMIT"] = ysmin
                 self.gui.tab.ySMin.setText(str(ysmin))
 
             ysmax = float(self.gui.tab.ySMax.text())
-            if ysmax > self.GL["YSMAX_HARD_LIMIT"]:
-                self.GL["YSMAX_SOFT_LIMIT"] = self.GL["YSMAX_HARD_LIMIT"]
-                self.gui.tab.ySMax.setText(str(self.GL["YSMAX_SOFT_LIMIT"]))
+            if ysmax > GL["YSMAX_HARD_LIMIT"]:
+                GL["YSMAX_SOFT_LIMIT"] = GL["YSMAX_HARD_LIMIT"]
+                self.gui.tab.ySMax.setText(str(GL["YSMAX_SOFT_LIMIT"]))
             else:
-                self.GL["YSMAX_SOFT_LIMIT"] = ysmax
+                GL["YSMAX_SOFT_LIMIT"] = ysmax
                 self.gui.tab.ySMax.setText(str(ysmax))
             
             zsmin = float(self.gui.tab.zSMin.text())
-            if zsmin < self.GL["ZSMIN_HARD_LIMIT"]:
-                self.GL["ZSMIN_SOFT_LIMIT"] = self.GL["ZSMIN_HARD_LIMIT"]
-                self.gui.tab.zSMin.setText(str(self.GL["ZSMIN_SOFT_LIMIT"]))
+            if zsmin < GL["ZSMIN_HARD_LIMIT"]:
+                GL["ZSMIN_SOFT_LIMIT"] = GL["ZSMIN_HARD_LIMIT"]
+                self.gui.tab.zSMin.setText(str(GL["ZSMIN_SOFT_LIMIT"]))
             else:
-                self.GL["ZSMIN_SOFT_LIMIT"] = zsmin
+                GL["ZSMIN_SOFT_LIMIT"] = zsmin
                 self.gui.tab.zSMin.setText(str(zsmin))
 
             zsmax = float(self.gui.tab.zSMax.text())
-            if zsmax > self.GL["ZSMAX_HARD_LIMIT"]:
-                self.GL["ZSMAX_SOFT_LIMIT"] = self.GL["ZSMAX_HARD_LIMIT"]
-                self.gui.tab.zSMax.setText(str(self.GL["ZSMAX_SOFT_LIMIT"]))
+            if zsmax > GL["ZSMAX_HARD_LIMIT"]:
+                GL["ZSMAX_SOFT_LIMIT"] = GL["ZSMAX_HARD_LIMIT"]
+                self.gui.tab.zSMax.setText(str(GL["ZSMAX_SOFT_LIMIT"]))
             else:
-                self.GL["ZSMAX_SOFT_LIMIT"] = zsmax
-                self.gui.tab.zSMzx.setText(str(zsmax))
+                GL["ZSMAX_SOFT_LIMIT"] = zsmax
+                self.gui.tab.zSMax.setText(str(zsmax))
             
             xomin = float(self.gui.tab.xOMin.text())
-            if xomin < self.GL["XOMIN_HARD_LIMIT"]:
-                self.GL["XOMIN_SOFT_LIMIT"] = self.GL["XOMIN_HARD_LIMIT"]
-                self.gui.tab.xOMin.setText(str(self.GL["XOMIN_SOFT_LIMIT"]))
+            if xomin < GL["XOMIN_HARD_LIMIT"]:
+                GL["XOMIN_SOFT_LIMIT"] = GL["XOMIN_HARD_LIMIT"]
+                self.gui.tab.xOMin.setText(str(GL["XOMIN_SOFT_LIMIT"]))
             else:
-                self.GL["XOMIN_SOFT_LIMIT"] = xomin
+                GL["XOMIN_SOFT_LIMIT"] = xomin
                 self.gui.tab.xOMin.setText(str(xomin))
 
             xomax = float(self.gui.tab.xOMax.text())
-            if xomax > self.GL["XOMAX_HARD_LIMIT"]:
-                self.GL["XOMAX_SOFT_LIMIT"] = self.GL["XOMAX_HARD_LIMIT"]
-                self.gui.tab.xOMax.setText(str(self.GL["XOMAX_SOFT_LIMIT"]))
+            if xomax > GL["XOMAX_HARD_LIMIT"]:
+                GL["XOMAX_SOFT_LIMIT"] = GL["XOMAX_HARD_LIMIT"]
+                self.gui.tab.xOMax.setText(str(GL["XOMAX_SOFT_LIMIT"]))
             else:
-                self.GL["XOMAX_SOFT_LIMIT"] = xomax
+                GL["XOMAX_SOFT_LIMIT"] = xomax
                 self.gui.tab.xOMax.setText(str(xomax))
             
             yomin = float(self.gui.tab.yOMin.text())
-            if yomin < self.GL["YOMIN_HARD_LIMIT"]:
-                self.GL["YOMIN_SOFT_LIMIT"] = self.GL["YOMIN_HARD_LIMIT"]
-                self.gui.tab.yOMin.setText(str(self.GL["YOMIN_SOFT_LIMIT"]))
+            if yomin < GL["YOMIN_HARD_LIMIT"]:
+                GL["YOMIN_SOFT_LIMIT"] = GL["YOMIN_HARD_LIMIT"]
+                self.gui.tab.yOMin.setText(str(GL["YOMIN_SOFT_LIMIT"]))
             else:
-                self.GL["YOMIN_SOFT_LIMIT"] = yomin
+                GL["YOMIN_SOFT_LIMIT"] = yomin
                 self.gui.tab.yOMin.setText(str(yomin))
 
             yomax = float(self.gui.tab.yOMax.text())
-            if yomax > self.GL["YOMAX_HARD_LIMIT"]:
-                self.GL["YOMAX_SOFT_LIMIT"] = self.GL["YOMAX_HARD_LIMIT"]
-                self.gui.tab.yOMax.setText(str(self.GL["YOMAX_SOFT_LIMIT"]))
+            if yomax > GL["YOMAX_HARD_LIMIT"]:
+                GL["YOMAX_SOFT_LIMIT"] = GL["YOMAX_HARD_LIMIT"]
+                self.gui.tab.yOMax.setText(str(GL["YOMAX_SOFT_LIMIT"]))
             else:
-                self.GL["YOMAX_SOFT_LIMIT"] = yomax
+                GL["YOMAX_SOFT_LIMIT"] = yomax
                 self.gui.tab.yOMax.setText(str(yomax))
             
             zomin = float(self.gui.tab.zOMin.text())
-            if zomin < self.GL["ZOMIN_HARD_LIMIT"]:
-                self.GL["ZOMIN_SOFT_LIMIT"] = self.GL["ZOMIN_HARD_LIMIT"]
-                self.gui.tab.zOMin.setText(str(self.GL["ZOMIN_SOFT_LIMIT"]))
+            if zomin < GL["ZOMIN_HARD_LIMIT"]:
+                GL["ZOMIN_SOFT_LIMIT"] = GL["ZOMIN_HARD_LIMIT"]
+                self.gui.tab.zOMin.setText(str(GL["ZOMIN_SOFT_LIMIT"]))
             else:
-                self.GL["ZOMIN_SOFT_LIMIT"] = zomin
+                GL["ZOMIN_SOFT_LIMIT"] = zomin
                 self.gui.tab.zOMin.setText(str(zomin))
 
             zomax = float(self.gui.tab.zOMax.text())
-            if zomax > self.GL["ZOMAX_HARD_LIMIT"]:
-                self.GL["ZOMAX_SOFT_LIMIT"] = self.GL["ZOMAX_HARD_LIMIT"]
-                self.gui.tab.zOMax.setText(str(self.GL["ZOMAX_SOFT_LIMIT"]))
+            if zomax > GL["ZOMAX_HARD_LIMIT"]:
+                GL["ZOMAX_SOFT_LIMIT"] = GL["ZOMAX_HARD_LIMIT"]
+                self.gui.tab.zOMax.setText(str(GL["ZOMAX_SOFT_LIMIT"]))
             else:
-                self.GL["ZOMAX_SOFT_LIMIT"] = zomax
+                GL["ZOMAX_SOFT_LIMIT"] = zomax
                 self.gui.tab.zOMax.setText(str(zomax))
             
         print(f"Updating soft limits, buttonID={buttonID}.")
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
-                Min = self.GL[f"{axis}{object}MIN_SOFT_LIMIT"]
-                Max = self.GL[f"{axis}{object}MAX_SOFT_LIMIT"]
+                Min = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
+                Max = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
                 print(f"XS SL: min -> {Min}, max -> {Max}")
 
     def updateBacklash(self) -> None:
@@ -647,20 +658,22 @@ class Controller(object):
         -------
         None
         """
-        # Set global backlash variables.
-        caput(self.GL["XSB"], abs(int(self.gui.tab.xSB.text())))
-        caput(self.GL["YSB"], abs(int(self.gui.tab.ySB.text())))
-        caput(self.GL["ZSB"], abs(int(self.gui.tab.zSB.text())))
-        caput(self.GL["XOB"], abs(int(self.gui.tab.xOB.text())))
-        caput(self.GL["YOB"], abs(int(self.gui.tab.yOB.text())))
-        caput(self.GL["ZOB"], abs(int(self.gui.tab.zOB.text())))
+        GL = globals()
 
-        self.gui.tab.xSB.setText(str(caget(self.GL["XSB"])))
-        self.gui.tab.ySB.setText(str(caget(self.GL["YSB"])))
-        self.gui.tab.zSB.setText(str(caget(self.GL["ZSB"])))
-        self.gui.tab.xOB.setText(str(caget(self.GL["XOB"])))
-        self.gui.tab.yOB.setText(str(caget(self.GL["YOB"])))
-        self.gui.tab.zOB.setText(str(caget(self.GL["ZOB"])))
+        # Set global backlash variables.
+        caput(GL["XSB"], abs(int(self.gui.tab.xSB.text())))
+        caput(GL["YSB"], abs(int(self.gui.tab.ySB.text())))
+        caput(GL["ZSB"], abs(int(self.gui.tab.zSB.text())))
+        caput(GL["XOB"], abs(int(self.gui.tab.xOB.text())))
+        caput(GL["YOB"], abs(int(self.gui.tab.yOB.text())))
+        caput(GL["ZOB"], abs(int(self.gui.tab.zOB.text())))
+
+        self.gui.tab.xSB.setText(str(caget(GL["XSB"])))
+        self.gui.tab.ySB.setText(str(caget(GL["YSB"])))
+        self.gui.tab.zSB.setText(str(caget(GL["ZSB"])))
+        self.gui.tab.xOB.setText(str(caget(GL["XOB"])))
+        self.gui.tab.yOB.setText(str(caget(GL["YOB"])))
+        self.gui.tab.zOB.setText(str(caget(GL["ZOB"])))
 
         print("Updating backlash values.")
 
@@ -690,13 +703,15 @@ class Controller(object):
         relative position defines the position displayed. Internal workings use
         base position but external workings use relative position.
         """
+        GL = globals()
+
         lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos,
                     ("S", "Y"): self.gui.ySAbsPos, ("O", "Y"): self.gui.yOAbsPos,
                     ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
 
         # Update the base and relative positions.
-        self.GL[f"{axis}{object}_BASE_POSITION"] += self.GL[f"{axis}{object}_RELATIVE_POSITION"]
-        self.GL[f"{axis}{object}_RELATIVE_POSITION"] = 0
+        GL[f"{axis}{object}_BASE_POSITION"] += GL[f"{axis}{object}_RELATIVE_POSITION"]
+        GL[f"{axis}{object}_RELATIVE_POSITION"] = 0
 
         # Update absolute position line edit widget to 0.
         lineEdit[(object, axis)].setText("0")
@@ -726,25 +741,27 @@ class Controller(object):
         pvname = kwargs["pvname"]
         value = kwargs["value"]
 
-        keys = list(self.GL.keys())
-        vals = list(self.GL.values())
+        keys = list(GL.keys())
+        vals = list(GL.values())
         pvKey = keys[vals.index(pvname)]
 
         axis = pvKey[0]
         object = pvKey[1]
 
-        if value == 1:
-            motionLabels[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-            motionLabels[(object, axis, 1)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
-        elif value == 0:
+        if value == 0:
             motionLabels[(object, axis, 0)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
             motionLabels[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        elif value == 0:
+            motionLabels[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+            motionLabels[(object, axis, 1)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
 
         print(f"Checkiing motor status, motor ident and state => {pvname}, {value}")
 
     def setHardLimitInd(self, **kwargs):
         """
         """
+        GL = globals()
+
         hardLimits = {("S", "X", 0): self.gui.xSHn, ("S", "X", 1): self.gui.xSHp,
                       ("S", "Y", 0): self.gui.ySHn, ("S", "Y", 1): self.gui.ySHp,
                       ("S", "Z", 0): self.gui.zSHn, ("S", "Z", 1): self.gui.zSHp,
@@ -755,17 +772,17 @@ class Controller(object):
         pvname = kwargs["pvname"]
         value = kwargs["value"]
 
-        keys = list(self.GL.keys())
-        vals = list(self.GL.values())
+        keys = list(GL.keys())
+        vals = list(GL.values())
         pvKey = keys[vals.index(pvname)]
 
         axis = pvKey[0]
         object = pvKey[1]
 
-        if self.GL[f"{axis}{object}HP"] - 5 < value:
+        if GL[f"{axis}{object}HP"] - 5 < value:
             hardLimits[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
             hardLimits[(object, axis, 1)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
-        elif value < self.GL[f"{axis}{object}HN"] + 5:
+        elif value < GL[f"{axis}{object}HN"] + 5:
             hardLimits[(object, axis, 0)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
             hardLimits[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
         else:
@@ -778,6 +795,8 @@ class Controller(object):
         """
         set soft limits if scheduled to move to soft limits
         """
+        GL = globals()
+
         softLimits = {("S", "X", 0): self.gui.xSSn, ("S", "X", 1): self.gui.xSSp,
                       ("S", "Y", 0): self.gui.ySSn, ("S", "Y", 1): self.gui.ySSp,
                       ("S", "Z", 0): self.gui.zSSn, ("S", "Z", 1): self.gui.zSSp,
@@ -785,12 +804,12 @@ class Controller(object):
                       ("O", "Y", 0): self.gui.yOSn, ("O", "Y", 1): self.gui.yOSp,
                       ("O", "Z", 0): self.gui.zOSn, ("O", "Z", 1): self.gui.zOSp}
 
-        value = caget(self.GL[f"{axis}{object}ABSPOS"])
+        value = caget(GL[f"{axis}{object}ABSPOS"])
 
-        if self.GL[f"{axis}{object}MAX_SOFT_LIMIT"] - 5 < value:
+        if GL[f"{axis}{object}MAX_SOFT_LIMIT"] - 5 < value:
             softLimits[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
             softLimits[(object, axis, 1)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
-        elif value < self.GL[f"{axis}{object}MIN_SOFT_LIMIT"] + 5:
+        elif value < GL[f"{axis}{object}MIN_SOFT_LIMIT"] + 5:
             softLimits[(object, axis, 0)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
             softLimits[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
         else:
@@ -798,3 +817,15 @@ class Controller(object):
             softLimits[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
         
         print("Setting soft limit indicators.")
+    
+    def displayGlobals(self):
+        """     
+        """
+        print("-*- GLOBAL VARIABLES - START -*-")
+
+        GL = globals()
+        keys = list(GL.keys())
+        for key in keys:
+            print(f"{key} -> {GL[key]}")
+
+        print("-*- GLOBAL VARIABLES - END -*-")
