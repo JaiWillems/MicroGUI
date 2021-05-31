@@ -858,7 +858,7 @@ class MyTableWidget(QWidget):
         # ---------------------------------------------------------------------
 
         # Define tab layout.
-        self.tab1.layout = QGridLayout(self)
+        self.tab1.layout = QGridLayout()
 
         # Define interactive sample widgets.
         self.xIdleS = QLabel("IDLE")
@@ -1066,7 +1066,7 @@ class MyTableWidget(QWidget):
         self.SSL.setStyleSheet("background-color: lightgrey")
         self.SESL.setStyleSheet("background-color: lightgrey")
         self.tab4.layout.addWidget(self.SSL, 5, 0, 1, 3)
-        self.tab4.layout.addWidget(self.SESL, 5, 4, 1, 3)
+        self.tab4.layout.addWidget(self.SESL, 5, 3, 1, 3)
 
         # Add information labels.
         softLimLabel = QLabel(

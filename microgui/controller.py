@@ -371,13 +371,13 @@ class Controller(object):
         PSL = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
         NSL = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
 
-        if direction == "P" and basePos + relPos + incPos >= PSL:
+        if direction == "P" and basePos + relPos + incPos > PSL:
             GL[f"{axis}{object}_RELATIVE_POSITION"] = PSL - basePos
 
             caput(GL[f"{axis}{object}ABSPOS"], PSL)
             caput(GL[f"{axis}{object}MOVE"], 1)
             caput(GL[f"{axis}{object}MOVE"], 0)
-        elif direction == "N" and basePos + relPos - incPos <= NSL:
+        elif direction == "N" and basePos + relPos - incPos < NSL:
             GL[f"{axis}{object}_RELATIVE_POSITION"] = NSL - basePos
 
             caput(GL[f"{axis}{object}ABSPOS"], NSL)
@@ -389,7 +389,7 @@ class Controller(object):
                 caput(GL[f"{axis}{object}ABSPOS"], basePos + relPos + incPos)
             else:
                 GL[f"{axis}{object}_RELATIVE_POSITION"] = relPos - incPos
-                caput(GL[f"{axis}{object}ABSPOS"], basePos + relPos + incPos)
+                caput(GL[f"{axis}{object}ABSPOS"], basePos + relPos - incPos)
 
             caput(GL[f"{axis}{object}MOVE"], 1)
             caput(GL[f"{axis}{object}MOVE"], 0)
@@ -429,10 +429,10 @@ class Controller(object):
         PSL = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
         NSL = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
 
-        if basePos + absPos >= PSL:
+        if basePos + absPos > PSL:
             GL[f"{axis}{object}_RELATIVE_POSITION"] = PSL - basePos
             caput(GL[f"{axis}{object}ABSPOS"], PSL)
-        elif basePos + absPos <= NSL:
+        elif basePos + absPos < NSL:
             GL[f"{axis}{object}_RELATIVE_POSITION"] = NSL - basePos
             caput(GL[f"{axis}{object}ABSPOS"], NSL)
         else:
@@ -514,9 +514,11 @@ class Controller(object):
         axis = pvKey[0]
         object = pvKey[1]
 
-        lineEdit[(object, axis)].setText(str(value))
+        basePos = GL[f"{axis}{object}_BASE_POSITION"]
 
-        print(f"Updating absolute position line edit to {value}.")
+        lineEdit[(object, axis)].setText(str(value - basePos))
+
+        print(f"Updating absolute position line edit to {value - basePos}.")
 
     def updateSoftLimits(self, buttonID: Literal[0, 1]) -> None:
         """Update sample and objective soft limits.
@@ -786,13 +788,15 @@ class Controller(object):
             motionLabels[(object, axis, 1)].setStyleSheet(
                 "background-color: #3ac200; border: 1px solid black;")
 
-        GL[f"{axis}{object}_RELATIVE_POSITION"] = caget(
-            GL[f"{axis}{object}ABSPOS"])
+        basePos = GL[f"{axis}{object}_BASE_POSITION"]
+        absPos = caget(GL[f"{axis}{object}ABSPOS"])
+        GL[f"{axis}{object}_RELATIVE_POSITION"] = absPos - basePos
+
         lineEdit[(object, axis)].setText(
             str(GL[f"{axis}{object}_RELATIVE_POSITION"]))
 
         print(
-            f"Checking motor status, motor ident and state => {pvname}, {value}")
+            f"Checking motor status, motor identity: {pvname}, state: {value}")
         relPos = GL[f"{axis}{object}_RELATIVE_POSITION"]
         print(f"Current relative position -> {relPos}")
 
