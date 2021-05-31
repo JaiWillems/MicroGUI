@@ -311,7 +311,7 @@ class Controller(object):
         plt.figure()
         plt.imshow(np.rot90(self.gui.image, 3))
         plt.axis("off")
-        plt.savefig(path, dpi=250, bbox_inches="tight")
+        plt.savefig(path, dpi=500, bbox_inches="tight")
 
         print(f"Image capture saved to: {path}")
 
@@ -364,21 +364,21 @@ class Controller(object):
 
         caput(GL[f"{axis}{object}STEP"], float(step.text()))
 
-        absPos = GL[f"{axis}{object}_BASE_POSITION"]
+        basePos = GL[f"{axis}{object}_BASE_POSITION"]
         relPos = GL[f"{axis}{object}_RELATIVE_POSITION"]
         incPos = caget(GL[f"{axis}{object}STEP"])
 
         PSL = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
         NSL = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
 
-        if direction == "P" and absPos + relPos + incPos >= PSL:
-            GL[f"{axis}{object}_RELATIVE_POSITION"] = PSL - absPos
+        if direction == "P" and basePos + relPos + incPos >= PSL:
+            GL[f"{axis}{object}_RELATIVE_POSITION"] = PSL - basePos
 
             caput(GL[f"{axis}{object}ABSPOS"], PSL)
             caput(GL[f"{axis}{object}MOVE"], 1)
             caput(GL[f"{axis}{object}MOVE"], 0)
-        elif direction == "N" and absPos + relPos - incPos <= NSL:
-            GL[f"{axis}{object}_RELATIVE_POSITION"] = NSL - absPos
+        elif direction == "N" and basePos + relPos - incPos <= NSL:
+            GL[f"{axis}{object}_RELATIVE_POSITION"] = NSL - basePos
 
             caput(GL[f"{axis}{object}ABSPOS"], NSL)
             caput(GL[f"{axis}{object}MOVE"], 1)
@@ -386,10 +386,13 @@ class Controller(object):
         else:
             if direction == "P":
                 GL[f"{axis}{object}_RELATIVE_POSITION"] = relPos + incPos
+                caput(GL[f"{axis}{object}ABSPOS"], basePos + relPos + incPos)
             else:
                 GL[f"{axis}{object}_RELATIVE_POSITION"] = relPos - incPos
+                caput(GL[f"{axis}{object}ABSPOS"], basePos + relPos + incPos)
 
-            caput(GL[f"{axis}{object}{direction}"], 1)
+            caput(GL[f"{axis}{object}MOVE"], 1)
+            caput(GL[f"{axis}{object}MOVE"], 0)
 
         self.setSoftLimitInd(object, axis)
 
@@ -490,7 +493,7 @@ class Controller(object):
         Parameters
         ----------
         **kwargs : Dict
-            Extra arguments to `motorStatus`: refer to PyEpics documentation
+            Extra arguments to `updateAbsPos`: refer to PyEpics documentation
             for a list of all possible arguments for PV callback functions.
 
         Returns
@@ -535,18 +538,18 @@ class Controller(object):
 
         if buttonID:
             # Set soft limits to hard limits.
-            GL["XSMIN_SOFT_LIMIT"] = GL["XSMIN_HARD_LIMIT"]
-            GL["XSMAX_SOFT_LIMIT"] = GL["XSMAX_HARD_LIMIT"]
-            GL["YSMIN_SOFT_LIMIT"] = GL["YSMIN_HARD_LIMIT"]
-            GL["YSMAX_SOFT_LIMIT"] = GL["YSMAX_HARD_LIMIT"]
-            GL["ZSMIN_SOFT_LIMIT"] = GL["ZSMIN_HARD_LIMIT"]
-            GL["ZSMAX_SOFT_LIMIT"] = GL["ZSMAX_HARD_LIMIT"]
-            GL["XOMIN_SOFT_LIMIT"] = GL["XOMIN_HARD_LIMIT"]
-            GL["XOMAX_SOFT_LIMIT"] = GL["XOMAX_HARD_LIMIT"]
-            GL["YOMIN_SOFT_LIMIT"] = GL["YOMIN_HARD_LIMIT"]
-            GL["YOMAX_SOFT_LIMIT"] = GL["YOMAX_HARD_LIMIT"]
-            GL["ZOMIN_SOFT_LIMIT"] = GL["ZOMIN_HARD_LIMIT"]
-            GL["ZOMAX_SOFT_LIMIT"] = GL["ZOMAX_HARD_LIMIT"]
+            GL["XSMIN_SOFT_LIMIT"] = float(GL["XSMIN_HARD_LIMIT"])
+            GL["XSMAX_SOFT_LIMIT"] = float(GL["XSMAX_HARD_LIMIT"])
+            GL["YSMIN_SOFT_LIMIT"] = float(GL["YSMIN_HARD_LIMIT"])
+            GL["YSMAX_SOFT_LIMIT"] = float(GL["YSMAX_HARD_LIMIT"])
+            GL["ZSMIN_SOFT_LIMIT"] = float(GL["ZSMIN_HARD_LIMIT"])
+            GL["ZSMAX_SOFT_LIMIT"] = float(GL["ZSMAX_HARD_LIMIT"])
+            GL["XOMIN_SOFT_LIMIT"] = float(GL["XOMIN_HARD_LIMIT"])
+            GL["XOMAX_SOFT_LIMIT"] = float(GL["XOMAX_HARD_LIMIT"])
+            GL["YOMIN_SOFT_LIMIT"] = float(GL["YOMIN_HARD_LIMIT"])
+            GL["YOMAX_SOFT_LIMIT"] = float(GL["YOMAX_HARD_LIMIT"])
+            GL["ZOMIN_SOFT_LIMIT"] = float(GL["ZOMIN_HARD_LIMIT"])
+            GL["ZOMAX_SOFT_LIMIT"] = float(GL["ZOMAX_HARD_LIMIT"])
 
             # Update soft limit line edits.
             self.gui.tab.xSMin.setText(str(GL["XSMIN_SOFT_LIMIT"]))
@@ -660,14 +663,14 @@ class Controller(object):
                 GL["ZOMAX_SOFT_LIMIT"] = zomax
                 self.gui.tab.zOMax.setText(str(zomax))
 
+            self.checkMotorPos()
+
         print(f"Updating soft limits, buttonID={buttonID}.")
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
                 Min = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
                 Max = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
                 print(f"XS SL: min -> {Min}, max -> {Max}")
-
-        self.checkMotorPos(object, axis)
 
     def updateBacklash(self) -> None:
         """Update backlash variables.
@@ -683,12 +686,12 @@ class Controller(object):
         GL = globals()
 
         # Set global backlash variables.
-        caput(GL["XSB"], abs(int(self.gui.tab.xSB.text())))
-        caput(GL["YSB"], abs(int(self.gui.tab.ySB.text())))
-        caput(GL["ZSB"], abs(int(self.gui.tab.zSB.text())))
-        caput(GL["XOB"], abs(int(self.gui.tab.xOB.text())))
-        caput(GL["YOB"], abs(int(self.gui.tab.yOB.text())))
-        caput(GL["ZOB"], abs(int(self.gui.tab.zOB.text())))
+        caput(GL["XSB"], abs(int(float(self.gui.tab.xSB.text()))))
+        caput(GL["YSB"], abs(int(float(self.gui.tab.ySB.text()))))
+        caput(GL["ZSB"], abs(int(float(self.gui.tab.zSB.text()))))
+        caput(GL["XOB"], abs(int(float(self.gui.tab.xOB.text()))))
+        caput(GL["YOB"], abs(int(float(self.gui.tab.yOB.text()))))
+        caput(GL["ZOB"], abs(int(float(self.gui.tab.zOB.text()))))
 
         self.gui.tab.xSB.setText(str(caget(GL["XSB"])))
         self.gui.tab.ySB.setText(str(caget(GL["YSB"])))
@@ -777,7 +780,7 @@ class Controller(object):
                 "background-color: #3ac200; border: 1px solid black;")
             motionLabels[(object, axis, 1)].setStyleSheet(
                 "background-color: lightgrey; border: 1px solid black;")
-        elif value == 0:
+        elif value != 0:
             motionLabels[(object, axis, 0)].setStyleSheet(
                 "background-color: lightgrey; border: 1px solid black;")
             motionLabels[(object, axis, 1)].setStyleSheet(
@@ -786,32 +789,36 @@ class Controller(object):
         GL[f"{axis}{object}_RELATIVE_POSITION"] = caget(
             GL[f"{axis}{object}ABSPOS"])
         lineEdit[(object, axis)].setText(
-            GL[f"{axis}{object}_RELATIVE_POSITION"])
+            str(GL[f"{axis}{object}_RELATIVE_POSITION"]))
 
         print(
-            f"Checkiing motor status, motor ident and state => {pvname}, {value}")
+            f"Checking motor status, motor ident and state => {pvname}, {value}")
         relPos = GL[f"{axis}{object}_RELATIVE_POSITION"]
         print(f"Current relative position -> {relPos}")
 
-    def checkMotorPos(self, object, axis):
+    def checkMotorPos(self):
         """
         """
         GL = globals()
-        PSL = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
-        NSL = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
+        for object in ["S", "O"]:
+            for axis in ["X", "Y", "Z"]:
+                PSL = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
+                NSL = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
 
-        basePos = GL[f"{axis}{object}_BASE_POSITION"]
-        relPos = GL[f"{axis}{object}_RELATIVE_POSITION"]
+                basePos = GL[f"{axis}{object}_BASE_POSITION"]
+                relPos = GL[f"{axis}{object}_RELATIVE_POSITION"]
 
-        if basePos + relPos > PSL:
-            GL[f"{axis}{object}_RELATIVE_POSITION"] = PSL - basePos
-            caput(GL[f"{axis}{object}ABSPOS"], PSL)
-        elif basePos + relPos < NSL:
-            GL[f"{axis}{object}_RELATIVE_POSITION"] = NSL - basePos
-            caput(GL[f"{axis}{object}ABSPOS"], NSL)
+                if basePos + relPos > PSL:
+                    GL[f"{axis}{object}_RELATIVE_POSITION"] = PSL - basePos
+                    caput(GL[f"{axis}{object}ABSPOS"], PSL)
+                    self.setSoftLimitInd(object, axis)
+                elif basePos + relPos < NSL:
+                    GL[f"{axis}{object}_RELATIVE_POSITION"] = NSL - basePos
+                    caput(GL[f"{axis}{object}ABSPOS"], NSL)
+                    self.setSoftLimitInd(object, axis)
 
-        caput(GL[f"{axis}{object}MOVE"], 1)
-        caput(GL[f"{axis}{object}MOVE"], 0)
+                caput(GL[f"{axis}{object}MOVE"], 1)
+                caput(GL[f"{axis}{object}MOVE"], 0)
 
     def setHardLimitInd(self, **kwargs):
         """

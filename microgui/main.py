@@ -18,6 +18,7 @@ modeMotor = initMotor()
 
 # Run the GUI.
 app = QApplication([])
+app.setStyle("Windows")
 gui = GUI()
 gui.show()
 Controller(gui=gui, modeMotor=modeMotor)

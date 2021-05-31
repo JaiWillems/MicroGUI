@@ -10,7 +10,7 @@ import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.ptime as ptime
 from typing import Any
-from PyQt5.QtGui import QPixmap, QFont
+from PyQt5.QtGui import QPixmap, QFont, QIcon
 from PyQt5.QtCore import QRectF, QTimer, Qt
 from PyQt5.QtWidgets import QMainWindow, QGridLayout, QVBoxLayout, QWidget,\
     QLabel, QPushButton, QLineEdit, QRadioButton,\
@@ -206,6 +206,8 @@ class GUI(QMainWindow):
         """Initialize the GUI."""
 
         super().__init__()
+
+        self.setWindowIcon(QIcon('CLS_logo.png'))
 
         # Define main GUI window.
         self.setWindowTitle("Horizontal Microscope Control")
@@ -1014,12 +1016,13 @@ class MyTableWidget(QWidget):
         self.tab4.layout = QGridLayout()
 
         # Define interactive sample widgets.
-        self.xSMin = QLineEdit("0")
-        self.ySMin = QLineEdit("0")
-        self.zSMin = QLineEdit("0")
-        self.xSMax = QLineEdit("0")
-        self.ySMax = QLineEdit("0")
-        self.zSMax = QLineEdit("0")
+        GL = globals()
+        self.xSMin = QLineEdit(str(float(GL["XSMIN_SOFT_LIMIT"])))
+        self.ySMin = QLineEdit(str(float(GL["YSMIN_SOFT_LIMIT"])))
+        self.zSMin = QLineEdit(str(float(GL["ZSMIN_SOFT_LIMIT"])))
+        self.xSMax = QLineEdit(str(float(GL["XSMAX_SOFT_LIMIT"])))
+        self.ySMax = QLineEdit(str(float(GL["YSMAX_SOFT_LIMIT"])))
+        self.zSMax = QLineEdit(str(float(GL["ZSMAX_SOFT_LIMIT"])))
 
         # Organize sample widgets in the tab layout.
         self.tab4.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 3)
@@ -1036,12 +1039,12 @@ class MyTableWidget(QWidget):
         self.tab4.layout.addWidget(self.zSMax, 4, 2, 1, 1)
 
         # Define interactive objective widgets.
-        self.xOMin = QLineEdit("0")
-        self.yOMin = QLineEdit("0")
-        self.zOMin = QLineEdit("0")
-        self.xOMax = QLineEdit("0")
-        self.yOMax = QLineEdit("0")
-        self.zOMax = QLineEdit("0")
+        self.xOMin = QLineEdit(str(float(GL["XOMIN_SOFT_LIMIT"])))
+        self.yOMin = QLineEdit(str(float(GL["YOMIN_SOFT_LIMIT"])))
+        self.zOMin = QLineEdit(str(float(GL["ZOMIN_SOFT_LIMIT"])))
+        self.xOMax = QLineEdit(str(float(GL["XOMAX_SOFT_LIMIT"])))
+        self.yOMax = QLineEdit(str(float(GL["YOMAX_SOFT_LIMIT"])))
+        self.zOMax = QLineEdit(str(float(GL["ZOMAX_SOFT_LIMIT"])))
 
         # Organize objective widgets in the tab layout.
         self.tab4.layout.addWidget(QLabel("<b>Objective</b>"), 0, 3, 1, 3)
