@@ -13,8 +13,8 @@ from typing import Any
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtCore import QRectF, QTimer, Qt
 from PyQt5.QtWidgets import QMainWindow, QGridLayout, QVBoxLayout, QWidget,\
-                            QLabel, QPushButton, QLineEdit, QRadioButton,\
-                            QTabWidget
+    QLabel, QPushButton, QLineEdit, QRadioButton,\
+    QTabWidget
 
 # Import file dependencies.
 from flir_camera_control import getImage
@@ -281,8 +281,10 @@ class GUI(QMainWindow):
             length = int(0.1 * min(height, width))
             xLine = np.full((5, 2 * length, 3), [225, 0, 0])
             yLine = np.full((length * 2, 5, 3), [225, 0, 0])
-            self.image[height // 2 - 2:height // 2 + 3, width // 2 - length:width // 2 + length] = xLine
-            self.image[height // 2 - length:height // 2 + length:, width // 2 - 2:width // 2 + 3] = yLine
+            self.image[height // 2 - 2:height // 2 + 3,
+                       width // 2 - length:width // 2 + length] = xLine
+            self.image[height // 2 - length:height // 2 +
+                       length:, width // 2 - 2:width // 2 + 3] = yLine
 
             # Update image.
             self.img.setImage(np.rot90(self.image, 2))
@@ -390,13 +392,17 @@ class GUI(QMainWindow):
         self.xSCn.setStyleSheet("background-color: lightgrey")
         self.xSStop.setStyleSheet("background-color: red")
         self.xSCp.setStyleSheet("background-color: lightgrey")
-        self.xSSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xSSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xSHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xSHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xSSn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xSSp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xSHn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xSHp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
-        layout.addWidget(QLabel("X:"), 2, 0, 1, 1)
+        layout.addWidget(QLabel("Horizontal:"), 2, 0, 1, 1)
         layout.addWidget(self.xSN, 2, 1, 1, 1)
         layout.addWidget(self.xSP, 2, 2, 1, 1)
         layout.addWidget(self.xSStep, 2, 3, 1, 1)
@@ -435,13 +441,17 @@ class GUI(QMainWindow):
         self.ySCn.setStyleSheet("background-color: lightgrey")
         self.ySStop.setStyleSheet("background-color: red")
         self.ySCp.setStyleSheet("background-color: lightgrey")
-        self.ySSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.ySSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.ySHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.ySHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.ySSn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.ySSp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.ySHn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.ySHp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
-        layout.addWidget(QLabel("Y:"), 3, 0, 1, 1)
+        layout.addWidget(QLabel("Vertical:"), 3, 0, 1, 1)
         layout.addWidget(self.ySN, 3, 1, 1, 1)
         layout.addWidget(self.ySP, 3, 2, 1, 1)
         layout.addWidget(self.ySStep, 3, 3, 1, 1)
@@ -480,13 +490,17 @@ class GUI(QMainWindow):
         self.zSCn.setStyleSheet("background-color: lightgrey")
         self.zSStop.setStyleSheet("background-color: red")
         self.zSCp.setStyleSheet("background-color: lightgrey")
-        self.zSSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zSSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zSHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zSHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zSSn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zSSp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zSHn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zSHp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
-        layout.addWidget(QLabel("Z:"), 4, 0, 1, 1)
+        layout.addWidget(QLabel("Focus:"), 4, 0, 1, 1)
         layout.addWidget(self.zSN, 4, 1, 1, 1)
         layout.addWidget(self.zSP, 4, 2, 1, 1)
         layout.addWidget(self.zSStep, 4, 3, 1, 1)
@@ -556,13 +570,17 @@ class GUI(QMainWindow):
         self.xOCn.setStyleSheet("background-color: lightgrey")
         self.xOStop.setStyleSheet("background-color: red")
         self.xOCp.setStyleSheet("background-color: lightgrey")
-        self.xOSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xOSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xOHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xOSn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xOSp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xOHn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xOHp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
-        layout.addWidget(QLabel("X:"), 2, 0, 1, 1)
+        layout.addWidget(QLabel("Horizontal:"), 2, 0, 1, 1)
         layout.addWidget(self.xON, 2, 1, 1, 1)
         layout.addWidget(self.xOP, 2, 2, 1, 1)
         layout.addWidget(self.xOStep, 2, 3, 1, 1)
@@ -601,13 +619,17 @@ class GUI(QMainWindow):
         self.yOCn.setStyleSheet("background-color: lightgrey")
         self.yOStop.setStyleSheet("background-color: red")
         self.yOCp.setStyleSheet("background-color: lightgrey")
-        self.yOSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.yOSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.yOHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.yOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.yOSn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.yOSp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.yOHn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.yOHp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
-        layout.addWidget(QLabel("Y:"), 3, 0, 1, 1)
+        layout.addWidget(QLabel("Vertical:"), 3, 0, 1, 1)
         layout.addWidget(self.yON, 3, 1, 1, 1)
         layout.addWidget(self.yOP, 3, 2, 1, 1)
         layout.addWidget(self.yOStep, 3, 3, 1, 1)
@@ -646,13 +668,17 @@ class GUI(QMainWindow):
         self.zOCn.setStyleSheet("background-color: lightgrey")
         self.zOStop.setStyleSheet("background-color: red")
         self.zOCp.setStyleSheet("background-color: lightgrey")
-        self.zOSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zOSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zOHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zOSn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zOSp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zOHn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zOHp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
-        layout.addWidget(QLabel("Z:"), 4, 0, 1, 1)
+        layout.addWidget(QLabel("Focus:"), 4, 0, 1, 1)
         layout.addWidget(self.zON, 4, 1, 1, 1)
         layout.addWidget(self.zOP, 4, 2, 1, 1)
         layout.addWidget(self.zOStep, 4, 3, 1, 1)
@@ -847,18 +873,24 @@ class MyTableWidget(QWidget):
         self.xStopS.setAlignment(Qt.AlignCenter)
         self.yStopS.setAlignment(Qt.AlignCenter)
         self.zStopS.setAlignment(Qt.AlignCenter)
-        self.xIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.yIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xStopS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.yStopS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zStopS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xIdleS.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.yIdleS.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zIdleS.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xStopS.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.yStopS.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zStopS.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize sample widgets in the tab layout.
         self.tab1.layout.addWidget(QLabel("<b>Sample</b>"), 0, 1, 1, 3)
-        self.tab1.layout.addWidget(QLabel("X:"), 1, 1, 1, 1)
-        self.tab1.layout.addWidget(QLabel("Y:"), 2, 1, 1, 1)
-        self.tab1.layout.addWidget(QLabel("Z:"), 3, 1, 1, 1)
+        self.tab1.layout.addWidget(QLabel("Horizontal:"), 1, 1, 1, 1)
+        self.tab1.layout.addWidget(QLabel("Vertical:"), 2, 1, 1, 1)
+        self.tab1.layout.addWidget(QLabel("Focus:"), 3, 1, 1, 1)
         self.tab1.layout.addWidget(self.xIdleS, 1, 2, 1, 1)
         self.tab1.layout.addWidget(self.yIdleS, 2, 2, 1, 1)
         self.tab1.layout.addWidget(self.zIdleS, 3, 2, 1, 1)
@@ -881,18 +913,24 @@ class MyTableWidget(QWidget):
         self.xStopO.setAlignment(Qt.AlignCenter)
         self.yStopO.setAlignment(Qt.AlignCenter)
         self.zStopO.setAlignment(Qt.AlignCenter)
-        self.xIdleO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.yIdleO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zIdleO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xStopO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.yStopO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zStopO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xIdleO.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.yIdleO.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zIdleO.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xStopO.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.yStopO.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zStopO.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize sample widgets in the tab layout.
         self.tab1.layout.addWidget(QLabel("<b>Objective</b>"), 0, 4, 1, 3)
-        self.tab1.layout.addWidget(QLabel("X:"), 1, 4, 1, 1)
-        self.tab1.layout.addWidget(QLabel("Y:"), 2, 4, 1, 1)
-        self.tab1.layout.addWidget(QLabel("Z:"), 3, 4, 1, 1)
+        self.tab1.layout.addWidget(QLabel("Horizontal:"), 1, 4, 1, 1)
+        self.tab1.layout.addWidget(QLabel("Vertical:"), 2, 4, 1, 1)
+        self.tab1.layout.addWidget(QLabel("Focus:"), 3, 4, 1, 1)
         self.tab1.layout.addWidget(self.xIdleO, 1, 5, 1, 1)
         self.tab1.layout.addWidget(self.yIdleO, 2, 5, 1, 1)
         self.tab1.layout.addWidget(self.zIdleO, 3, 5, 1, 1)
@@ -943,9 +981,9 @@ class MyTableWidget(QWidget):
         # Organize sample widgets in the tab layout.
         self.tab3.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 2)
         self.tab3.layout.addWidget(QLabel("<i>Min to Max</i>"), 1, 1, 1, 1)
-        self.tab3.layout.addWidget(QLabel("X:"), 2, 0, 1, 1)
-        self.tab3.layout.addWidget(QLabel("Y:"), 3, 0, 1, 1)
-        self.tab3.layout.addWidget(QLabel("Z:"), 4, 0, 1, 1)
+        self.tab3.layout.addWidget(QLabel("Horizontal:"), 2, 0, 1, 1)
+        self.tab3.layout.addWidget(QLabel("Vertical:"), 3, 0, 1, 1)
+        self.tab3.layout.addWidget(QLabel("Focus:"), 4, 0, 1, 1)
         self.tab3.layout.addWidget(self.xSMM, 2, 1, 1, 1)
         self.tab3.layout.addWidget(self.ySMM, 3, 1, 1, 1)
         self.tab3.layout.addWidget(self.zSMM, 4, 1, 1, 1)
@@ -958,9 +996,9 @@ class MyTableWidget(QWidget):
         # Organize objective widgets in the tab layout.
         self.tab3.layout.addWidget(QLabel("<b>Objective</b>"), 0, 2, 1, 2)
         self.tab3.layout.addWidget(QLabel("<i>Min to Max</i>"), 1, 3, 1, 1)
-        self.tab3.layout.addWidget(QLabel("X:"), 2, 2, 1, 1)
-        self.tab3.layout.addWidget(QLabel("Y:"), 3, 2, 1, 1)
-        self.tab3.layout.addWidget(QLabel("Z:"), 4, 2, 1, 1)
+        self.tab3.layout.addWidget(QLabel("Horizontal:"), 2, 2, 1, 1)
+        self.tab3.layout.addWidget(QLabel("Vertical:"), 3, 2, 1, 1)
+        self.tab3.layout.addWidget(QLabel("Focus:"), 4, 2, 1, 1)
         self.tab3.layout.addWidget(self.xOMM, 2, 3, 1, 1)
         self.tab3.layout.addWidget(self.yOMM, 3, 3, 1, 1)
         self.tab3.layout.addWidget(self.zOMM, 4, 3, 1, 1)
@@ -987,9 +1025,9 @@ class MyTableWidget(QWidget):
         self.tab4.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 3)
         self.tab4.layout.addWidget(QLabel("<i>Min</i>"), 1, 1, 1, 1)
         self.tab4.layout.addWidget(QLabel("<i>Max</i>"), 1, 2, 1, 1)
-        self.tab4.layout.addWidget(QLabel("X:"), 2, 0, 1, 1)
-        self.tab4.layout.addWidget(QLabel("Y:"), 3, 0, 1, 1)
-        self.tab4.layout.addWidget(QLabel("Z:"), 4, 0, 1, 1)
+        self.tab4.layout.addWidget(QLabel("Horizontal:"), 2, 0, 1, 1)
+        self.tab4.layout.addWidget(QLabel("Vertical:"), 3, 0, 1, 1)
+        self.tab4.layout.addWidget(QLabel("Focus:"), 4, 0, 1, 1)
         self.tab4.layout.addWidget(self.xSMin, 2, 1, 1, 1)
         self.tab4.layout.addWidget(self.ySMin, 3, 1, 1, 1)
         self.tab4.layout.addWidget(self.zSMin, 4, 1, 1, 1)
@@ -1009,9 +1047,9 @@ class MyTableWidget(QWidget):
         self.tab4.layout.addWidget(QLabel("<b>Objective</b>"), 0, 3, 1, 3)
         self.tab4.layout.addWidget(QLabel("<i>Min</i>"), 1, 4, 1, 1)
         self.tab4.layout.addWidget(QLabel("<i>Max</i>"), 1, 5, 1, 1)
-        self.tab4.layout.addWidget(QLabel("X:"), 2, 3, 1, 1)
-        self.tab4.layout.addWidget(QLabel("Y:"), 3, 3, 1, 1)
-        self.tab4.layout.addWidget(QLabel("Z:"), 4, 3, 1, 1)
+        self.tab4.layout.addWidget(QLabel("Horizontal:"), 2, 3, 1, 1)
+        self.tab4.layout.addWidget(QLabel("Vertical:"), 3, 3, 1, 1)
+        self.tab4.layout.addWidget(QLabel("Focus:"), 4, 3, 1, 1)
         self.tab4.layout.addWidget(self.xOMin, 2, 4, 1, 1)
         self.tab4.layout.addWidget(self.yOMin, 3, 4, 1, 1)
         self.tab4.layout.addWidget(self.zOMin, 4, 4, 1, 1)
@@ -1028,7 +1066,8 @@ class MyTableWidget(QWidget):
         self.tab4.layout.addWidget(self.SESL, 5, 4, 1, 3)
 
         # Add information labels.
-        softLimLabel=QLabel("<i>The motors will move 'backlash' steps past the low limit before moving back to the lower limit.</i>")
+        softLimLabel = QLabel(
+            "<i>The motors will move 'backlash' steps past the low limit before moving back to the lower limit.</i>")
         softLimLabel.setWordWrap(True)
         self.tab4.layout.addWidget(softLimLabel, 6, 0, 1, 6)
 
@@ -1058,9 +1097,9 @@ class MyTableWidget(QWidget):
         # Organize sample widgets in the tab layout.
         self.tab5.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 3)
         self.tab5.layout.addWidget(QLabel("<i>Backlash</i>"), 1, 2, 1, 1)
-        self.tab5.layout.addWidget(QLabel("X:"), 2, 0, 1, 1)
-        self.tab5.layout.addWidget(QLabel("Y:"), 3, 0, 1, 1)
-        self.tab5.layout.addWidget(QLabel("Z:"), 4, 0, 1, 1)
+        self.tab5.layout.addWidget(QLabel("Horizontal:"), 2, 0, 1, 1)
+        self.tab5.layout.addWidget(QLabel("Vertical:"), 3, 0, 1, 1)
+        self.tab5.layout.addWidget(QLabel("Focus:"), 4, 0, 1, 1)
         self.tab5.layout.addWidget(self.xSZero, 2, 1, 1, 1)
         self.tab5.layout.addWidget(self.ySZero, 3, 1, 1, 1)
         self.tab5.layout.addWidget(self.zSZero, 4, 1, 1, 1)
@@ -1084,9 +1123,9 @@ class MyTableWidget(QWidget):
         # Organize objective widgets in the tab layout.
         self.tab5.layout.addWidget(QLabel("<b>Objective</b>"), 0, 3, 1, 3)
         self.tab5.layout.addWidget(QLabel("<i>Backlash</i>"), 1, 5, 1, 1)
-        self.tab5.layout.addWidget(QLabel("X:"), 2, 3, 1, 1)
-        self.tab5.layout.addWidget(QLabel("Y:"), 3, 3, 1, 1)
-        self.tab5.layout.addWidget(QLabel("Z:"), 4, 3, 1, 1)
+        self.tab5.layout.addWidget(QLabel("Horizontal:"), 2, 3, 1, 1)
+        self.tab5.layout.addWidget(QLabel("Vertical:"), 3, 3, 1, 1)
+        self.tab5.layout.addWidget(QLabel("Focus:"), 4, 3, 1, 1)
         self.tab5.layout.addWidget(self.xOZero, 2, 4, 1, 1)
         self.tab5.layout.addWidget(self.yOZero, 3, 4, 1, 1)
         self.tab5.layout.addWidget(self.zOZero, 4, 4, 1, 1)
@@ -1100,8 +1139,10 @@ class MyTableWidget(QWidget):
         self.tab5.layout.addWidget(self.SBL, 5, 0, 1, 6)
 
         # Add information labels.
-        backlashLabel=QLabel("<i>Backlash is applied when moving negitively. The motor will move 'backlash' steps past the target position before returning to the target position</i>")
-        zeroLabel=QLabel("<i>Zero'ing sets the current position as the datum.</i>")
+        backlashLabel = QLabel(
+            "<i>Backlash is applied when moving negitively. The motor will move 'backlash' steps past the target position before returning to the target position</i>")
+        zeroLabel = QLabel(
+            "<i>Zero'ing sets the current position as the datum.</i>")
         backlashLabel.setWordWrap(True)
         zeroLabel.setWordWrap(True)
         self.tab5.layout.addWidget(backlashLabel, 6, 0, 1, 6)

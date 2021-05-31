@@ -83,7 +83,7 @@ class Controller(object):
 
         self.monitorPVs()
         self.connectSignals()
-    
+
     def monitorPVs(self) -> None:
         """Configure and initiallize PVs.
 
@@ -125,26 +125,52 @@ class Controller(object):
         self.gui.tab.yOB.setText(str(caget(GL["YOB"])))
         self.gui.tab.zOB.setText(str(caget(GL["ZOB"])))
 
-        self.PV_XSABSPOS = PV(pvname=GL["XSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_ySABSPOS = PV(pvname=GL["YSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_zSABSPOS = PV(pvname=GL["ZSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_XOABSPOS = PV(pvname=GL["XOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_yOABSPOS = PV(pvname=GL["YOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_zOABSPOS = PV(pvname=GL["ZOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        # Set relative position global variables to current motor position.
+        GL["XS_RELATIVE_POSITION"] = caget(GL["XSABSPOS"])
+        GL["YS_RELATIVE_POSITION"] = caget(GL["YSABSPOS"])
+        GL["ZS_RELATIVE_POSITION"] = caget(GL["ZSABSPOS"])
+        GL["XO_RELATIVE_POSITION"] = caget(GL["XOABSPOS"])
+        GL["YO_RELATIVE_POSITION"] = caget(GL["YOABSPOS"])
+        GL["ZO_RELATIVE_POSITION"] = caget(GL["ZOABSPOS"])
 
-        self.PV_XSSTATE = PV(pvname=GL["XSSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_YSSTATE = PV(pvname=GL["YSSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_ZSSTATE = PV(pvname=GL["ZSSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_XOSTATE = PV(pvname=GL["XOSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_YOSTATE = PV(pvname=GL["YOSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_ZOSTATE = PV(pvname=GL["ZOSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_XSABSPOS = PV(
+            pvname=GL["XSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_ySABSPOS = PV(
+            pvname=GL["YSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_zSABSPOS = PV(
+            pvname=GL["ZSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_XOABSPOS = PV(
+            pvname=GL["XOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_yOABSPOS = PV(
+            pvname=GL["YOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        self.PV_zOABSPOS = PV(
+            pvname=GL["ZOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
 
-        self.PV_XSHN = PV(pvname=GL["XSHN"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_XSHP = PV(pvname=GL["XSHP"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_YSHN = PV(pvname=GL["YSHN"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_YSHP = PV(pvname=GL["YSHP"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_ZSHN = PV(pvname=GL["ZSHN"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_ZSHP = PV(pvname=GL["ZSHP"], auto_monitor=True, callback=self.setHardLimitInd)
+        self.PV_XSSTATE = PV(
+            pvname=GL["XSSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_YSSTATE = PV(
+            pvname=GL["YSSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_ZSSTATE = PV(
+            pvname=GL["ZSSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_XOSTATE = PV(
+            pvname=GL["XOSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_YOSTATE = PV(
+            pvname=GL["YOSTATE"], auto_monitor=True, callback=self.motorStatus)
+        self.PV_ZOSTATE = PV(
+            pvname=GL["ZOSTATE"], auto_monitor=True, callback=self.motorStatus)
+
+        self.PV_XSHN = PV(
+            pvname=GL["XSHN"], auto_monitor=True, callback=self.setHardLimitInd)
+        self.PV_XSHP = PV(
+            pvname=GL["XSHP"], auto_monitor=True, callback=self.setHardLimitInd)
+        self.PV_YSHN = PV(
+            pvname=GL["YSHN"], auto_monitor=True, callback=self.setHardLimitInd)
+        self.PV_YSHP = PV(
+            pvname=GL["YSHP"], auto_monitor=True, callback=self.setHardLimitInd)
+        self.PV_ZSHN = PV(
+            pvname=GL["ZSHN"], auto_monitor=True, callback=self.setHardLimitInd)
+        self.PV_ZSHP = PV(
+            pvname=GL["ZSHP"], auto_monitor=True, callback=self.setHardLimitInd)
 
         print("-*- PVs configured and initialized. -*-")
 
@@ -166,40 +192,40 @@ class Controller(object):
         self.gui.WCB.clicked.connect(self.saveImage)
 
         # Mode select functionality.
-        self.gui.tab.RDM1.pressed.connect(partial(self.modeState, 1,
-                                                  self.modeMotor))
-        self.gui.tab.RDM2.pressed.connect(partial(self.modeState, 2,
-                                                  self.modeMotor))
-        self.gui.tab.RDM3.pressed.connect(partial(self.modeState, 3,
-                                                  self.modeMotor))
-        self.gui.tab.RDM4.pressed.connect(partial(self.modeState, 4,
-                                                  self.modeMotor))
+        self.gui.tab.RDM1.pressed.connect(
+            partial(self.modeState, 1, self.modeMotor))
+        self.gui.tab.RDM2.pressed.connect(
+            partial(self.modeState, 2, self.modeMotor))
+        self.gui.tab.RDM3.pressed.connect(
+            partial(self.modeState, 3, self.modeMotor))
+        self.gui.tab.RDM4.pressed.connect(
+            partial(self.modeState, 4, self.modeMotor))
 
         # Increment sample and objective stage functionality.
-        self.gui.xSN.clicked.connect(partial(self.incPos, "S", "X", "N",
-                                             self.gui.xSStep))
-        self.gui.xSP.clicked.connect(partial(self.incPos, "S", "X", "P",
-                                             self.gui.xSStep))
-        self.gui.ySN.clicked.connect(partial(self.incPos, "S", "Y", "N",
-                                             self.gui.ySStep))
-        self.gui.ySP.clicked.connect(partial(self.incPos, "S", "Y", "P",
-                                             self.gui.ySStep))
-        self.gui.zSN.clicked.connect(partial(self.incPos, "S", "Z", "N",
-                                             self.gui.zSStep))
-        self.gui.zSP.clicked.connect(partial(self.incPos, "S", "Z", "P",
-                                             self.gui.zSStep))
-        self.gui.xON.clicked.connect(partial(self.incPos, "O", "X", "N",
-                                             self.gui.xOStep))
-        self.gui.xOP.clicked.connect(partial(self.incPos, "O", "X", "P",
-                                             self.gui.xOStep))
-        self.gui.yON.clicked.connect(partial(self.incPos, "O", "Y", "N",
-                                             self.gui.yOStep))
-        self.gui.yOP.clicked.connect(partial(self.incPos, "O", "Y", "P",
-                                             self.gui.yOStep))
-        self.gui.zON.clicked.connect(partial(self.incPos, "O", "Z", "N",
-                                             self.gui.zOStep))
-        self.gui.zOP.clicked.connect(partial(self.incPos, "O", "Z", "P",
-                                             self.gui.zOStep))
+        self.gui.xSN.clicked.connect(
+            partial(self.incPos, "S", "X", "N", self.gui.xSStep))
+        self.gui.xSP.clicked.connect(
+            partial(self.incPos, "S", "X", "P", self.gui.xSStep))
+        self.gui.ySN.clicked.connect(
+            partial(self.incPos, "S", "Y", "N", self.gui.ySStep))
+        self.gui.ySP.clicked.connect(
+            partial(self.incPos, "S", "Y", "P", self.gui.ySStep))
+        self.gui.zSN.clicked.connect(
+            partial(self.incPos, "S", "Z", "N", self.gui.zSStep))
+        self.gui.zSP.clicked.connect(
+            partial(self.incPos, "S", "Z", "P", self.gui.zSStep))
+        self.gui.xON.clicked.connect(
+            partial(self.incPos, "O", "X", "N", self.gui.xOStep))
+        self.gui.xOP.clicked.connect(
+            partial(self.incPos, "O", "X", "P", self.gui.xOStep))
+        self.gui.yON.clicked.connect(
+            partial(self.incPos, "O", "Y", "N", self.gui.yOStep))
+        self.gui.yOP.clicked.connect(
+            partial(self.incPos, "O", "Y", "P", self.gui.yOStep))
+        self.gui.zON.clicked.connect(
+            partial(self.incPos, "O", "Z", "N", self.gui.zOStep))
+        self.gui.zOP.clicked.connect(
+            partial(self.incPos, "O", "Z", "P", self.gui.zOStep))
 
         # Move sample and objective stage to absolute position functionality.
         self.gui.xSMove.clicked.connect(partial(self.absMove, "S", "X"))
@@ -210,42 +236,42 @@ class Controller(object):
         self.gui.zOMove.clicked.connect(partial(self.absMove, "O", "Z"))
 
         # Continuous motion of the sample and objective stages functionality.
-        self.gui.xSCn.clicked.connect(partial(self.continuousMotion, "S", "X",
-                                              "CN"))
-        self.gui.xSStop.clicked.connect(partial(self.continuousMotion, "S",
-                                                "X", "STOP"))
-        self.gui.xSCp.clicked.connect(partial(self.continuousMotion, "S", "X",
-                                              "CP"))
-        self.gui.ySCn.clicked.connect(partial(self.continuousMotion, "S", "Y",
-                                              "CN"))
-        self.gui.ySStop.clicked.connect(partial(self.continuousMotion, "S",
-                                                "Y", "STOP"))
-        self.gui.ySCp.clicked.connect(partial(self.continuousMotion, "S", "Y",
-                                              "CP"))
-        self.gui.zSCn.clicked.connect(partial(self.continuousMotion, "S", "Z",
-                                              "CN"))
-        self.gui.zSStop.clicked.connect(partial(self.continuousMotion, "S",
-                                                "Z", "STOP"))
-        self.gui.zSCp.clicked.connect(partial(self.continuousMotion, "S", "Z",
-                                              "CP"))
-        self.gui.xOCn.clicked.connect(partial(self.continuousMotion, "O", "X",
-                                              "CN"))
-        self.gui.xOStop.clicked.connect(partial(self.continuousMotion, "O",
-                                                "X", "STOP"))
-        self.gui.xOCp.clicked.connect(partial(self.continuousMotion, "O", "X",
-                                              "CP"))
-        self.gui.yOCn.clicked.connect(partial(self.continuousMotion, "O", "Y",
-                                              "CN"))
-        self.gui.yOStop.clicked.connect(partial(self.continuousMotion, "O",
-                                                "Y", "STOP"))
-        self.gui.yOCp.clicked.connect(partial(self.continuousMotion, "O", "Y",
-                                              "CP"))
-        self.gui.zOCn.clicked.connect(partial(self.continuousMotion, "O", "Z",
-                                              "CN"))
-        self.gui.zOStop.clicked.connect(partial(self.continuousMotion, "O",
-                                                "Z", "STOP"))
-        self.gui.zOCp.clicked.connect(partial(self.continuousMotion, "O", "Z",
-                                              "CP"))
+        self.gui.xSCn.clicked.connect(
+            partial(self.continuousMotion, "S", "X", "CN"))
+        self.gui.xSStop.clicked.connect(
+            partial(self.continuousMotion, "S", "X", "STOP"))
+        self.gui.xSCp.clicked.connect(
+            partial(self.continuousMotion, "S", "X", "CP"))
+        self.gui.ySCn.clicked.connect(
+            partial(self.continuousMotion, "S", "Y", "CN"))
+        self.gui.ySStop.clicked.connect(
+            partial(self.continuousMotion, "S", "Y", "STOP"))
+        self.gui.ySCp.clicked.connect(
+            partial(self.continuousMotion, "S", "Y", "CP"))
+        self.gui.zSCn.clicked.connect(
+            partial(self.continuousMotion, "S", "Z", "CN"))
+        self.gui.zSStop.clicked.connect(
+            partial(self.continuousMotion, "S", "Z", "STOP"))
+        self.gui.zSCp.clicked.connect(
+            partial(self.continuousMotion, "S", "Z", "CP"))
+        self.gui.xOCn.clicked.connect(
+            partial(self.continuousMotion, "O", "X", "CN"))
+        self.gui.xOStop.clicked.connect(
+            partial(self.continuousMotion, "O", "X", "STOP"))
+        self.gui.xOCp.clicked.connect(
+            partial(self.continuousMotion, "O", "X", "CP"))
+        self.gui.yOCn.clicked.connect(
+            partial(self.continuousMotion, "O", "Y", "CN"))
+        self.gui.yOStop.clicked.connect(
+            partial(self.continuousMotion, "O", "Y", "STOP"))
+        self.gui.yOCp.clicked.connect(
+            partial(self.continuousMotion, "O", "Y", "CP"))
+        self.gui.zOCn.clicked.connect(
+            partial(self.continuousMotion, "O", "Z", "CN"))
+        self.gui.zOStop.clicked.connect(
+            partial(self.continuousMotion, "O", "Z", "STOP"))
+        self.gui.zOCp.clicked.connect(
+            partial(self.continuousMotion, "O", "Z", "CP"))
 
         # Updating soft limits functionality.
         self.gui.tab.SSL.clicked.connect(partial(self.updateSoftLimits, 0))
@@ -279,14 +305,14 @@ class Controller(object):
         -------
         None
         """
-        path, _ = QFileDialog.getSaveFileName(self.gui, "Save File",
-                "sample_capture", "Image files (*.jpg *.jpeg *.gif *png)")
-        
+        path, _ = QFileDialog.getSaveFileName(
+            self.gui, "Save File", "sample_capture", "Image files (*.jpg *.jpeg *.gif *png)")
+
         plt.figure()
         plt.imshow(np.rot90(self.gui.image, 3))
         plt.axis("off")
         plt.savefig(path, dpi=250, bbox_inches="tight")
-        
+
         print(f"Image capture saved to: {path}")
 
     def modeState(self, mode: Literal[1, 2, 3, 4], modeMotor: Any) -> None:
@@ -310,8 +336,7 @@ class Controller(object):
 
         print(f"Changing mode to mode {mode}.")
 
-    def incPos(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"],
-               direction: Literal["N", "P"], step: QLineEdit) -> None:
+    def incPos(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], direction: Literal["N", "P"], step: QLineEdit) -> None:
         """Increment motor position.
 
         Increment the motor defined by 'object' and 'axis' in the direction
@@ -339,38 +364,38 @@ class Controller(object):
 
         caput(GL[f"{axis}{object}STEP"], float(step.text()))
 
-        absPos = caget(GL[f"{axis}{object}ABSPOS"])
+        absPos = GL[f"{axis}{object}_BASE_POSITION"]
+        relPos = GL[f"{axis}{object}_RELATIVE_POSITION"]
         incPos = caget(GL[f"{axis}{object}STEP"])
 
-        PHL = GL[f"{axis}{object}MAX_HARD_LIMIT"]
-        NHL = GL[f"{axis}{object}MIN_HARD_LIMIT"]
         PSL = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
         NSL = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
 
-        if direction == "P" and absPos + incPos > PSL:
+        if direction == "P" and absPos + relPos + incPos >= PSL:
+            GL[f"{axis}{object}_RELATIVE_POSITION"] = PSL - absPos
+
             caput(GL[f"{axis}{object}ABSPOS"], PSL)
             caput(GL[f"{axis}{object}MOVE"], 1)
             caput(GL[f"{axis}{object}MOVE"], 0)
-        elif direction == "P" and absPos + incPos > PHL:
-            caput(GL[f"{axis}{object}ABSPOS"], PHL)
-            caput(GL[f"{axis}{object}MOVE"], 1)
-            caput(GL[f"{axis}{object}MOVE"], 0)
-        elif direction == "N" and absPos - incPos < NSL:
+        elif direction == "N" and absPos + relPos - incPos <= NSL:
+            GL[f"{axis}{object}_RELATIVE_POSITION"] = NSL - absPos
+
             caput(GL[f"{axis}{object}ABSPOS"], NSL)
             caput(GL[f"{axis}{object}MOVE"], 1)
             caput(GL[f"{axis}{object}MOVE"], 0)
-        elif direction == "N" and absPos - incPos < NHL:
-            caput(GL[f"{axis}{object}ABSPOS"], NHL)
-            caput(GL[f"{axis}{object}MOVE"], 1)
-            caput(GL[f"{axis}{object}MOVE"], 0)
         else:
+            if direction == "P":
+                GL[f"{axis}{object}_RELATIVE_POSITION"] = relPos + incPos
+            else:
+                GL[f"{axis}{object}_RELATIVE_POSITION"] = relPos - incPos
+
             caput(GL[f"{axis}{object}{direction}"], 1)
-        
+
         self.setSoftLimitInd(object, axis)
-        
+
         absPos = caget(GL[f"{axis}{object}ABSPOS"])
         print(f"Incremental movement to {axis}{object}ABSPOS = {absPos}.")
-    
+
     def absMove(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
         """Move sample or objective motor to specified position.
 
@@ -392,28 +417,25 @@ class Controller(object):
         """
         GL = globals()
 
-        lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos,
-                    ("S", "Y"): self.gui.ySAbsPos, ("O", "Y"): self.gui.yOAbsPos,
-                    ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
+        lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos, ("S", "Y"): self.gui.ySAbsPos,
+                    ("O", "Y"): self.gui.yOAbsPos, ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
 
         absPos = float(lineEdit[(object, axis)].text())
+        basePos = GL[f"{axis}{object}_BASE_POSITION"]
 
-        PHL = GL[f"{axis}{object}MAX_HARD_LIMIT"]
-        NHL = GL[f"{axis}{object}MIN_HARD_LIMIT"]
         PSL = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
         NSL = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
 
-        if absPos > PSL:
+        if basePos + absPos >= PSL:
+            GL[f"{axis}{object}_RELATIVE_POSITION"] = PSL - basePos
             caput(GL[f"{axis}{object}ABSPOS"], PSL)
-        elif absPos > PHL:
-            caput(GL[f"{axis}{object}ABSPOS"], PHL)
-        elif absPos < NSL:
+        elif basePos + absPos <= NSL:
+            GL[f"{axis}{object}_RELATIVE_POSITION"] = NSL - basePos
             caput(GL[f"{axis}{object}ABSPOS"], NSL)
-        elif absPos < NHL:
-            caput(GL[f"{axis}{object}ABSPOS"], NHL)
         else:
-            caput(GL[f"{axis}{object}ABSPOS"], absPos)
-        
+            GL[f"{axis}{object}_RELATIVE_POSITION"] = absPos
+            caput(GL[f"{axis}{object}ABSPOS"], basePos + absPos)
+
         caput(GL[f"{axis}{object}MOVE"], 1)
         caput(GL[f"{axis}{object}MOVE"], 0)
 
@@ -421,10 +443,8 @@ class Controller(object):
 
         absPos = caget(GL[f"{axis}{object}ABSPOS"])
         print(f"Absolute movement to {axis}{object}ABSPOS = {absPos}.")
-    
-    def continuousMotion(self, object: Literal["S", "O"], axis:
-                         Literal["X", "Y", "Z"], type:
-                         Literal["CN", "STOP", "CP"]) -> None:
+
+    def continuousMotion(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], type: Literal["CN", "STOP", "CP"]) -> None:
         """Control continuous motion of the sample and objective stages.
 
         This method allows for the continuous motion functionality of the
@@ -459,9 +479,9 @@ class Controller(object):
             caput(GL[f"{axis}{object}CP"], 0)
             caput(GL[f"{axis}{object}STOP"], 1)
             caput(GL[f"{axis}{object}STOP"], 0)
-        
+
         self.setSoftLimitInd(object, axis)
-        
+
         print(f"Change continuous movement to -> {type}.")
 
     def updateAbsPos(self, **kwargs: Dict) -> None:
@@ -472,14 +492,14 @@ class Controller(object):
         **kwargs : Dict
             Extra arguments to `motorStatus`: refer to PyEpics documentation
             for a list of all possible arguments for PV callback functions.
-        
+
         Returns
         -------
         None
         """
-        lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos,
-                    ("S", "Y"): self.gui.ySAbsPos, ("O", "Y"): self.gui.yOAbsPos,
-                    ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
+        GL = globals()
+        lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos, ("S", "Y"): self.gui.ySAbsPos,
+                    ("O", "Y"): self.gui.yOAbsPos, ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
 
         pvname = kwargs["pvname"]
         value = kwargs["value"]
@@ -559,7 +579,7 @@ class Controller(object):
             else:
                 GL["XSMAX_SOFT_LIMIT"] = xsmax
                 self.gui.tab.xSMax.setText(str(xsmax))
-            
+
             ysmin = float(self.gui.tab.ySMin.text())
             if ysmin < GL["YSMIN_HARD_LIMIT"]:
                 GL["YSMIN_SOFT_LIMIT"] = GL["YSMIN_HARD_LIMIT"]
@@ -575,7 +595,7 @@ class Controller(object):
             else:
                 GL["YSMAX_SOFT_LIMIT"] = ysmax
                 self.gui.tab.ySMax.setText(str(ysmax))
-            
+
             zsmin = float(self.gui.tab.zSMin.text())
             if zsmin < GL["ZSMIN_HARD_LIMIT"]:
                 GL["ZSMIN_SOFT_LIMIT"] = GL["ZSMIN_HARD_LIMIT"]
@@ -591,7 +611,7 @@ class Controller(object):
             else:
                 GL["ZSMAX_SOFT_LIMIT"] = zsmax
                 self.gui.tab.zSMax.setText(str(zsmax))
-            
+
             xomin = float(self.gui.tab.xOMin.text())
             if xomin < GL["XOMIN_HARD_LIMIT"]:
                 GL["XOMIN_SOFT_LIMIT"] = GL["XOMIN_HARD_LIMIT"]
@@ -607,7 +627,7 @@ class Controller(object):
             else:
                 GL["XOMAX_SOFT_LIMIT"] = xomax
                 self.gui.tab.xOMax.setText(str(xomax))
-            
+
             yomin = float(self.gui.tab.yOMin.text())
             if yomin < GL["YOMIN_HARD_LIMIT"]:
                 GL["YOMIN_SOFT_LIMIT"] = GL["YOMIN_HARD_LIMIT"]
@@ -623,7 +643,7 @@ class Controller(object):
             else:
                 GL["YOMAX_SOFT_LIMIT"] = yomax
                 self.gui.tab.yOMax.setText(str(yomax))
-            
+
             zomin = float(self.gui.tab.zOMin.text())
             if zomin < GL["ZOMIN_HARD_LIMIT"]:
                 GL["ZOMIN_SOFT_LIMIT"] = GL["ZOMIN_HARD_LIMIT"]
@@ -639,13 +659,15 @@ class Controller(object):
             else:
                 GL["ZOMAX_SOFT_LIMIT"] = zomax
                 self.gui.tab.zOMax.setText(str(zomax))
-            
+
         print(f"Updating soft limits, buttonID={buttonID}.")
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
                 Min = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
                 Max = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
                 print(f"XS SL: min -> {Min}, max -> {Max}")
+
+        self.checkMotorPos(object, axis)
 
     def updateBacklash(self) -> None:
         """Update backlash variables.
@@ -677,8 +699,7 @@ class Controller(object):
 
         print("Updating backlash values.")
 
-    def zeroPos(self, object: Literal["S", "O"], axis:
-                Literal["X", "Y", "Z"]) -> None:
+    def zeroPos(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
         """Zero sample or objective axis position.
 
         This method zeros the absolute position line edit of the motor defined
@@ -705,9 +726,8 @@ class Controller(object):
         """
         GL = globals()
 
-        lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos,
-                    ("S", "Y"): self.gui.ySAbsPos, ("O", "Y"): self.gui.yOAbsPos,
-                    ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
+        lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos, ("S", "Y"): self.gui.ySAbsPos,
+                    ("O", "Y"): self.gui.yOAbsPos, ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
 
         # Update the base and relative positions.
         GL[f"{axis}{object}_BASE_POSITION"] += GL[f"{axis}{object}_RELATIVE_POSITION"]
@@ -726,17 +746,21 @@ class Controller(object):
         **kwargs : Dict
             Extra arguments to `motorStatus`: refer to PyEpics documentation
             for a list of all possible arguments for PV callback functions.
-        
+
         Returns
         -------
         None
         """
+        GL = globals()
         motionLabels = {("S", "X", 0): self.gui.tab.xIdleS, ("S", "X", 1): self.gui.tab.xStopS,
                         ("S", "Y", 0): self.gui.tab.yIdleS, ("S", "Y", 1): self.gui.tab.yStopS,
                         ("S", "Z", 0): self.gui.tab.zIdleS, ("S", "Z", 1): self.gui.tab.zStopS,
                         ("O", "X", 0): self.gui.tab.xIdleO, ("O", "X", 1): self.gui.tab.xStopO,
                         ("O", "Y", 0): self.gui.tab.yIdleO, ("O", "Y", 1): self.gui.tab.yStopO,
                         ("O", "Z", 0): self.gui.tab.zIdleO, ("O", "Z", 1): self.gui.tab.zStopO}
+
+        lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos, ("S", "Y"): self.gui.ySAbsPos,
+                    ("O", "Y"): self.gui.yOAbsPos, ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
 
         pvname = kwargs["pvname"]
         value = kwargs["value"]
@@ -749,13 +773,45 @@ class Controller(object):
         object = pvKey[1]
 
         if value == 0:
-            motionLabels[(object, axis, 0)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
-            motionLabels[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+            motionLabels[(object, axis, 0)].setStyleSheet(
+                "background-color: #3ac200; border: 1px solid black;")
+            motionLabels[(object, axis, 1)].setStyleSheet(
+                "background-color: lightgrey; border: 1px solid black;")
         elif value == 0:
-            motionLabels[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-            motionLabels[(object, axis, 1)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
+            motionLabels[(object, axis, 0)].setStyleSheet(
+                "background-color: lightgrey; border: 1px solid black;")
+            motionLabels[(object, axis, 1)].setStyleSheet(
+                "background-color: #3ac200; border: 1px solid black;")
 
-        print(f"Checkiing motor status, motor ident and state => {pvname}, {value}")
+        GL[f"{axis}{object}_RELATIVE_POSITION"] = caget(
+            GL[f"{axis}{object}ABSPOS"])
+        lineEdit[(object, axis)].setText(
+            GL[f"{axis}{object}_RELATIVE_POSITION"])
+
+        print(
+            f"Checkiing motor status, motor ident and state => {pvname}, {value}")
+        relPos = GL[f"{axis}{object}_RELATIVE_POSITION"]
+        print(f"Current relative position -> {relPos}")
+
+    def checkMotorPos(self, object, axis):
+        """
+        """
+        GL = globals()
+        PSL = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
+        NSL = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
+
+        basePos = GL[f"{axis}{object}_BASE_POSITION"]
+        relPos = GL[f"{axis}{object}_RELATIVE_POSITION"]
+
+        if basePos + relPos > PSL:
+            GL[f"{axis}{object}_RELATIVE_POSITION"] = PSL - basePos
+            caput(GL[f"{axis}{object}ABSPOS"], PSL)
+        elif basePos + relPos < NSL:
+            GL[f"{axis}{object}_RELATIVE_POSITION"] = NSL - basePos
+            caput(GL[f"{axis}{object}ABSPOS"], NSL)
+
+        caput(GL[f"{axis}{object}MOVE"], 1)
+        caput(GL[f"{axis}{object}MOVE"], 0)
 
     def setHardLimitInd(self, **kwargs):
         """
@@ -779,16 +835,22 @@ class Controller(object):
         axis = pvKey[0]
         object = pvKey[1]
 
-        if GL[f"{axis}{object}HP"] - 5 < value:
-            hardLimits[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-            hardLimits[(object, axis, 1)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
-        elif value < GL[f"{axis}{object}HN"] + 5:
-            hardLimits[(object, axis, 0)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
-            hardLimits[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        # Set maximum hard limit indicator.
+        if GL[f"{axis}{object}MAX_HARD_LIMIT"] <= value:
+            hardLimits[(object, axis, 1)].setStyleSheet(
+                "background-color: #3ac200; border: 1px solid black;")
         else:
-            hardLimits[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-            hardLimits[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        
+            hardLimits[(object, axis, 1)].setStyleSheet(
+                "background-color: lightgrey; border: 1px solid black;")
+
+        # Set minimum hard limit indicator.
+        if value <= GL[f"{axis}{object}MIN_HARD_LIMIT"]:
+            hardLimits[(object, axis, 0)].setStyleSheet(
+                "background-color: #3ac200; border: 1px solid black;")
+        else:
+            hardLimits[(object, axis, 0)].setStyleSheet(
+                "background-color: lightgrey; border: 1px solid black;")
+
         print("Setting hard limit indicators.")
 
     def setSoftLimitInd(self, object, axis):
@@ -806,18 +868,24 @@ class Controller(object):
 
         value = caget(GL[f"{axis}{object}ABSPOS"])
 
-        if GL[f"{axis}{object}MAX_SOFT_LIMIT"] - 5 < value:
-            softLimits[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-            softLimits[(object, axis, 1)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
-        elif value < GL[f"{axis}{object}MIN_SOFT_LIMIT"] + 5:
-            softLimits[(object, axis, 0)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
-            softLimits[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        # Set maximum soft limit indicator.
+        if GL[f"{axis}{object}MAX_SOFT_LIMIT"] <= value:
+            softLimits[(object, axis, 1)].setStyleSheet(
+                "background-color: #3ac200; border: 1px solid black;")
         else:
-            softLimits[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-            softLimits[(object, axis, 1)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        
+            softLimits[(object, axis, 1)].setStyleSheet(
+                "background-color: lightgrey; border: 1px solid black;")
+
+        # Set minimum soft limit indicator.
+        if value <= GL[f"{axis}{object}MIN_SOFT_LIMIT"]:
+            softLimits[(object, axis, 0)].setStyleSheet(
+                "background-color: #3ac200; border: 1px solid black;")
+        else:
+            softLimits[(object, axis, 0)].setStyleSheet(
+                "background-color: lightgrey; border: 1px solid black;")
+
         print("Setting soft limit indicators.")
-    
+
     def displayGlobals(self):
         """     
         """
