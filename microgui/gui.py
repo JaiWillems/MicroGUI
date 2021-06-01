@@ -822,6 +822,8 @@ class MyTableWidget(QWidget):
         Backlash input for the objective's z dimension.
     SBL : QPushButton
         Update all backlash values button.
+    valueType : QPushButton
+        Toggles between actual and relative values.
     globals : QPushButton
         Display the programs global variables.
 
@@ -1139,7 +1141,7 @@ class MyTableWidget(QWidget):
         # Define, style, and organize additional interactive widgets.
         self.SBL = QPushButton("Update Backlash Values")
         self.SBL.setStyleSheet("background-color: lightgrey")
-        self.tab5.layout.addWidget(self.SBL, 5, 0, 1, 6)
+        self.tab5.layout.addWidget(self.SBL, 5, 0, 1, 3)
 
         # Add information labels.
         backlashLabel = QLabel(
@@ -1151,9 +1153,14 @@ class MyTableWidget(QWidget):
         self.tab5.layout.addWidget(backlashLabel, 6, 0, 1, 6)
         self.tab5.layout.addWidget(zeroLabel, 7, 0, 1, 4)
 
+        self.valueType = QPushButton("Display Relative Values")
+        self.valueType.setCheckable(True)
+        self.valueType.setStyleSheet("background-color: lightgrey")
+        self.tab5.layout.addWidget(self.valueType, 5, 3, 1, 3)
+
         self.globals = QPushButton("GLOBALS")
         self.globals.setStyleSheet("background-color: lightgrey")
-        self.tab5.layout.addWidget(self.globals, 7, 5, 1, 2)
+        self.tab5.layout.addWidget(self.globals, 7, 5, 1, 1)
 
         # Set tab layout.
         self.tab5.setLayout(self.tab5.layout)

@@ -287,6 +287,8 @@ class Controller(object):
 
         self.gui.tab.SBL.clicked.connect(self.updateBacklash)
 
+        self.gui.tab.valueType.clicked.connect(self.changeValues)
+
         self.gui.tab.globals.clicked.connect(self.displayGlobals)
 
         print("-*- Widgets connected to control sequences. -*-")
@@ -442,6 +444,12 @@ class Controller(object):
         caput(GL[f"{axis}{object}MOVE"], 1)
         caput(GL[f"{axis}{object}MOVE"], 0)
 
+        relPos = GL[f"{axis}{object}_RELATIVE_POSITION"]
+        if self.gui.tab.valueType.isChecked():
+            lineEdit[(object, axis)].setText(str(relPos))
+        else:
+            lineEdit[(object, axis)].setText(str(basePos + relPos))
+
         self.setSoftLimitInd(object, axis)
 
         absPos = caget(GL[f"{axis}{object}ABSPOS"])
@@ -515,10 +523,20 @@ class Controller(object):
         object = pvKey[1]
 
         basePos = GL[f"{axis}{object}_BASE_POSITION"]
+        if self.gui.tab.valueType.isChecked():
+            lineEdit[(object, axis)].setText(str(value))
+            print(
+                f"Updating absolute position line edit to relative position: {value}.")
+        else:
+            lineEdit[(object, axis)].setText(str(basePos + value))
+            print(
+                f"Updating absolute position line edit to absolute position: {basePos + value}.")
 
-        lineEdit[(object, axis)].setText(str(value - basePos))
-
-        print(f"Updating absolute position line edit to {value - basePos}.")
+    def offset(self, object, axis):
+        GL = globals()
+        if self.gui.tab.valueType.isChecked():
+            return 0
+        return GL[f"{axis}{object}_BASE_POSITION"]
 
     def updateSoftLimits(self, buttonID: Literal[0, 1]) -> None:
         """Update sample and objective soft limits.
@@ -538,6 +556,13 @@ class Controller(object):
         """
         GL = globals()
 
+        softLimits = {("S", "X", 0): self.gui.tab.xSMin, ("S", "X", 1): self.gui.tab.xSMin,
+                      ("S", "Y", 0): self.gui.tab.ySMin, ("S", "Y", 1): self.gui.tab.ySMin,
+                      ("S", "Z", 0): self.gui.tab.zSMin, ("S", "Z", 1): self.gui.tab.zSMin,
+                      ("O", "X", 0): self.gui.tab.xOMin, ("O", "X", 1): self.gui.tab.xOMax,
+                      ("O", "Y", 0): self.gui.tab.yOMin, ("O", "Y", 1): self.gui.tab.yOMax,
+                      ("O", "Z", 0): self.gui.tab.zOMin, ("O", "Z", 1): self.gui.tab.zOMax}
+
         if buttonID:
             # Set soft limits to hard limits.
             GL["XSMIN_SOFT_LIMIT"] = float(GL["XSMIN_HARD_LIMIT"])
@@ -554,116 +579,54 @@ class Controller(object):
             GL["ZOMAX_SOFT_LIMIT"] = float(GL["ZOMAX_HARD_LIMIT"])
 
             # Update soft limit line edits.
-            self.gui.tab.xSMin.setText(str(GL["XSMIN_SOFT_LIMIT"]))
-            self.gui.tab.xSMax.setText(str(GL["XSMAX_SOFT_LIMIT"]))
-            self.gui.tab.ySMin.setText(str(GL["YSMIN_SOFT_LIMIT"]))
-            self.gui.tab.ySMax.setText(str(GL["YSMAX_SOFT_LIMIT"]))
-            self.gui.tab.zSMin.setText(str(GL["ZSMIN_SOFT_LIMIT"]))
-            self.gui.tab.zSMax.setText(str(GL["ZSMAX_SOFT_LIMIT"]))
-            self.gui.tab.xOMin.setText(str(GL["XOMIN_SOFT_LIMIT"]))
-            self.gui.tab.xOMax.setText(str(GL["XOMAX_SOFT_LIMIT"]))
-            self.gui.tab.yOMin.setText(str(GL["YOMIN_SOFT_LIMIT"]))
-            self.gui.tab.yOMax.setText(str(GL["YOMAX_SOFT_LIMIT"]))
-            self.gui.tab.zOMin.setText(str(GL["ZOMIN_SOFT_LIMIT"]))
-            self.gui.tab.zOMax.setText(str(GL["ZOMAX_SOFT_LIMIT"]))
+            self.gui.tab.xSMin.setText(
+                str(GL["XSMIN_SOFT_LIMIT"] - self.offset("S", "X")))
+            self.gui.tab.xSMax.setText(
+                str(GL["XSMAX_SOFT_LIMIT"] - self.offset("S", "X")))
+            self.gui.tab.ySMin.setText(
+                str(GL["YSMIN_SOFT_LIMIT"] - self.offset("S", "Y")))
+            self.gui.tab.ySMax.setText(
+                str(GL["YSMAX_SOFT_LIMIT"] - self.offset("S", "Y")))
+            self.gui.tab.zSMin.setText(
+                str(GL["ZSMIN_SOFT_LIMIT"] - self.offset("S", "Z")))
+            self.gui.tab.zSMax.setText(
+                str(GL["ZSMAX_SOFT_LIMIT"] - self.offset("S", "Z")))
+            self.gui.tab.xOMin.setText(
+                str(GL["XOMIN_SOFT_LIMIT"] - self.offset("O", "X")))
+            self.gui.tab.xOMax.setText(
+                str(GL["XOMAX_SOFT_LIMIT"] - self.offset("O", "X")))
+            self.gui.tab.yOMin.setText(
+                str(GL["YOMIN_SOFT_LIMIT"] - self.offset("O", "Y")))
+            self.gui.tab.yOMax.setText(
+                str(GL["YOMAX_SOFT_LIMIT"] - self.offset("O", "Y")))
+            self.gui.tab.zOMin.setText(
+                str(GL["ZOMIN_SOFT_LIMIT"] - self.offset("O", "Z")))
+            self.gui.tab.zOMax.setText(
+                str(GL["ZOMAX_SOFT_LIMIT"] - self.offset("O", "Z")))
 
         else:
             # Set soft limits to inputted values
-            xsmin = float(self.gui.tab.xSMin.text())
-            if xsmin < GL["XSMIN_HARD_LIMIT"]:
-                GL["XSMIN_SOFT_LIMIT"] = GL["XSMIN_HARD_LIMIT"]
-                self.gui.tab.xSMin.setText(str(GL["XSMIN_SOFT_LIMIT"]))
-            else:
-                GL["XSMIN_SOFT_LIMIT"] = xsmin
-                self.gui.tab.xSMin.setText(str(xsmin))
+            for object in ["S", "X"]:
+                for axis in ["X", "Y", "Z"]:
+                    min = float(softLimits[(object, axis)].text())
+                    if min < GL[f"{axis}{object}MIN_HARD_LIMIT"]:
+                        GL[f"{axis}{object}MIN_SOFT_LIMIT"] = GL[f"{axis}{object}MIN_HARD_LIMIT"]
+                        softLimits[(object, axis)].setText(
+                            str(GL[f"{axis}{object}MIN_SOFT_LIMIT"] - self.offset(object, axis)))
+                    else:
+                        GL[f"{axis}{object}MIN_SOFT_LIMIT"] = min
+                        softLimits[(object, axis)].setText(
+                            str(min - self.offset(object, axis)))
 
-            xsmax = float(self.gui.tab.xSMax.text())
-            if xsmax > GL["XSMAX_HARD_LIMIT"]:
-                GL["XSMAX_SOFT_LIMIT"] = GL["XSMAX_HARD_LIMIT"]
-                self.gui.tab.xSMax.setText(str(GL["XSMAX_SOFT_LIMIT"]))
-            else:
-                GL["XSMAX_SOFT_LIMIT"] = xsmax
-                self.gui.tab.xSMax.setText(str(xsmax))
-
-            ysmin = float(self.gui.tab.ySMin.text())
-            if ysmin < GL["YSMIN_HARD_LIMIT"]:
-                GL["YSMIN_SOFT_LIMIT"] = GL["YSMIN_HARD_LIMIT"]
-                self.gui.tab.ySMin.setText(str(GL["YSMIN_SOFT_LIMIT"]))
-            else:
-                GL["YSMIN_SOFT_LIMIT"] = ysmin
-                self.gui.tab.ySMin.setText(str(ysmin))
-
-            ysmax = float(self.gui.tab.ySMax.text())
-            if ysmax > GL["YSMAX_HARD_LIMIT"]:
-                GL["YSMAX_SOFT_LIMIT"] = GL["YSMAX_HARD_LIMIT"]
-                self.gui.tab.ySMax.setText(str(GL["YSMAX_SOFT_LIMIT"]))
-            else:
-                GL["YSMAX_SOFT_LIMIT"] = ysmax
-                self.gui.tab.ySMax.setText(str(ysmax))
-
-            zsmin = float(self.gui.tab.zSMin.text())
-            if zsmin < GL["ZSMIN_HARD_LIMIT"]:
-                GL["ZSMIN_SOFT_LIMIT"] = GL["ZSMIN_HARD_LIMIT"]
-                self.gui.tab.zSMin.setText(str(GL["ZSMIN_SOFT_LIMIT"]))
-            else:
-                GL["ZSMIN_SOFT_LIMIT"] = zsmin
-                self.gui.tab.zSMin.setText(str(zsmin))
-
-            zsmax = float(self.gui.tab.zSMax.text())
-            if zsmax > GL["ZSMAX_HARD_LIMIT"]:
-                GL["ZSMAX_SOFT_LIMIT"] = GL["ZSMAX_HARD_LIMIT"]
-                self.gui.tab.zSMax.setText(str(GL["ZSMAX_SOFT_LIMIT"]))
-            else:
-                GL["ZSMAX_SOFT_LIMIT"] = zsmax
-                self.gui.tab.zSMax.setText(str(zsmax))
-
-            xomin = float(self.gui.tab.xOMin.text())
-            if xomin < GL["XOMIN_HARD_LIMIT"]:
-                GL["XOMIN_SOFT_LIMIT"] = GL["XOMIN_HARD_LIMIT"]
-                self.gui.tab.xOMin.setText(str(GL["XOMIN_SOFT_LIMIT"]))
-            else:
-                GL["XOMIN_SOFT_LIMIT"] = xomin
-                self.gui.tab.xOMin.setText(str(xomin))
-
-            xomax = float(self.gui.tab.xOMax.text())
-            if xomax > GL["XOMAX_HARD_LIMIT"]:
-                GL["XOMAX_SOFT_LIMIT"] = GL["XOMAX_HARD_LIMIT"]
-                self.gui.tab.xOMax.setText(str(GL["XOMAX_SOFT_LIMIT"]))
-            else:
-                GL["XOMAX_SOFT_LIMIT"] = xomax
-                self.gui.tab.xOMax.setText(str(xomax))
-
-            yomin = float(self.gui.tab.yOMin.text())
-            if yomin < GL["YOMIN_HARD_LIMIT"]:
-                GL["YOMIN_SOFT_LIMIT"] = GL["YOMIN_HARD_LIMIT"]
-                self.gui.tab.yOMin.setText(str(GL["YOMIN_SOFT_LIMIT"]))
-            else:
-                GL["YOMIN_SOFT_LIMIT"] = yomin
-                self.gui.tab.yOMin.setText(str(yomin))
-
-            yomax = float(self.gui.tab.yOMax.text())
-            if yomax > GL["YOMAX_HARD_LIMIT"]:
-                GL["YOMAX_SOFT_LIMIT"] = GL["YOMAX_HARD_LIMIT"]
-                self.gui.tab.yOMax.setText(str(GL["YOMAX_SOFT_LIMIT"]))
-            else:
-                GL["YOMAX_SOFT_LIMIT"] = yomax
-                self.gui.tab.yOMax.setText(str(yomax))
-
-            zomin = float(self.gui.tab.zOMin.text())
-            if zomin < GL["ZOMIN_HARD_LIMIT"]:
-                GL["ZOMIN_SOFT_LIMIT"] = GL["ZOMIN_HARD_LIMIT"]
-                self.gui.tab.zOMin.setText(str(GL["ZOMIN_SOFT_LIMIT"]))
-            else:
-                GL["ZOMIN_SOFT_LIMIT"] = zomin
-                self.gui.tab.zOMin.setText(str(zomin))
-
-            zomax = float(self.gui.tab.zOMax.text())
-            if zomax > GL["ZOMAX_HARD_LIMIT"]:
-                GL["ZOMAX_SOFT_LIMIT"] = GL["ZOMAX_HARD_LIMIT"]
-                self.gui.tab.zOMax.setText(str(GL["ZOMAX_SOFT_LIMIT"]))
-            else:
-                GL["ZOMAX_SOFT_LIMIT"] = zomax
-                self.gui.tab.zOMax.setText(str(zomax))
+                    max = float(softLimits[(object, axis)].text())
+                    if max > GL[f"{axis}{object}MAX_HARD_LIMIT"]:
+                        GL[f"{axis}{object}MAX_SOFT_LIMIT"] = GL[f"{axis}{object}MAX_HARD_LIMIT"]
+                        softLimits[(object, axis)].setText(
+                            str(GL[f"{axis}{object}MAX_SOFT_LIMIT"] - self.offset(object, axis)))
+                    else:
+                        GL[f"{axis}{object}MAX_SOFT_LIMIT"] = max
+                        softLimits[(object, axis)].setText(
+                            str(max - self.offset(object, axis)))
 
             self.checkMotorPos()
 
@@ -793,7 +756,7 @@ class Controller(object):
         GL[f"{axis}{object}_RELATIVE_POSITION"] = absPos - basePos
 
         lineEdit[(object, axis)].setText(
-            str(GL[f"{axis}{object}_RELATIVE_POSITION"]))
+            str(self.offset(object, axis) + GL[f"{axis}{object}_RELATIVE_POSITION"]))
 
         print(
             f"Checking motor status, motor identity: {pvname}, state: {value}")
@@ -865,7 +828,9 @@ class Controller(object):
         print("Setting hard limit indicators.")
 
     def setSoftLimitInd(self, object, axis):
-        """
+        """Set soft limit indicators.
+
+
         set soft limits if scheduled to move to soft limits
         """
         GL = globals()
@@ -897,8 +862,86 @@ class Controller(object):
 
         print("Setting soft limit indicators.")
 
+    def changeValues(self):
+        """Switch displayed values between actual and relative values.
+
+        This method changes all position based line edits and labels between
+        actual values and relative values where relative values are taken with
+        reference to the zeroed position.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        GL = globals()
+        lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos, ("S", "Y"): self.gui.ySAbsPos,
+                    ("O", "Y"): self.gui.yOAbsPos, ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
+
+        hardLimits = {("S", "X"): self.gui.tab.xSMM, ("O", "X"): self.gui.tab.xOMM, ("S", "Y"): self.gui.tab.ySMM,
+                      ("O", "Y"): self.gui.tab.yOMM, ("S", "Z"): self.gui.tab.zSMM, ("O", "Z"): self.gui.tab.zOMM}
+
+        softLimits = {("S", "X", 0): self.gui.tab.xSMin, ("S", "X", 1): self.gui.tab.xSMin,
+                      ("S", "Y", 0): self.gui.tab.ySMin, ("S", "Y", 1): self.gui.tab.ySMin,
+                      ("S", "Z", 0): self.gui.tab.zSMin, ("S", "Z", 1): self.gui.tab.zSMin,
+                      ("O", "X", 0): self.gui.tab.xOMin, ("O", "X", 1): self.gui.tab.xOMax,
+                      ("O", "Y", 0): self.gui.tab.yOMin, ("O", "Y", 1): self.gui.tab.yOMax,
+                      ("O", "Z", 0): self.gui.tab.zOMin, ("O", "Z", 1): self.gui.tab.zOMax}
+
+        if self.gui.tab.valueType.isChecked():
+            for object in ["S", "O"]:
+                for axis in ["X", "Y", "Z"]:
+
+                    relPos = GL[f"{axis}{object}_RELATIVE_POSITION"]
+                    basePos = GL[f"{axis}{object}_BASE_POSITION"]
+
+                    # Change absolute position line edit.
+                    lineEdit[(object, axis)].setText(str(relPos))
+
+                    # Change hard limit displays.
+                    minLim = GL[f"{axis}{object}MIN_HARD_LIMIT"] - basePos
+                    maxLim = GL[f"{axis}{object}MAX_HARD_LIMIT"] - basePos
+                    hardLimits[(object, axis)].setText(f"{minLim} to {maxLim}")
+
+                    # Change soft limit line edits.
+                    minLim = GL[f"{axis}{object}MIN_SOFT_LIMIT"] - basePos
+                    maxLim = GL[f"{axis}{object}MAX_SOFT_LIMIT"] - basePos
+                    softLimits[(object, axis, 0)].setText(str(minLim))
+                    softLimits[(object, axis, 1)].setText(str(maxLim))
+        else:
+            for object in ["S", "O"]:
+                for axis in ["X", "Y", "Z"]:
+
+                    relPos = GL[f"{axis}{object}_RELATIVE_POSITION"]
+                    basePos = GL[f"{axis}{object}_BASE_POSITION"]
+
+                    # Change absolute position line edit.
+                    lineEdit[(object, axis)].setText(str(basePos + relPos))
+
+                    # Change hard limit displays.
+                    minLim = GL[f"{axis}{object}MIN_HARD_LIMIT"]
+                    maxLim = GL[f"{axis}{object}MAX_HARD_LIMIT"]
+                    hardLimits[(object, axis)].setText(f"{minLim} to {maxLim}")
+
+                    # Change soft limit line edits.
+                    minLim = GL[f"{axis}{object}MIN_SOFT_LIMIT"]
+                    maxLim = GL[f"{axis}{object}MAX_SOFT_LIMIT"]
+                    softLimits[(object, axis, 0)].setText(str(minLim))
+                    softLimits[(object, axis, 1)].setText(str(maxLim))
+
     def displayGlobals(self):
-        """     
+        """Print out all global variables.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None     
         """
         print("-*- GLOBAL VARIABLES - START -*-")
 
