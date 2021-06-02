@@ -9,12 +9,6 @@ import thorlabs_apt as apt
 from thorlabs_apt import Motor
 
 
-TRANSMISSION_POSITION = 36
-REFLECTION_POSITION = 47
-VISIBLE_IMAGE_POSITION = 0
-BEAMSPLITTER_POSITION = 18
-
-
 def initMotor() -> Motor:
     """
     Defines and instantiates the mode motor.

@@ -18,7 +18,6 @@ from gui import GUI
 
 # Import file dependencies.
 from thorlabs_motor_control import changeMode
-from globals import *
 
 
 # Set up epics environment.
