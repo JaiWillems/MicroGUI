@@ -1,0 +1,168 @@
+{
+    "thorlabs_positions": {
+        "TRANSMISSION_POSITION": 36,
+        "REFLECTION_POSITION": 47,
+        "VISIBLE_IMAGE_POSITION": 0,
+        "BEAMSPLITTER_POSITION": 18
+    },
+    "positions": {
+        "base_positions": {
+            "XS_BASE_POSITION": 0,
+            "YS_BASE_POSITION": 0,
+            "ZS_BASE_POSITION": 0,
+            "XO_BASE_POSITION": 0,
+            "YO_BASE_POSITION": 0,
+            "ZO_BASE_POSITION": 0
+        },
+        "relative_positions": {
+            "XS_RELATIVE_POSITION": 0,
+            "YS_RELATIVE_POSITION": 0,
+            "ZS_RELATIVE_POSITION": 0,
+            "XO_RELATIVE_POSITION": 0,
+            "YO_RELATIVE_POSITION": 0,
+            "ZO_RELATIVE_POSITION": 0
+        }
+    },
+    "limits": {
+        "soft_limits": {
+            "XSMIN_SOFT_LIMIT": 0,
+            "XSMAX_SOFT_LIMIT": 0,
+            "YSMIN_SOFT_LIMIT": 0,
+            "YSMAX_SOFT_LIMIT": 0,
+            "ZSMIN_SOFT_LIMIT": 0,
+            "ZSMAX_SOFT_LIMIT": 0,
+            "XOMIN_SOFT_LIMIT": 0,
+            "XOMAX_SOFT_LIMIT": 0,
+            "YOMIN_SOFT_LIMIT": 0,
+            "YOMAX_SOFT_LIMIT": 0,
+            "ZOMIN_SOFT_LIMIT": 0,
+            "ZOMAX_SOFT_LIMIT": 0
+        },
+        "hard_limits": {
+            "XSMIN_HARD_LIMIT": -50000,
+            "XSMAX_HARD_LIMIT": 50000,
+            "YSMIN_HARD_LIMIT": -50000,
+            "YSMAX_HARD_LIMIT": 50000,
+            "ZSMIN_HARD_LIMIT": -50000,
+            "ZSMAX_HARD_LIMIT": 50000,
+            "XOMIN_HARD_LIMIT": -50000,
+            "XOMAX_HARD_LIMIT": 50000,
+            "YOMIN_HARD_LIMIT": -50000,
+            "YOMAX_HARD_LIMIT": 50000,
+            "ZOMIN_HARD_LIMIT": -50000,
+            "ZOMAX_HARD_LIMIT": 50000
+        }
+    },
+    "backlash": {
+        "XS_BACKLASH": 0,
+        "YS_BACKLASH": 0,
+        "ZS_BACKLASH": 0,
+        "XO_BACKLASH": 0,
+        "YO_BACKLASH": 0,
+        "ZO_BACKLASH": 0
+    },
+    "PVs": {
+        "XS": {
+            "XSN": "fihr:SMTR1601-1-R10-28:step:moveDeltaIn",
+            "XSP": "fihr:SMTR1601-1-R10-28:step:moveDeltaOut",
+            "XSSTEP": "fihr:SMTR1601-1-R10-28:step:delta",
+            "XSABSPOS": "fihr:SMTR1601-1-R10-28:step:c:target",
+            "XSMOVE": "fihr:SMTR1601-1-R10-28:step:c:moveTo",
+            "XSCN": "SMTR1601-1-R10-28:step",
+            "XSSTOP": "SMTR1601-1-R10-28:emergStop",
+            "XSCP": "SMTR1601-1-R10-28:step",
+            "XSSN": "",
+            "XSSP": "",
+            "XSHN": "SMTR1601-1-R10-28:ccw",
+            "XSHP": "SMTR1601-1-R10-28:cw",
+            "XSZERO": "fihr:SMTR1601-1-R10-28:setAsZero",
+            "XSB": "fihr:SMTR1601-1-R10-28:step:backlash",
+            "XSSTATE": "SMTR1601-1-R10-28:state"
+        },
+        "YS": {
+            "YSN": "fihr:SMTR1601-1-R10-29:step:moveDeltaOut",
+            "YSP": "fihr:SMTR1601-1-R10-29:step:moveDeltaIn",
+            "YSSTEP": "fihr:SMTR1601-1-R10-29:step:delta",
+            "YSABSPOS": "fihr:SMTR1601-1-R10-29:step:c:target",
+            "YSMOVE": "fihr:SMTR1601-1-R10-29:step:c:moveTo",
+            "YSCN": "SMTR1601-1-R10-29:step",
+            "YSSTOP": "SMTR1601-1-R10-29:emergStop",
+            "YSCP": "SMTR1601-1-R10-29:step",
+            "YSSN": "",
+            "YSSP": "",
+            "YSHN": "SMTR1601-1-R10-29:ccw",
+            "YSHP": "SMTR1601-1-R10-29:cw",
+            "YSZERO": "fihr:SMTR1601-1-R10-29:setAsZero",
+            "YSB": "fihr:SMTR1601-1-R10-29:step:backlash",
+            "YSSTATE": "SMTR1601-1-R10-29:state"
+        },
+        "ZS": {
+            "ZSN": "fihr:SMTR1601-1-R10-30:step:moveDeltaOut",
+            "ZSP": "fihr:SMTR1601-1-R10-30:step:moveDeltaIn",
+            "ZSSTEP": "fihr:SMTR1601-1-R10-30:step:delta",
+            "ZSABSPOS": "fihr:SMTR1601-1-R10-30:step:c:target",
+            "ZSMOVE": "fihr:SMTR1601-1-R10-30:step:c:moveTo",
+            "ZSCN": "SMTR1601-1-R10-30:step",
+            "ZSSTOP": "SMTR1601-1-R10-30:emergStop",
+            "ZSCP": "SMTR1601-1-R10-30:step",
+            "ZSSN": "",
+            "ZSSP": "",
+            "ZSHN": "SMTR1601-1-R10-30:ccw",
+            "ZSHP": "SMTR1601-1-R10-30:cw",
+            "ZSZERO": "fihr:SMTR1601-1-R10-30:setAsZero",
+            "ZSB": "fihr:SMTR1601-1-R10-30:step:backlash",
+            "ZSSTATE": "SMTR1601-1-R10-30:state"
+        },
+        "XO": {
+            "XON": "obj:SMTR1601-1-R10-27:step:moveDeltaIn",
+            "XOP": "obj:SMTR1601-1-R10-27:step:moveDeltaOut",
+            "XOSTEP": "obj:SMTR1601-1-R10-27:step:delta",
+            "XOABSPOS": "obj:SMTR1601-1-R10-27:step:c:target",
+            "XOMOVE": "obj:SMTR1601-1-R10-27:step:c:moveTo",
+            "XOCN": "SMTR1601-1-R10-27:step",
+            "XOSTOP": "SMTR1601-1-R10-27:emergStop",
+            "XOCP": "SMTR1601-1-R10-27:step",
+            "XOSN": "",
+            "XOSP": "",
+            "XOHN": "SMTR1601-1-R10-27:ccw",
+            "XOHP": "SMTR1601-1-R10-27:cw",
+            "XOZERO": "obj:SMTR1601-1-R10-27:setAsZero",
+            "XOB": "obj:SMTR1601-1-R10-27:step:backlash",
+            "XOSTATE": "SMTR1601-1-R10-27:state"
+        },
+        "YO": {
+            "YON": "obj:SMTR1601-1-R10-31:step:moveDeltaIn",
+            "YOP": "obj:SMTR1601-1-R10-31:step:moveDeltaOut",
+            "YOSTEP": "obj:SMTR1601-1-R10-31:step:delta",
+            "YOABSPOS": "obj:SMTR1601-1-R10-31:step:c:target",
+            "YOMOVE": "obj:SMTR1601-1-R10-31:step:c:moveTo",
+            "YOCN": "SMTR1601-1-R10-31:step",
+            "YOSTOP": "SMTR1601-1-R10-31:emergStop",
+            "YOCP": "SMTR1601-1-R10-31:step",
+            "YOSN": "",
+            "YOSP": "",
+            "YOHN": "SMTR1601-1-R10-31:ccw",
+            "YOHP": "SMTR1601-1-R10-31:cw",
+            "YOZERO": "obj:SMTR1601-1-R10-31:setAsZero",
+            "YOB": "obj:SMTR1601-1-R10-31:step:backlash",
+            "YOSTATE": "SMTR1601-1-R10-31:state"
+        },
+        "ZO": {
+            "ZON": "obj:SMTR1601-1-R10-32:step:moveDeltaOut",
+            "ZOP": "obj:SMTR1601-1-R10-32:step:moveDeltaIn",
+            "ZOSTEP": "obj:SMTR1601-1-R10-32:step:delta",
+            "ZOABSPOS": "obj:SMTR1601-1-R10-32:step:c:target",
+            "ZOMOVE": "obj:SMTR1601-1-R10-32:step:c:moveTo",
+            "ZOCN": "SMTR1601-1-R10-32:step",
+            "ZOSTOP": "SMTR1601-1-R10-32:emergStop",
+            "ZOCP": "SMTR1601-1-R10-32:step",
+            "ZOSN": "",
+            "ZOSP": "",
+            "ZOHN": "SMTR1601-1-R10-32:ccw",
+            "ZOHP": "SMTR1601-1-R10-32:cw",
+            "ZOZERO": "obj:SMTR1601-1-R10-32:setAsZero",
+            "ZOB": "obj:SMTR1601-1-R10-32:step:backlash",
+            "ZOSTATE": "SMTR1601-1-R10-32:state"
+        }
+    }
+}

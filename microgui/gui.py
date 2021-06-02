@@ -33,6 +33,8 @@ class GUI(QMainWindow):
 
     Attributes
     ----------
+    macros : Dict
+        Dictionary containing macro variables.
     cameraWindow : QWidget
         QWidget window containing camera feed and interface.
     img : pg.ImageItem
@@ -202,10 +204,12 @@ class GUI(QMainWindow):
         Creates the objective window.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, macros) -> None:
         """Initialize the GUI."""
 
         super().__init__()
+
+        self.macros = macros
 
         self.setWindowIcon(QIcon('CLS_logo.png'))
 
@@ -730,24 +734,24 @@ class MyTableWidget(QWidget):
         Idle label for the sample's y dimension.
     zIdleS : QLabel
         Idle label for the sample's z dimension.
-    xStopS : QLabel
-        In-Motion label for the sample's x dimension.
-    yStopS : QLabel
-        In-Motion label for the sample's y dimension.
-    zStopS : QLabel
-        In-Motion label for the sample's z dimension.
+    xStepS : QLabel
+        STEPS label for the sample's x dimension.
+    yStepS : QLabel
+        STEPS label for the sample's y dimension.
+    zStepS : QLabel
+        STEPS label for the sample's z dimension.
     xIdleO : QLabel
         Idle label for the objective's x dimension.
     yIdleO : QLabel
         Idle label for the objective's y dimension.
     zIdleO : QLabel
         Idle label for the objective's z dimension.
-    xStopO : QLabel
-        In-Motion label for the objective's x dimension.
-    yStopO : QLabel
-        In-Motion label for the objective's y dimension.
-    zStopO : QLabel
-        In-Motion label for the objective's z dimension.
+    xStepO : QLabel
+        STEPS label for the objective's x dimension.
+    yStepO : QLabel
+        STEPS label for the objective's y dimension.
+    zStepO : QLabel
+        STEPS label for the objective's z dimension.
     RDM1 : QRadioButton
         Transmission mode radio button.
     RDM2 : QRadioButton
@@ -756,6 +760,22 @@ class MyTableWidget(QWidget):
         Visible Image mode radio button.
     RDM4 : QRadioButton
         Beamsplitter mode radio button.
+    TMTM : QLineEdit
+        Transmission mode position line edit.
+    TMRM : QLineEdit
+        Reflection mode position line edit.
+    TMVM : QLineEdit
+        Visual image mode position line edit.
+    TMBM : QLineEdit
+        Beamsplitter mode position line edit.
+    TMTMbutton : QPushButton
+        Transmission "Set Position" button.
+    TMRMbutton : QPushButton
+        Reflection "Set Position" button.
+    TMVMbutton : QPushButton
+        Visual image "Set Position" button.
+    TMBMbutton : QPushButton
+        Beamsplitter "Set Position" button.
     xSMM : QLabel
         Minimum and maximum label for the sample's x dimension.
     ySMM : QLabel
@@ -794,8 +814,10 @@ class MyTableWidget(QWidget):
         Soft limit maximum for the objective's z dimension.
     SSL : QPushButton
         Set soft limits button.
-    SSL : QPushButton
-        Set extreme soft limits button.
+    SMSL : QPushButton
+        Set minimal soft limits button.
+    SESL : QPushButton
+        Set maximal soft limits button.
     xSZero : QPushButton
         Button to zero the sample's x dimension.
     ySZero : QPushButton
@@ -835,6 +857,8 @@ class MyTableWidget(QWidget):
     def __init__(self, parent: Any) -> None:
         """Initialize Class."""
 
+        self.parent = parent
+
         super(QWidget, self).__init__(parent)
         self.layout = QVBoxLayout(self)
 
@@ -866,81 +890,69 @@ class MyTableWidget(QWidget):
         self.xIdleS = QLabel("IDLE")
         self.yIdleS = QLabel("IDLE")
         self.zIdleS = QLabel("IDLE")
-        self.xStopS = QLabel("In Motion")
-        self.yStopS = QLabel("In Motion")
-        self.zStopS = QLabel("In Motion")
+        self.xStepS = QLabel("<b>STEPS</b>")
+        self.yStepS = QLabel("<b>STEPS</b>")
+        self.zStepS = QLabel("<b>STEPS</b>")
 
         # Style interactive sample widgets.
         self.xIdleS.setAlignment(Qt.AlignCenter)
         self.yIdleS.setAlignment(Qt.AlignCenter)
         self.zIdleS.setAlignment(Qt.AlignCenter)
-        self.xStopS.setAlignment(Qt.AlignCenter)
-        self.yStopS.setAlignment(Qt.AlignCenter)
-        self.zStopS.setAlignment(Qt.AlignCenter)
+        self.xStepS.setAlignment(Qt.AlignCenter)
+        self.yStepS.setAlignment(Qt.AlignCenter)
+        self.zStepS.setAlignment(Qt.AlignCenter)
         self.xIdleS.setStyleSheet(
             "background-color: lightgrey; border: 1px solid black;")
         self.yIdleS.setStyleSheet(
             "background-color: lightgrey; border: 1px solid black;")
         self.zIdleS.setStyleSheet(
             "background-color: lightgrey; border: 1px solid black;")
-        self.xStopS.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.yStopS.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.zStopS.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize sample widgets in the tab layout.
-        self.tab1.layout.addWidget(QLabel("<b>Sample</b>"), 0, 1, 1, 3)
-        self.tab1.layout.addWidget(QLabel("Horizontal:"), 1, 1, 1, 1)
-        self.tab1.layout.addWidget(QLabel("Vertical:"), 2, 1, 1, 1)
-        self.tab1.layout.addWidget(QLabel("Focus:"), 3, 1, 1, 1)
-        self.tab1.layout.addWidget(self.xIdleS, 1, 2, 1, 1)
-        self.tab1.layout.addWidget(self.yIdleS, 2, 2, 1, 1)
-        self.tab1.layout.addWidget(self.zIdleS, 3, 2, 1, 1)
-        self.tab1.layout.addWidget(self.xStopS, 1, 3, 1, 1)
-        self.tab1.layout.addWidget(self.yStopS, 2, 3, 1, 1)
-        self.tab1.layout.addWidget(self.zStopS, 3, 3, 1, 1)
+        self.tab1.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 3)
+        self.tab1.layout.addWidget(QLabel("Horizontal:"), 1, 0, 1, 1)
+        self.tab1.layout.addWidget(QLabel("Vertical:"), 2, 0, 1, 1)
+        self.tab1.layout.addWidget(QLabel("Focus:"), 3, 0, 1, 1)
+        self.tab1.layout.addWidget(self.xIdleS, 1, 1, 1, 1)
+        self.tab1.layout.addWidget(self.yIdleS, 2, 1, 1, 1)
+        self.tab1.layout.addWidget(self.zIdleS, 3, 1, 1, 1)
+        self.tab1.layout.addWidget(self.xStepS, 1, 2, 1, 1)
+        self.tab1.layout.addWidget(self.yStepS, 2, 2, 1, 1)
+        self.tab1.layout.addWidget(self.zStepS, 3, 2, 1, 1)
 
         # Interactive objective widgets.
         self.xIdleO = QLabel("IDLE")
         self.yIdleO = QLabel("IDLE")
         self.zIdleO = QLabel("IDLE")
-        self.xStopO = QLabel("In Motion")
-        self.yStopO = QLabel("In Motion")
-        self.zStopO = QLabel("In Motion")
+        self.xStepO = QLabel("<b>STEPS</b>")
+        self.yStepO = QLabel("<b>STEPS</b>")
+        self.zStepO = QLabel("<b>STEPS</b>")
 
         # Style interactive sample widgets.
         self.xIdleO.setAlignment(Qt.AlignCenter)
         self.yIdleO.setAlignment(Qt.AlignCenter)
         self.zIdleO.setAlignment(Qt.AlignCenter)
-        self.xStopO.setAlignment(Qt.AlignCenter)
-        self.yStopO.setAlignment(Qt.AlignCenter)
-        self.zStopO.setAlignment(Qt.AlignCenter)
+        self.xStepO.setAlignment(Qt.AlignCenter)
+        self.yStepO.setAlignment(Qt.AlignCenter)
+        self.zStepO.setAlignment(Qt.AlignCenter)
         self.xIdleO.setStyleSheet(
             "background-color: lightgrey; border: 1px solid black;")
         self.yIdleO.setStyleSheet(
             "background-color: lightgrey; border: 1px solid black;")
         self.zIdleO.setStyleSheet(
             "background-color: lightgrey; border: 1px solid black;")
-        self.xStopO.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.yStopO.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.zStopO.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize sample widgets in the tab layout.
-        self.tab1.layout.addWidget(QLabel("<b>Objective</b>"), 0, 4, 1, 3)
-        self.tab1.layout.addWidget(QLabel("Horizontal:"), 1, 4, 1, 1)
-        self.tab1.layout.addWidget(QLabel("Vertical:"), 2, 4, 1, 1)
-        self.tab1.layout.addWidget(QLabel("Focus:"), 3, 4, 1, 1)
-        self.tab1.layout.addWidget(self.xIdleO, 1, 5, 1, 1)
-        self.tab1.layout.addWidget(self.yIdleO, 2, 5, 1, 1)
-        self.tab1.layout.addWidget(self.zIdleO, 3, 5, 1, 1)
-        self.tab1.layout.addWidget(self.xStopO, 1, 6, 1, 1)
-        self.tab1.layout.addWidget(self.yStopO, 2, 6, 1, 1)
-        self.tab1.layout.addWidget(self.zStopO, 3, 6, 1, 1)
+        self.tab1.layout.addWidget(QLabel("<b>Objective</b>"), 0, 3, 1, 3)
+        self.tab1.layout.addWidget(QLabel("Horizontal:"), 1, 3, 1, 1)
+        self.tab1.layout.addWidget(QLabel("Vertical:"), 2, 3, 1, 1)
+        self.tab1.layout.addWidget(QLabel("Focus:"), 3, 3, 1, 1)
+        self.tab1.layout.addWidget(self.xIdleO, 1, 4, 1, 1)
+        self.tab1.layout.addWidget(self.yIdleO, 2, 4, 1, 1)
+        self.tab1.layout.addWidget(self.zIdleO, 3, 4, 1, 1)
+        self.tab1.layout.addWidget(self.xStepO, 1, 5, 1, 1)
+        self.tab1.layout.addWidget(self.yStepO, 2, 5, 1, 1)
+        self.tab1.layout.addWidget(self.zStepO, 3, 5, 1, 1)
 
         # Set tab layout.
         self.tab1.setLayout(self.tab1.layout)
@@ -950,7 +962,7 @@ class MyTableWidget(QWidget):
         # ---------------------------------------------------------------------
 
         # Define tab layout.
-        self.tab2.layout = QVBoxLayout()
+        self.tab2.layout = QGridLayout()
 
         # Define mode select buttons.
         self.RDM1 = QRadioButton("Transmission")
@@ -959,10 +971,31 @@ class MyTableWidget(QWidget):
         self.RDM4 = QRadioButton("Beamsplitter")
 
         # Organize widgets on tab layout.
-        self.tab2.layout.addWidget(self.RDM1)
-        self.tab2.layout.addWidget(self.RDM2)
-        self.tab2.layout.addWidget(self.RDM3)
-        self.tab2.layout.addWidget(self.RDM4)
+        self.tab2.layout.addWidget(self.RDM1, 0, 0, 1, 1)
+        self.tab2.layout.addWidget(self.RDM2, 1, 0, 1, 1)
+        self.tab2.layout.addWidget(self.RDM3, 2, 0, 1, 1)
+        self.tab2.layout.addWidget(self.RDM4, 3, 0, 1, 1)
+
+        # Set position customization widgets
+        self.TMTM = QLineEdit(str(self.GL["TRANSMISSION_POSITION"]))
+        self.TMRM = QLineEdit(str(self.GL["REFLECTION_POSITION"]))
+        self.TMVM = QLineEdit(str(self.GL["VISIBLE_IMAGE_POSITION"]))
+        self.TMBM = QLineEdit(str(self.GL["BEAMSPLITTER_POSITION"]))
+
+        self.tab2.layout.addWidget(self.TMTM, 0, 2, 1, 1)
+        self.tab2.layout.addWidget(self.TMRM, 1, 2, 1, 1)
+        self.tab2.layout.addWidget(self.TMVM, 2, 2, 1, 1)
+        self.tab2.layout.addWidget(self.TMBM, 3, 2, 1, 1)
+
+        self.TMTMbutton = QPushButton("Set Position")
+        self.TMRMbutton = QPushButton("Set Position")
+        self.TMVMbutton = QPushButton("Set Position")
+        self.TMBMbutton = QPushButton("Set Position")
+
+        self.tab2.layout.addWidget(self.TMTMbutton, 0, 3, 1, 1)
+        self.tab2.layout.addWidget(self.TMRMbutton, 1, 3, 1, 1)
+        self.tab2.layout.addWidget(self.TMVMbutton, 2, 3, 1, 1)
+        self.tab2.layout.addWidget(self.TMBMbutton, 3, 3, 1, 1)
 
         # Check mode when in homed position.
         self.RDM3.setChecked(True)
@@ -978,9 +1011,15 @@ class MyTableWidget(QWidget):
         self.tab3.layout = QGridLayout()
 
         # Define interactive sample widgets.
-        self.xSMM = QLabel(f"{XSMIN_HARD_LIMIT} to {XSMAX_HARD_LIMIT}")
-        self.ySMM = QLabel(f"{YSMIN_HARD_LIMIT} to {YSMAX_HARD_LIMIT}")
-        self.zSMM = QLabel(f"{ZSMIN_HARD_LIMIT} to {ZSMAX_HARD_LIMIT}")
+        xHardMin = self.parent.macros["XSMIN_HARD_LIMIT"]
+        xHardMax = self.parent.macros["XSMAX_HARD_LIMIT"]
+        yHardMin = self.parent.macros["YSMIN_HARD_LIMIT"]
+        yHardMax = self.parent.macros["YSMAX_HARD_LIMIT"]
+        zHardMin = self.parent.macros["ZSMIN_HARD_LIMIT"]
+        zHardMax = self.parent.macros["ZSMAX_HARD_LIMIT"]
+        self.xSMM = QLabel(f"{xHardMin} to {xHardMax}")
+        self.ySMM = QLabel(f"{yHardMin} to {yHardMax}")
+        self.zSMM = QLabel(f"{zHardMin} to {zHardMax}")
 
         # Organize sample widgets in the tab layout.
         self.tab3.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 2)
@@ -993,9 +1032,15 @@ class MyTableWidget(QWidget):
         self.tab3.layout.addWidget(self.zSMM, 4, 1, 1, 1)
 
         # Define interactive objective widgets.
-        self.xOMM = QLabel(f"{XOMIN_HARD_LIMIT} to {XOMAX_HARD_LIMIT}")
-        self.yOMM = QLabel(f"{YOMIN_HARD_LIMIT} to {YOMAX_HARD_LIMIT}")
-        self.zOMM = QLabel(f"{ZOMIN_HARD_LIMIT} to {ZOMAX_HARD_LIMIT}")
+        xHardMin = self.parent.macros["XOMIN_HARD_LIMIT"]
+        xHardMax = self.parent.macros["XOMAX_HARD_LIMIT"]
+        yHardMin = self.parent.macros["YOMIN_HARD_LIMIT"]
+        yHardMax = self.parent.macros["YOMAX_HARD_LIMIT"]
+        zHardMin = self.parent.macros["ZOMIN_HARD_LIMIT"]
+        zHardMax = self.parent.macros["ZOMAX_HARD_LIMIT"]
+        self.xOMM = QLabel(f"{xHardMin} to {xHardMax}")
+        self.yOMM = QLabel(f"{yHardMin} to {yHardMax}")
+        self.zOMM = QLabel(f"{zHardMin} to {zHardMax}")
 
         # Organize objective widgets in the tab layout.
         self.tab3.layout.addWidget(QLabel("<b>Objective</b>"), 0, 2, 1, 2)
@@ -1018,13 +1063,18 @@ class MyTableWidget(QWidget):
         self.tab4.layout = QGridLayout()
 
         # Define interactive sample widgets.
-        GL = globals()
-        self.xSMin = QLineEdit(str(float(GL["XSMIN_SOFT_LIMIT"])))
-        self.ySMin = QLineEdit(str(float(GL["YSMIN_SOFT_LIMIT"])))
-        self.zSMin = QLineEdit(str(float(GL["ZSMIN_SOFT_LIMIT"])))
-        self.xSMax = QLineEdit(str(float(GL["XSMAX_SOFT_LIMIT"])))
-        self.ySMax = QLineEdit(str(float(GL["YSMAX_SOFT_LIMIT"])))
-        self.zSMax = QLineEdit(str(float(GL["ZSMAX_SOFT_LIMIT"])))
+        self.xSMin = QLineEdit(
+            str(float(self.parent.macros["XSMIN_SOFT_LIMIT"])))
+        self.ySMin = QLineEdit(
+            str(float(self.parent.macros["YSMIN_SOFT_LIMIT"])))
+        self.zSMin = QLineEdit(
+            str(float(self.parent.macros["ZSMIN_SOFT_LIMIT"])))
+        self.xSMax = QLineEdit(
+            str(float(self.parent.macros["XSMAX_SOFT_LIMIT"])))
+        self.ySMax = QLineEdit(
+            str(float(self.parent.macros["YSMAX_SOFT_LIMIT"])))
+        self.zSMax = QLineEdit(
+            str(float(self.parent.macros["ZSMAX_SOFT_LIMIT"])))
 
         # Organize sample widgets in the tab layout.
         self.tab4.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 3)
@@ -1041,12 +1091,18 @@ class MyTableWidget(QWidget):
         self.tab4.layout.addWidget(self.zSMax, 4, 2, 1, 1)
 
         # Define interactive objective widgets.
-        self.xOMin = QLineEdit(str(float(GL["XOMIN_SOFT_LIMIT"])))
-        self.yOMin = QLineEdit(str(float(GL["YOMIN_SOFT_LIMIT"])))
-        self.zOMin = QLineEdit(str(float(GL["ZOMIN_SOFT_LIMIT"])))
-        self.xOMax = QLineEdit(str(float(GL["XOMAX_SOFT_LIMIT"])))
-        self.yOMax = QLineEdit(str(float(GL["YOMAX_SOFT_LIMIT"])))
-        self.zOMax = QLineEdit(str(float(GL["ZOMAX_SOFT_LIMIT"])))
+        self.xOMin = QLineEdit(
+            str(float(self.parent.macros["XOMIN_SOFT_LIMIT"])))
+        self.yOMin = QLineEdit(
+            str(float(self.parent.macros["YOMIN_SOFT_LIMIT"])))
+        self.zOMin = QLineEdit(
+            str(float(self.parent.macros["ZOMIN_SOFT_LIMIT"])))
+        self.xOMax = QLineEdit(
+            str(float(self.parent.macros["XOMAX_SOFT_LIMIT"])))
+        self.yOMax = QLineEdit(
+            str(float(self.parent.macros["YOMAX_SOFT_LIMIT"])))
+        self.zOMax = QLineEdit(
+            str(float(self.parent.macros["ZOMAX_SOFT_LIMIT"])))
 
         # Organize objective widgets in the tab layout.
         self.tab4.layout.addWidget(QLabel("<b>Objective</b>"), 0, 3, 1, 3)
@@ -1064,17 +1120,20 @@ class MyTableWidget(QWidget):
 
         # Define, style, and organize additional interactive widgets.
         self.SSL = QPushButton("Set Soft Limits")
-        self.SESL = QPushButton("Set Extreme Soft Limits")
+        self.SMSL = QPushButton("Set Minimal Soft Limits")
+        self.SESL = QPushButton("Set Maximal Soft Limits")
         self.SSL.setStyleSheet("background-color: lightgrey")
+        self.SMSL.setStyleSheet("background-color: lightgrey")
         self.SESL.setStyleSheet("background-color: lightgrey")
-        self.tab4.layout.addWidget(self.SSL, 5, 0, 1, 3)
-        self.tab4.layout.addWidget(self.SESL, 5, 3, 1, 3)
+        self.tab4.layout.addWidget(self.SSL, 5, 0, 1, 6)
+        self.tab4.layout.addWidget(self.SMSL, 6, 0, 1, 3)
+        self.tab4.layout.addWidget(self.SESL, 6, 3, 1, 3)
 
         # Add information labels.
         softLimLabel = QLabel(
             "<i>The motors will move 'backlash' steps past the low limit before moving back to the lower limit.</i>")
         softLimLabel.setWordWrap(True)
-        self.tab4.layout.addWidget(softLimLabel, 6, 0, 1, 6)
+        self.tab4.layout.addWidget(softLimLabel, 7, 0, 1, 6)
 
         # Set tab layout.
         self.tab4.setLayout(self.tab4.layout)
@@ -1090,9 +1149,12 @@ class MyTableWidget(QWidget):
         self.xSZero = QPushButton("ZERO")
         self.ySZero = QPushButton("ZERO")
         self.zSZero = QPushButton("ZERO")
-        self.xSB = QLineEdit(str(XS_BACKLASH))
-        self.ySB = QLineEdit(str(YS_BACKLASH))
-        self.zSB = QLineEdit(str(ZS_BACKLASH))
+        xB = self.parent.macros["XS_BACKLASH"]
+        yB = self.parent.macros["YS_BACKLASH"]
+        zB = self.parent.macros["ZS_BACKLASH"]
+        self.xSB = QLineEdit(str(xB))
+        self.ySB = QLineEdit(str(yB))
+        self.zSB = QLineEdit(str(zB))
 
         # Style interactive sample widgets.
         self.xSZero.setStyleSheet("background-color: lightgrey")
@@ -1116,9 +1178,12 @@ class MyTableWidget(QWidget):
         self.xOZero = QPushButton("ZERO")
         self.yOZero = QPushButton("ZERO")
         self.zOZero = QPushButton("ZERO")
-        self.xOB = QLineEdit(str(XO_BACKLASH))
-        self.yOB = QLineEdit(str(YO_BACKLASH))
-        self.zOB = QLineEdit(str(ZO_BACKLASH))
+        xB = self.parent.macros["XO_BACKLASH"]
+        yB = self.parent.macros["YO_BACKLASH"]
+        zB = self.parent.macros["ZO_BACKLASH"]
+        self.xOB = QLineEdit(str(xB))
+        self.yOB = QLineEdit(str(yB))
+        self.zOB = QLineEdit(str(zB))
 
         # Style interactive objective widgets.
         self.xOZero.setStyleSheet("background-color: lightgrey")
@@ -1146,14 +1211,13 @@ class MyTableWidget(QWidget):
         # Add information labels.
         backlashLabel = QLabel(
             "<i>Backlash is applied when moving negitively. The motor will move 'backlash' steps past the target position before returning to the target position</i>")
-        zeroLabel = QLabel(
-            "<i>Zero'ing sets the current position as the datum.</i>")
+        zeroLabel = QLabel("<i>Cannot zero when displaying actual values.</i>")
         backlashLabel.setWordWrap(True)
         zeroLabel.setWordWrap(True)
         self.tab5.layout.addWidget(backlashLabel, 6, 0, 1, 6)
         self.tab5.layout.addWidget(zeroLabel, 7, 0, 1, 4)
 
-        self.valueType = QPushButton("Display Relative Values")
+        self.valueType = QPushButton("Display Actual Values")
         self.valueType.setCheckable(True)
         self.valueType.setStyleSheet("background-color: lightgrey")
         self.tab5.layout.addWidget(self.valueType, 5, 3, 1, 3)

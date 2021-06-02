@@ -53,7 +53,7 @@ def initMotor() -> Motor:
     return modeMotor
 
 
-def changeMode(mode: int, modeMotor: Motor) -> None:
+def changeMode(pos: int, modeMotor: Motor) -> None:
     """
     Change THORLAB motor position by pre-set ammount.
 
@@ -62,10 +62,9 @@ def changeMode(mode: int, modeMotor: Motor) -> None:
 
     Parameters
     ----------
-    mode : int
-        The mode values correspond to one of the four microscope modes where
-        mode=1 -> Transmission mode, mode=2 -> Reflection mode, mode=3 ->
-        Visible Image Mode, and mode=4 -> Beamsplitter Mode.
+    pos : int
+        The position to move to corresponding to one of the four modes:
+        transmission, reflection, visible image, and the beamsplitter mode.
     modeMotor : Motor
         Motor object to change the mode of.
 
@@ -77,14 +76,4 @@ def changeMode(mode: int, modeMotor: Motor) -> None:
     -----
     modeMotor must have been initiated using initMotor().
     """
-    # Set move_to position based on mode.
-    if mode == 1:
-        pos = TRANSMISSION_POSITION
-    elif mode == 2:
-        pos = REFLECTION_POSITION
-    elif mode == 3:
-        pos = VISIBLE_IMAGE_POSITION
-    else:
-        pos = BEAMSPLITTER_POSITION
-
-    modeMotor.move_to(value=pos, blocking=False) 
+    modeMotor.move_to(value=pos, blocking=False)
