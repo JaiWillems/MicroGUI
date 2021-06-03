@@ -99,8 +99,8 @@
             "YSPOS": "SMTR1601-1-R10-29:step:fbk"
         },
         "ZS": {
-            "ZSN": "fihr:SMTR1601-1-R10-30:step:moveDeltaOut",
-            "ZSP": "fihr:SMTR1601-1-R10-30:step:moveDeltaIn",
+            "ZSN": "fihr:SMTR1601-1-R10-30:step:moveDeltaIn",
+            "ZSP": "fihr:SMTR1601-1-R10-30:step:moveDeltaOut",
             "ZSSTEP": "fihr:SMTR1601-1-R10-30:step:delta",
             "ZSABSPOS": "fihr:SMTR1601-1-R10-30:step:c:target",
             "ZSMOVE": "fihr:SMTR1601-1-R10-30:step:c:moveTo",
@@ -153,8 +153,8 @@
             "YOPOS": "SMTR1601-1-R10-31:step:fbk"
         },
         "ZO": {
-            "ZON": "obj:SMTR1601-1-R10-32:step:moveDeltaOut",
-            "ZOP": "obj:SMTR1601-1-R10-32:step:moveDeltaIn",
+            "ZON": "obj:SMTR1601-1-R10-32:step:moveDeltaIn",
+            "ZOP": "obj:SMTR1601-1-R10-32:step:moveDeltaOut",
             "ZOSTEP": "obj:SMTR1601-1-R10-32:step:delta",
             "ZOABSPOS": "obj:SMTR1601-1-R10-32:step:c:target",
             "ZOMOVE": "obj:SMTR1601-1-R10-32:step:c:moveTo",

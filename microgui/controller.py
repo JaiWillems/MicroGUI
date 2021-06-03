@@ -12,7 +12,7 @@ from functools import partial
 from epics import ca, caput, caget, PV
 
 # Import objects for type annotations.
-from typing import Literal, Dict
+from typing import Literal, Dict, Any
 from PyQt5.QtWidgets import QLineEdit, QFileDialog
 from gui import GUI
 
@@ -307,18 +307,22 @@ class Controller(object):
         """
         if mode == 1:
             self.gui.macros["TRANSMISSION_POSITION"] = float(self.gui.tab.TMTM.text())
+            self.gui.tab.TMTM.setText(str(self.gui.macros["TRANSMISSION_POSITION"]))
             if self.gui.tab.RDM1.isChecked():
                 self.modeState(1, self.modeMotor)
         elif mode == 2:
             self.gui.macros["REFLECTION_POSITION"] = float(self.gui.tab.TMRM.text())
+            self.gui.tab.TMRM.setText(str(self.gui.macros["REFLECTION_POSITION"]))
             if self.gui.tab.RDM2.isChecked():
                 self.modeState(2, self.modeMotor)
         elif mode == 3:
-            self.gui.macros["VISUAL_IMAGE_POSITION"] = float(self.gui.tab.TMVM.text())
+            self.gui.macros["VISIBLE_IMAGE_POSITION"] = float(self.gui.tab.TMVM.text())
+            self.gui.tab.TMVM.setText(str(self.gui.macros["VISIBLE_IMAGE_POSITION"]))
             if self.gui.tab.RDM3.isChecked():
                 self.modeState(3, self.modeMotor)
         else:
             self.gui.macros["BEAMSPLITTER_POSITION"] = float(self.gui.tab.TMBM.text())
+            self.gui.tab.TMBM.setText(str(self.gui.macros["BEAMSPLITTER_POSITION"]))
             if self.gui.tab.RDM4.isChecked():
                 self.modeState(4, self.modeMotor)
 
@@ -358,12 +362,11 @@ class Controller(object):
             incPos = PSL - basePos - relPos
         elif direction == "N" and basePos + relPos - incPos < NSL:
             relPos = NSL - basePos
-            incPos = basePos + basePos - NSL
+            incPos = basePos + relPos - NSL
+        elif direction == "P":
+            relPos = relPos + incPos
         else:
-            if direction == "P":
-                relPos = relPos + incPos
-            else:
-                relPos = relPos - incPos
+            relPos = relPos - incPos
 
         self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"] = relPos
         caput(self.gui.macros[f"{axis}{object}STEP"], incPos)
@@ -674,7 +677,7 @@ class Controller(object):
         self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"] = 0
 
         # Update absolute position line edit widget to 0.
-        lineEdit[(object, axis)].setText("0")
+        lineEdit[(object, axis)].setText("0.0")
 
         self.changeValues()
 
@@ -722,12 +725,15 @@ class Controller(object):
         elif value == 1:
             motionLabels[(object, axis)].setText("POWERING")
             motionLabels[(object, axis)].setStyleSheet("background-color: #ff4747; border: 1px solid black;")
+            self.setSoftLimitInd(object, axis)
         elif value == 2:
             motionLabels[(object, axis)].setText("POWERED")
             motionLabels[(object, axis)].setStyleSheet("background-color: #ff4747; border: 1px solid black;")
+            self.setSoftLimitInd(object, axis)
         elif value == 3:
             motionLabels[(object, axis)].setText("RELEASING")
             motionLabels[(object, axis)].setStyleSheet("background-color: #edde07; border: 1px solid black;")
+            self.setSoftLimitInd(object, axis)
         elif value == 4:
             motionLabels[(object, axis)].setText("ACTIVE")
             motionLabels[(object, axis)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
@@ -766,14 +772,15 @@ class Controller(object):
                 if basePos + relPos > PSL:
                     relPos = PSL - basePos
                     caput(self.gui.macros[f"{axis}{object}ABSPOS"], PSL)
+                    caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
+                    caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
                 elif basePos + relPos < NSL:
                     relPos = NSL - basePos
                     caput(self.gui.macros[f"{axis}{object}ABSPOS"], NSL)
+                    caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
+                    caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
 
                 self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"] = relPos
-
-                caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
-                caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
 
     def setHardLimitInd(self, **kwargs):
         """
@@ -923,7 +930,7 @@ class Controller(object):
         axis = pvKey[0]
         object = pvKey[1]
 
-        stepText = f"<b>{value} STEPS</b>"
+        stepText = f"<b>{value - self.offset(object, axis)} STEPS</b>"
         stepLineEdit[(object, axis)].setText(stepText)
 
     def displayGlobals(self):
