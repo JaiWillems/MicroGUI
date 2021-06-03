@@ -78,7 +78,7 @@
             "XSZERO": "fihr:SMTR1601-1-R10-28:setAsZero",
             "XSB": "fihr:SMTR1601-1-R10-28:step:backlash",
             "XSSTATE": "SMTR1601-1-R10-28:state",
-            "XSPOS": "SMTR1601-1-R10-28:step:fbk",
+            "XSPOS": "SMTR1601-1-R10-28:step:fbk"
         },
         "YS": {
             "YSN": "fihr:SMTR1601-1-R10-29:step:moveDeltaOut",
@@ -96,7 +96,7 @@
             "YSZERO": "fihr:SMTR1601-1-R10-29:setAsZero",
             "YSB": "fihr:SMTR1601-1-R10-29:step:backlash",
             "YSSTATE": "SMTR1601-1-R10-29:state",
-            "YSPOS": "SMTR1601-1-R10-29:step:fbk",
+            "YSPOS": "SMTR1601-1-R10-29:step:fbk"
         },
         "ZS": {
             "ZSN": "fihr:SMTR1601-1-R10-30:step:moveDeltaOut",
@@ -150,7 +150,7 @@
             "YOZERO": "obj:SMTR1601-1-R10-31:setAsZero",
             "YOB": "obj:SMTR1601-1-R10-31:step:backlash",
             "YOSTATE": "SMTR1601-1-R10-31:state",
-            "YOPOS": "SMTR1601-1-R10-31:step:fbk",
+            "YOPOS": "SMTR1601-1-R10-31:step:fbk"
         },
         "ZO": {
             "ZON": "obj:SMTR1601-1-R10-32:step:moveDeltaOut",
@@ -168,7 +168,7 @@
             "ZOZERO": "obj:SMTR1601-1-R10-32:setAsZero",
             "ZOB": "obj:SMTR1601-1-R10-32:step:backlash",
             "ZOSTATE": "SMTR1601-1-R10-32:state",
-            "ZOPOS": "SMTR1601-1-R10-28:step:fbk"
+            "ZOPOS": "SMTR1601-1-R10-32:step:fbk"
         }
     }
 }
