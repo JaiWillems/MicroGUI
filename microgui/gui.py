@@ -371,6 +371,8 @@ class GUI(QMainWindow):
         layout.addWidget(QLabel("<b>Absolute Position</b>"), 1, 4, 1, 1)
         layout.addWidget(QLabel("<b>Continual Motion</b>"), 1, 6, 1, 3)
         layout.addWidget(QLabel("<b>Limits</b>"), 1, 9, 1, 4)
+        layout.addWidget(QLabel("<b>Current Position</b>"), 1, 13, 1, 1)
+        layout.addWidget(QLabel("<b>Motor Status</b>"), 1, 14, 1, 1)
 
         # ---------------------------------------------------------------------
         #   X Sample Axis
@@ -389,6 +391,12 @@ class GUI(QMainWindow):
         self.xSSp = QLabel("Soft +")
         self.xSHn = QLabel("Hard -")
         self.xSHp = QLabel("Hard +")
+        self.xIdleS = QLabel("IDLE")
+        self.xStepS = QLabel("<b>STEPS</b>")
+
+        # Set label alignment.
+        self.xIdleS.setAlignment(Qt.AlignCenter)
+        self.xStepS.setAlignment(Qt.AlignCenter)
 
         # Style interactive widgets.
         self.xSN.setStyleSheet("background-color: lightgrey")
@@ -397,14 +405,11 @@ class GUI(QMainWindow):
         self.xSCn.setStyleSheet("background-color: lightgrey")
         self.xSStop.setStyleSheet("background-color: red")
         self.xSCp.setStyleSheet("background-color: lightgrey")
-        self.xSSn.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.xSSp.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.xSHn.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.xSHp.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
+        self.xSSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xSSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xSHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xSHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Horizontal:"), 2, 0, 1, 1)
@@ -420,6 +425,8 @@ class GUI(QMainWindow):
         layout.addWidget(self.xSSp, 2, 10, 1, 1)
         layout.addWidget(self.xSHn, 2, 11, 1, 1)
         layout.addWidget(self.xSHp, 2, 12, 1, 1)
+        layout.addWidget(self.xStepS, 2, 13, 1, 1)
+        layout.addWidget(self.xIdleS, 2, 14, 1, 1)
 
         # ---------------------------------------------------------------------
         #   Y Sample Axis
@@ -438,6 +445,12 @@ class GUI(QMainWindow):
         self.ySSp = QLabel("Soft +")
         self.ySHn = QLabel("Hard -")
         self.ySHp = QLabel("Hard +")
+        self.yIdleS = QLabel("IDLE")
+        self.yStepS = QLabel("<b>STEPS</b>")
+
+        # Set label alignment.
+        self.yIdleS.setAlignment(Qt.AlignCenter)
+        self.yStepS.setAlignment(Qt.AlignCenter)
 
         # Style interactive widgets.
         self.ySN.setStyleSheet("background-color: lightgrey")
@@ -446,14 +459,11 @@ class GUI(QMainWindow):
         self.ySCn.setStyleSheet("background-color: lightgrey")
         self.ySStop.setStyleSheet("background-color: red")
         self.ySCp.setStyleSheet("background-color: lightgrey")
-        self.ySSn.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.ySSp.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.ySHn.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.ySHp.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
+        self.ySSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.ySSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.ySHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.ySHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.yIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Vertical:"), 3, 0, 1, 1)
@@ -469,6 +479,8 @@ class GUI(QMainWindow):
         layout.addWidget(self.ySSp, 3, 10, 1, 1)
         layout.addWidget(self.ySHn, 3, 11, 1, 1)
         layout.addWidget(self.ySHp, 3, 12, 1, 1)
+        layout.addWidget(self.yStepS, 3, 13, 1, 1)
+        layout.addWidget(self.yIdleS, 3, 14, 1, 1)
 
         # ---------------------------------------------------------------------
         #   Z Sample Axis
@@ -487,6 +499,12 @@ class GUI(QMainWindow):
         self.zSSp = QLabel("Soft +")
         self.zSHn = QLabel("Hard -")
         self.zSHp = QLabel("Hard +")
+        self.zIdleS = QLabel("IDLE")
+        self.zStepS = QLabel("<b>STEPS</b>")
+
+        # Set label alignment.
+        self.zIdleS.setAlignment(Qt.AlignCenter)
+        self.zStepS.setAlignment(Qt.AlignCenter)
 
         # Style interactive widgets.
         self.zSN.setStyleSheet("background-color: lightgrey")
@@ -495,14 +513,11 @@ class GUI(QMainWindow):
         self.zSCn.setStyleSheet("background-color: lightgrey")
         self.zSStop.setStyleSheet("background-color: red")
         self.zSCp.setStyleSheet("background-color: lightgrey")
-        self.zSSn.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.zSSp.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.zSHn.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.zSHp.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
+        self.zSSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zSSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zSHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zSHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Focus:"), 4, 0, 1, 1)
@@ -518,6 +533,8 @@ class GUI(QMainWindow):
         layout.addWidget(self.zSSp, 4, 10, 1, 1)
         layout.addWidget(self.zSHn, 4, 11, 1, 1)
         layout.addWidget(self.zSHp, 4, 12, 1, 1)
+        layout.addWidget(self.zStepS, 4, 13, 1, 1)
+        layout.addWidget(self.zIdleS, 4, 14, 1, 1)
 
         # Set window layout.
         window.setLayout(layout)
@@ -549,6 +566,8 @@ class GUI(QMainWindow):
         layout.addWidget(QLabel("<b>Absolute Position</b>"), 1, 4, 1, 1)
         layout.addWidget(QLabel("<b>Continual Motion</b>"), 1, 6, 1, 3)
         layout.addWidget(QLabel("<b>Limits</b>"), 1, 9, 1, 4)
+        layout.addWidget(QLabel("<b>Current Position</b>"), 1, 13, 1, 1)
+        layout.addWidget(QLabel("<b>Motor Status</b>"), 1, 14, 1, 1)
 
         # ----------------------------------------------------------------------
         #   X Objective Axis
@@ -567,6 +586,12 @@ class GUI(QMainWindow):
         self.xOSp = QLabel("Soft +")
         self.xOHn = QLabel("Hard -")
         self.xOHp = QLabel("Hard +")
+        self.xIdleO = QLabel("IDLE")
+        self.xStepO = QLabel("<b>STEPS</b>")
+
+        # Set label alignment.
+        self.xIdleO.setAlignment(Qt.AlignCenter)
+        self.xStepO.setAlignment(Qt.AlignCenter)
 
         # Style interactive widgets.
         self.xON.setStyleSheet("background-color: lightgrey")
@@ -575,14 +600,11 @@ class GUI(QMainWindow):
         self.xOCn.setStyleSheet("background-color: lightgrey")
         self.xOStop.setStyleSheet("background-color: red")
         self.xOCp.setStyleSheet("background-color: lightgrey")
-        self.xOSn.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.xOSp.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.xOHn.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.xOHp.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
+        self.xOSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xOSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xOHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xIdleO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Horizontal:"), 2, 0, 1, 1)
@@ -598,6 +620,8 @@ class GUI(QMainWindow):
         layout.addWidget(self.xOSp, 2, 10, 1, 1)
         layout.addWidget(self.xOHn, 2, 11, 1, 1)
         layout.addWidget(self.xOHp, 2, 12, 1, 1)
+        layout.addWidget(self.xStepO, 2, 13, 1, 1)
+        layout.addWidget(self.xIdleO, 2, 14, 1, 1)
 
         # ---------------------------------------------------------------------
         #   Y Objectivs Axis
@@ -616,6 +640,12 @@ class GUI(QMainWindow):
         self.yOSp = QLabel("Soft +")
         self.yOHn = QLabel("Hard -")
         self.yOHp = QLabel("Hard +")
+        self.yIdleO = QLabel("IDLE")
+        self.yStepO = QLabel("<b>STEPS</b>")
+
+        # Set label alignment.
+        self.yIdleO.setAlignment(Qt.AlignCenter)
+        self.yStepO.setAlignment(Qt.AlignCenter)
 
         # Style interactive widgets.
         self.yON.setStyleSheet("background-color: lightgrey")
@@ -624,14 +654,11 @@ class GUI(QMainWindow):
         self.yOCn.setStyleSheet("background-color: lightgrey")
         self.yOStop.setStyleSheet("background-color: red")
         self.yOCp.setStyleSheet("background-color: lightgrey")
-        self.yOSn.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.yOSp.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.yOHn.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.yOHp.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
+        self.yOSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.yOSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.yOHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.yOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.yIdleO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Vertical:"), 3, 0, 1, 1)
@@ -647,6 +674,8 @@ class GUI(QMainWindow):
         layout.addWidget(self.yOSp, 3, 10, 1, 1)
         layout.addWidget(self.yOHn, 3, 11, 1, 1)
         layout.addWidget(self.yOHp, 3, 12, 1, 1)
+        layout.addWidget(self.yStepO, 3, 13, 1, 1)
+        layout.addWidget(self.yIdleO, 3, 14, 1, 1)
 
         # ---------------------------------------------------------------------
         #   Z Objective Axis
@@ -665,6 +694,12 @@ class GUI(QMainWindow):
         self.zOSp = QLabel("Soft +")
         self.zOHn = QLabel("Hard -")
         self.zOHp = QLabel("Hard +")
+        self.zIdleO = QLabel("IDLE")
+        self.zStepO = QLabel("<b>STEPS</b>")
+
+        # Set label alignment.
+        self.zIdleO.setAlignment(Qt.AlignCenter)
+        self.zStepO.setAlignment(Qt.AlignCenter)
 
         # Style interactive widgets.
         self.zON.setStyleSheet("background-color: lightgrey")
@@ -673,14 +708,11 @@ class GUI(QMainWindow):
         self.zOCn.setStyleSheet("background-color: lightgrey")
         self.zOStop.setStyleSheet("background-color: red")
         self.zOCp.setStyleSheet("background-color: lightgrey")
-        self.zOSn.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.zOSp.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.zOHn.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.zOHp.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
+        self.zOSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zOSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zOHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zIdleO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Focus:"), 4, 0, 1, 1)
@@ -696,6 +728,8 @@ class GUI(QMainWindow):
         layout.addWidget(self.zOSp, 4, 10, 1, 1)
         layout.addWidget(self.zOHn, 4, 11, 1, 1)
         layout.addWidget(self.zOHp, 4, 12, 1, 1)
+        layout.addWidget(self.zStepO, 4, 13, 1, 1)
+        layout.addWidget(self.zIdleO, 4, 14, 1, 1)
 
         # Set window layout.
         window.setLayout(layout)
@@ -863,7 +897,6 @@ class MyTableWidget(QWidget):
 
         # Define tab windows.
         self.tabs = QTabWidget()
-        self.tab1 = QWidget()
         self.tab2 = QWidget()
         self.tab3 = QWidget()
         self.tab4 = QWidget()
@@ -872,89 +905,11 @@ class MyTableWidget(QWidget):
         self.tabs.resize(3000, 1000)
 
         # Add tabs to window layout.
-        self.tabs.addTab(self.tab1, "Status")
         self.tabs.addTab(self.tab2, "Mode")
         self.tabs.addTab(self.tab3, "Hard Limits")
         self.tabs.addTab(self.tab4, "Soft Limits")
         self.tabs.addTab(self.tab5, "Calibration")
 
-        # ---------------------------------------------------------------------
-        #   Tab 1
-        # ---------------------------------------------------------------------
-
-        # Define tab layout.
-        self.tab1.layout = QGridLayout()
-
-        # Define interactive sample widgets.
-        self.xIdleS = QLabel("IDLE")
-        self.yIdleS = QLabel("IDLE")
-        self.zIdleS = QLabel("IDLE")
-        self.xStepS = QLabel("<b>STEPS</b>")
-        self.yStepS = QLabel("<b>STEPS</b>")
-        self.zStepS = QLabel("<b>STEPS</b>")
-
-        # Style interactive sample widgets.
-        self.xIdleS.setAlignment(Qt.AlignCenter)
-        self.yIdleS.setAlignment(Qt.AlignCenter)
-        self.zIdleS.setAlignment(Qt.AlignCenter)
-        self.xStepS.setAlignment(Qt.AlignCenter)
-        self.yStepS.setAlignment(Qt.AlignCenter)
-        self.zStepS.setAlignment(Qt.AlignCenter)
-        self.xIdleS.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.yIdleS.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.zIdleS.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-
-        # Organize sample widgets in the tab layout.
-        self.tab1.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 3)
-        self.tab1.layout.addWidget(QLabel("Horizontal:"), 1, 0, 1, 1)
-        self.tab1.layout.addWidget(QLabel("Vertical:"), 2, 0, 1, 1)
-        self.tab1.layout.addWidget(QLabel("Focus:"), 3, 0, 1, 1)
-        self.tab1.layout.addWidget(self.xIdleS, 1, 1, 1, 1)
-        self.tab1.layout.addWidget(self.yIdleS, 2, 1, 1, 1)
-        self.tab1.layout.addWidget(self.zIdleS, 3, 1, 1, 1)
-        self.tab1.layout.addWidget(self.xStepS, 1, 2, 1, 1)
-        self.tab1.layout.addWidget(self.yStepS, 2, 2, 1, 1)
-        self.tab1.layout.addWidget(self.zStepS, 3, 2, 1, 1)
-
-        # Interactive objective widgets.
-        self.xIdleO = QLabel("IDLE")
-        self.yIdleO = QLabel("IDLE")
-        self.zIdleO = QLabel("IDLE")
-        self.xStepO = QLabel("<b>STEPS</b>")
-        self.yStepO = QLabel("<b>STEPS</b>")
-        self.zStepO = QLabel("<b>STEPS</b>")
-
-        # Style interactive sample widgets.
-        self.xIdleO.setAlignment(Qt.AlignCenter)
-        self.yIdleO.setAlignment(Qt.AlignCenter)
-        self.zIdleO.setAlignment(Qt.AlignCenter)
-        self.xStepO.setAlignment(Qt.AlignCenter)
-        self.yStepO.setAlignment(Qt.AlignCenter)
-        self.zStepO.setAlignment(Qt.AlignCenter)
-        self.xIdleO.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.yIdleO.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-        self.zIdleO.setStyleSheet(
-            "background-color: lightgrey; border: 1px solid black;")
-
-        # Organize sample widgets in the tab layout.
-        self.tab1.layout.addWidget(QLabel("<b>Objective</b>"), 0, 3, 1, 3)
-        self.tab1.layout.addWidget(QLabel("Horizontal:"), 1, 3, 1, 1)
-        self.tab1.layout.addWidget(QLabel("Vertical:"), 2, 3, 1, 1)
-        self.tab1.layout.addWidget(QLabel("Focus:"), 3, 3, 1, 1)
-        self.tab1.layout.addWidget(self.xIdleO, 1, 4, 1, 1)
-        self.tab1.layout.addWidget(self.yIdleO, 2, 4, 1, 1)
-        self.tab1.layout.addWidget(self.zIdleO, 3, 4, 1, 1)
-        self.tab1.layout.addWidget(self.xStepO, 1, 5, 1, 1)
-        self.tab1.layout.addWidget(self.yStepO, 2, 5, 1, 1)
-        self.tab1.layout.addWidget(self.zStepO, 3, 5, 1, 1)
-
-        # Set tab layout.
-        self.tab1.setLayout(self.tab1.layout)
 
         # ---------------------------------------------------------------------
         #   Tab 2
