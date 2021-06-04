@@ -588,53 +588,53 @@ class Controller(object):
 
         if buttonID == 2:
             # Set soft limits to hard limits.
-            self.gui.macros["XSMIN_SOFT_LIMIT"] = float(self.gui.macros["XSMIN_HARD_LIMIT"]) - self._offset("S", "X", True)
-            self.gui.macros["XSMAX_SOFT_LIMIT"] = float(self.gui.macros["XSMAX_HARD_LIMIT"]) - self._offset("S", "X", True)
-            self.gui.macros["YSMIN_SOFT_LIMIT"] = float(self.gui.macros["YSMIN_HARD_LIMIT"]) - self._offset("S", "Y", True)
-            self.gui.macros["YSMAX_SOFT_LIMIT"] = float(self.gui.macros["YSMAX_HARD_LIMIT"]) - self._offset("S", "Y", True)
-            self.gui.macros["ZSMIN_SOFT_LIMIT"] = float(self.gui.macros["ZSMIN_HARD_LIMIT"]) - self._offset("S", "Z", True)
-            self.gui.macros["ZSMAX_SOFT_LIMIT"] = float(self.gui.macros["ZSMAX_HARD_LIMIT"]) - self._offset("S", "Z", True)
-            self.gui.macros["XOMIN_SOFT_LIMIT"] = float(self.gui.macros["XOMIN_HARD_LIMIT"]) - self._offset("O", "X", True)
-            self.gui.macros["XOMAX_SOFT_LIMIT"] = float(self.gui.macros["XOMAX_HARD_LIMIT"]) - self._offset("O", "X", True)
-            self.gui.macros["YOMIN_SOFT_LIMIT"] = float(self.gui.macros["YOMIN_HARD_LIMIT"]) - self._offset("O", "Y", True)
-            self.gui.macros["YOMAX_SOFT_LIMIT"] = float(self.gui.macros["YOMAX_HARD_LIMIT"]) - self._offset("O", "Y", True)
-            self.gui.macros["ZOMIN_SOFT_LIMIT"] = float(self.gui.macros["ZOMIN_HARD_LIMIT"]) - self._offset("O", "Z", True)
-            self.gui.macros["ZOMAX_SOFT_LIMIT"] = float(self.gui.macros["ZOMAX_HARD_LIMIT"]) - self._offset("O", "Z", True)
+            self.gui.macros["XSMIN_SOFT_LIMIT"] = float(self.gui.macros["XSMIN_HARD_LIMIT"])
+            self.gui.macros["XSMAX_SOFT_LIMIT"] = float(self.gui.macros["XSMAX_HARD_LIMIT"])
+            self.gui.macros["YSMIN_SOFT_LIMIT"] = float(self.gui.macros["YSMIN_HARD_LIMIT"])
+            self.gui.macros["YSMAX_SOFT_LIMIT"] = float(self.gui.macros["YSMAX_HARD_LIMIT"])
+            self.gui.macros["ZSMIN_SOFT_LIMIT"] = float(self.gui.macros["ZSMIN_HARD_LIMIT"])
+            self.gui.macros["ZSMAX_SOFT_LIMIT"] = float(self.gui.macros["ZSMAX_HARD_LIMIT"])
+            self.gui.macros["XOMIN_SOFT_LIMIT"] = float(self.gui.macros["XOMIN_HARD_LIMIT"])
+            self.gui.macros["XOMAX_SOFT_LIMIT"] = float(self.gui.macros["XOMAX_HARD_LIMIT"])
+            self.gui.macros["YOMIN_SOFT_LIMIT"] = float(self.gui.macros["YOMIN_HARD_LIMIT"])
+            self.gui.macros["YOMAX_SOFT_LIMIT"] = float(self.gui.macros["YOMAX_HARD_LIMIT"])
+            self.gui.macros["ZOMIN_SOFT_LIMIT"] = float(self.gui.macros["ZOMIN_HARD_LIMIT"])
+            self.gui.macros["ZOMAX_SOFT_LIMIT"] = float(self.gui.macros["ZOMAX_HARD_LIMIT"])
 
         elif buttonID == 1:
             # Set soft limits to hard limits.
-            self.gui.macros["XSMIN_SOFT_LIMIT"] = float(0) - self._offset("S", "X", True)
-            self.gui.macros["XSMAX_SOFT_LIMIT"] = float(0) - self._offset("S", "X", True)
-            self.gui.macros["YSMIN_SOFT_LIMIT"] = float(0) - self._offset("S", "Y", True)
-            self.gui.macros["YSMAX_SOFT_LIMIT"] = float(0) - self._offset("S", "Y", True)
-            self.gui.macros["ZSMIN_SOFT_LIMIT"] = float(0) - self._offset("S", "Z", True)
-            self.gui.macros["ZSMAX_SOFT_LIMIT"] = float(0) - self._offset("S", "Z", True)
-            self.gui.macros["XOMIN_SOFT_LIMIT"] = float(0) - self._offset("O", "X", True)
-            self.gui.macros["XOMAX_SOFT_LIMIT"] = float(0) - self._offset("O", "X", True)
-            self.gui.macros["YOMIN_SOFT_LIMIT"] = float(0) - self._offset("O", "Y", True)
-            self.gui.macros["YOMAX_SOFT_LIMIT"] = float(0) - self._offset("O", "Y", True)
-            self.gui.macros["ZOMIN_SOFT_LIMIT"] = float(0) - self._offset("O", "Z", True)
-            self.gui.macros["ZOMAX_SOFT_LIMIT"] = float(0) - self._offset("O", "Z", True)
+            self.gui.macros["XSMIN_SOFT_LIMIT"] = float(0)
+            self.gui.macros["XSMAX_SOFT_LIMIT"] = float(0)
+            self.gui.macros["YSMIN_SOFT_LIMIT"] = float(0)
+            self.gui.macros["YSMAX_SOFT_LIMIT"] = float(0)
+            self.gui.macros["ZSMIN_SOFT_LIMIT"] = float(0)
+            self.gui.macros["ZSMAX_SOFT_LIMIT"] = float(0)
+            self.gui.macros["XOMIN_SOFT_LIMIT"] = float(0)
+            self.gui.macros["XOMAX_SOFT_LIMIT"] = float(0)
+            self.gui.macros["YOMIN_SOFT_LIMIT"] = float(0)
+            self.gui.macros["YOMAX_SOFT_LIMIT"] = float(0)
+            self.gui.macros["ZOMIN_SOFT_LIMIT"] = float(0)
+            self.gui.macros["ZOMAX_SOFT_LIMIT"] = float(0)
 
         else:
             # Set soft limits to inputted values
             for object in ["S", "O"]:
                 for axis in ["X", "Y", "Z"]:
 
-                    min = float(softLimits[(object, axis, 0)].text())
-                    max = float(softLimits[(object, axis, 1)].text())
-
                     offset = self._offset(object, axis, True)
 
+                    min = float(softLimits[(object, axis, 0)].text()) + offset
+                    max = float(softLimits[(object, axis, 1)].text()) + offset
+
                     if min < self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"]:
-                        self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] = float(self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"]) + offset
+                        self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] = float(self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"])
                     else:
-                        self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] = min + offset
+                        self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] = min
 
                     if max > self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"]:
-                        self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] = float(self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"]) + offset
+                        self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] = float(self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"])
                     else:
-                        self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] = max + offset
+                        self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] = max
 
         # Update soft limit line edits.
         self.gui.tab.xSMin.setText(str(self.gui.macros["XSMIN_SOFT_LIMIT"] - self._offset("S", "X", True)))
@@ -960,46 +960,33 @@ class Controller(object):
                       ("O", "Y", 0): self.gui.tab.yOMin, ("O", "Y", 1): self.gui.tab.yOMax,
                       ("O", "Z", 0): self.gui.tab.zOMin, ("O", "Z", 1): self.gui.tab.zOMax}
 
-        if not self.gui.tab.valueType.isChecked():
-            for object in ["S", "O"]:
-                for axis in ["X", "Y", "Z"]:
+        currentStep = {("S", "X"): self.gui.xStepS, ("O", "X"): self.gui.xStepO,
+                       ("S", "Y"): self.gui.yStepS, ("O", "Y"): self.gui.yStepO,
+                       ("S", "Z"): self.gui.zStepS, ("O", "Z"): self.gui.zStepO}
+        
+        for object in ["S", "O"]:
+            for axis in ["X", "Y", "Z"]:
 
-                    relPos = self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"]
-                    basePos = self.gui.macros[f"{axis}{object}_BASE_POSITION"]
+                # Change absolute position line edit.
+                relPos = self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"]
+                lineEdit[(object, axis)].setText(str(relPos + self._offset(object, axis)))
 
-                    # Change absolute position line edit.
-                    lineEdit[(object, axis)].setText(str(relPos))
+                offset = self._offset(object, axis, True)
 
-                    # Change hard limit displays.
-                    minLim = self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"] - basePos
-                    maxLim = self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"] - basePos
-                    hardLimits[(object, axis)].setText(f"{minLim} to {maxLim}")
+                # Change hard limit displays.
+                minLim = self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"] - offset
+                maxLim = self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"] - offset
+                hardLimits[(object, axis)].setText(f"{minLim} to {maxLim}")
 
-                    # Change soft limit line edits.
-                    minLim = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] - basePos
-                    maxLim = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] - basePos
-                    softLimits[(object, axis, 0)].setText(str(minLim))
-                    softLimits[(object, axis, 1)].setText(str(maxLim))
-        else:
-            for object in ["S", "O"]:
-                for axis in ["X", "Y", "Z"]:
+                # Change soft limit line edits.
+                minLim = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] - offset
+                maxLim = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] - offset
+                softLimits[(object, axis, 0)].setText(str(minLim))
+                softLimits[(object, axis, 1)].setText(str(maxLim))
 
-                    relPos = self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"]
-                    basePos = self.gui.macros[f"{axis}{object}_BASE_POSITION"]
-
-                    # Change absolute position line edit.
-                    lineEdit[(object, axis)].setText(str(basePos + relPos))
-
-                    # Change hard limit displays.
-                    minLim = self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"]
-                    maxLim = self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"]
-                    hardLimits[(object, axis)].setText(f"{minLim} to {maxLim}")
-
-                    # Change soft limit line edits.
-                    minLim = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
-                    maxLim = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
-                    softLimits[(object, axis, 0)].setText(str(minLim))
-                    softLimits[(object, axis, 1)].setText(str(maxLim))
+                # Change current step line edit.
+                value = caget(self.gui.macros[f"{axis}{object}POS"])"
+                currentStep[(object, axis)].setText(f"<b>{value - offset} STEPS</b>")
 
     def _set_current_position(self, **kwargs: Union[str, int, float]) -> None:
         """Update current position label.
