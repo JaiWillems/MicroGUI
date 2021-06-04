@@ -10,14 +10,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from functools import partial
 from epics import ca, caput, caget, PV
-
-# Import objects for type annotations.
-from typing import Literal, Dict, Any
+from typing import Literal, Dict, Any, Union
 from PyQt5.QtWidgets import QLineEdit, QFileDialog
-from gui import GUI
+from thorlabs_apt import Motor
 
 # Import file dependencies.
 from thorlabs_motor_control import changeMode
+from gui import GUI
 
 
 # Set up epics environment.
@@ -46,44 +45,59 @@ class Controller(object):
 
     Methods
     -------
-    connectSignals()
+    _initialize_GUI()
+        Configure and initiallize PVs.
+    _connect_signals()
         Connect the widgets to a control sequence.
-    saveImage(fileName, image)
+    _save_image()
         Control sequence to capture an image of the live feed.
-    modeState(mode, modeMotor)
+    _mode_state(mode, modeMotor)
         Control sequence to change the microscope mode.
-    incPos(object, axis, direction, step)
+    _mode_position(mode)
+        Change Mode position settings.
+    _increment(object, axis, direction, step)
         Control sequence to increment sample and objective stage motors.
-    absMove(object, axis, pos)
+    _absolute(object, axis, pos)
         Control sequence to move the sample and objective stage motors to a set
         point.
-    continuousMotion(object, axis, type)
+    _continuous(object, axis, type)
         Control sequence for the continuous motion of the sample and objective
         stages.
-    moveToPos(object, axis)
-        Control sequence to move the sample and objective stages to an absolute
-        position.
-    updateAbsPos(object, axis, direction, step)
+    _update_abs_pos(**kwargs)
         Control sequence to update the absolute position line edit widget.
-    updateSoftLimits(buttonID)
+    _offset(object, axis, invert)
+        Generate offset to convert between actual and relative values.
+    _update_soft_lim(buttonID)
         Control sequence to set soft limits to the inputted soft limits.
-    updateBacklash()
+    _update_BL()
         Control sequence to update backlash values.
-    zeroPos(object, axis)
+    _zero(object, axis)
         Control sequence to zero the current motor positions.
-    setRelPos(object, axis)
-        Control sequence to update the relative position global variables.
+    _motor_status(**kwargs)
+        Control sequence to check and set mode status indicators.
+    _check_motor_position()
+        Control sequence to move motors within soft limits.
+    _hard_lim_indicators(**kwargs)
+        Control sequence to set hard limit indicators.
+    _soft_lim_indicators(object, axis)
+        Control sequence to set doft limit indicators.
+    _change_display_vals()
+        Control sequence to switch displayed values between actual and relative values.
+    _set_current_position(**kwargs)
+        Control sequence to update current position labels.
+    _print_globals()
+        Control sequence to display all global variables.
     """
 
-    def __init__(self, gui: GUI, modeMotor: Any) -> None:
+    def __init__(self, gui: GUI, modeMotor: Motor) -> None:
         """Initialize the Controller."""
         self.gui = gui
         self.modeMotor = modeMotor
 
-        self.initializeGUI()
-        self.connectSignals()
+        self._initialize_GUI()
+        self._connect_signals()
 
-    def initializeGUI(self) -> None:
+    def _initialize_GUI(self) -> None:
         """Configure and initiallize PVs.
 
         This method initializes the line-edits to the PV values on program
@@ -131,37 +145,43 @@ class Controller(object):
         self.gui.macros["YO_RELATIVE_POSITION"] = caget(self.gui.macros["YOABSPOS"])
         self.gui.macros["ZO_RELATIVE_POSITION"] = caget(self.gui.macros["ZOABSPOS"])
 
-        self.PV_XSABSPOS = PV(pvname=self.gui.macros["XSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_ySABSPOS = PV(pvname=self.gui.macros["YSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_zSABSPOS = PV(pvname=self.gui.macros["ZSABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_XOABSPOS = PV(pvname=self.gui.macros["XOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_yOABSPOS = PV(pvname=self.gui.macros["YOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
-        self.PV_zOABSPOS = PV(pvname=self.gui.macros["ZOABSPOS"], auto_monitor=True, callback=self.updateAbsPos)
+        # Set absolute position PV monitoring and callback.
+        self.PV_XSABSPOS = PV(pvname=self.gui.macros["XSABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
+        self.PV_ySABSPOS = PV(pvname=self.gui.macros["YSABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
+        self.PV_zSABSPOS = PV(pvname=self.gui.macros["ZSABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
+        self.PV_XOABSPOS = PV(pvname=self.gui.macros["XOABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
+        self.PV_yOABSPOS = PV(pvname=self.gui.macros["YOABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
+        self.PV_zOABSPOS = PV(pvname=self.gui.macros["ZOABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
 
-        self.PV_XSSTATE = PV(pvname=self.gui.macros["XSSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_YSSTATE = PV(pvname=self.gui.macros["YSSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_ZSSTATE = PV(pvname=self.gui.macros["ZSSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_XOSTATE = PV(pvname=self.gui.macros["XOSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_YOSTATE = PV(pvname=self.gui.macros["YOSTATE"], auto_monitor=True, callback=self.motorStatus)
-        self.PV_ZOSTATE = PV(pvname=self.gui.macros["ZOSTATE"], auto_monitor=True, callback=self.motorStatus)
+        # Set state PV monitoring and callback.
+        self.PV_XSSTATE = PV(pvname=self.gui.macros["XSSTATE"], auto_monitor=True, callback=self._motor_status)
+        self.PV_YSSTATE = PV(pvname=self.gui.macros["YSSTATE"], auto_monitor=True, callback=self._motor_status)
+        self.PV_ZSSTATE = PV(pvname=self.gui.macros["ZSSTATE"], auto_monitor=True, callback=self._motor_status)
+        self.PV_XOSTATE = PV(pvname=self.gui.macros["XOSTATE"], auto_monitor=True, callback=self._motor_status)
+        self.PV_YOSTATE = PV(pvname=self.gui.macros["YOSTATE"], auto_monitor=True, callback=self._motor_status)
+        self.PV_ZOSTATE = PV(pvname=self.gui.macros["ZOSTATE"], auto_monitor=True, callback=self._motor_status)
 
-        self.PV_XSHN = PV(pvname=self.gui.macros["XSHN"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_XSHP = PV(pvname=self.gui.macros["XSHP"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_YSHN = PV(pvname=self.gui.macros["YSHN"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_YSHP = PV(pvname=self.gui.macros["YSHP"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_ZSHN = PV(pvname=self.gui.macros["ZSHN"], auto_monitor=True, callback=self.setHardLimitInd)
-        self.PV_ZSHP = PV(pvname=self.gui.macros["ZSHP"], auto_monitor=True, callback=self.setHardLimitInd)
+        # Set hard limit position PV monitoring and callback.
+        self.PV_XSHN = PV(pvname=self.gui.macros["XSHN"], auto_monitor=True, callback=self._hard_lim_indicators)
+        self.PV_XSHP = PV(pvname=self.gui.macros["XSHP"], auto_monitor=True, callback=self._hard_lim_indicators)
+        self.PV_YSHN = PV(pvname=self.gui.macros["YSHN"], auto_monitor=True, callback=self._hard_lim_indicators)
+        self.PV_YSHP = PV(pvname=self.gui.macros["YSHP"], auto_monitor=True, callback=self._hard_lim_indicators)
+        self.PV_ZSHN = PV(pvname=self.gui.macros["ZSHN"], auto_monitor=True, callback=self._hard_lim_indicators)
+        self.PV_ZSHP = PV(pvname=self.gui.macros["ZSHP"], auto_monitor=True, callback=self._hard_lim_indicators)
 
-        self.PV_XSPOS = PV(pvname=self.gui.macros["XSPOS"], auto_monitor=True, callback=self.updateSteps)
-        self.PV_YSPOS = PV(pvname=self.gui.macros["YSPOS"], auto_monitor=True, callback=self.updateSteps)
-        self.PV_ZSPOS = PV(pvname=self.gui.macros["ZSPOS"], auto_monitor=True, callback=self.updateSteps)
-        self.PV_XOPOS = PV(pvname=self.gui.macros["XOPOS"], auto_monitor=True, callback=self.updateSteps)
-        self.PV_YOPOS = PV(pvname=self.gui.macros["YOPOS"], auto_monitor=True, callback=self.updateSteps)
-        self.PV_ZOPOS = PV(pvname=self.gui.macros["ZOPOS"], auto_monitor=True, callback=self.updateSteps)
+        # Set current position PV monitoring and callback.
+        self.PV_XSPOS = PV(pvname=self.gui.macros["XSPOS"], auto_monitor=True, callback=self._set_current_position)
+        self.PV_YSPOS = PV(pvname=self.gui.macros["YSPOS"], auto_monitor=True, callback=self._set_current_position)
+        self.PV_ZSPOS = PV(pvname=self.gui.macros["ZSPOS"], auto_monitor=True, callback=self._set_current_position)
+        self.PV_XOPOS = PV(pvname=self.gui.macros["XOPOS"], auto_monitor=True, callback=self._set_current_position)
+        self.PV_YOPOS = PV(pvname=self.gui.macros["YOPOS"], auto_monitor=True, callback=self._set_current_position)
+        self.PV_ZOPOS = PV(pvname=self.gui.macros["ZOPOS"], auto_monitor=True, callback=self._set_current_position)
 
+        # -Simulation----------------------------------------------------------
         print("-*- PVs configured and initialized. -*-")
+        # ---------------------------------------------------------------------
 
-    def connectSignals(self) -> None:
+    def _connect_signals(self) -> None:
         """Connect widgets and control sequences.
 
         This method connects each of the widgets on the gui with a control
@@ -176,19 +196,19 @@ class Controller(object):
         None
         """
         # Save image functionality.
-        self.gui.WCB.clicked.connect(self.saveImage)
+        self.gui.WCB.clicked.connect(self._save_image)
 
         # Mode select functionality.
-        self.gui.tab.RDM1.pressed.connect(partial(self.modeState, 1, self.modeMotor))
-        self.gui.tab.RDM2.pressed.connect(partial(self.modeState, 2, self.modeMotor))
-        self.gui.tab.RDM3.pressed.connect(partial(self.modeState, 3, self.modeMotor))
-        self.gui.tab.RDM4.pressed.connect(partial(self.modeState, 4, self.modeMotor))
+        self.gui.tab.RDM1.pressed.connect(partial(self._mode_state, 1, self.modeMotor))
+        self.gui.tab.RDM2.pressed.connect(partial(self._mode_state, 2, self.modeMotor))
+        self.gui.tab.RDM3.pressed.connect(partial(self._mode_state, 3, self.modeMotor))
+        self.gui.tab.RDM4.pressed.connect(partial(self._mode_state, 4, self.modeMotor))
 
         # Mode position customizarion functionality.
-        self.gui.tab.TMTMbutton.clicked.connect(partial(self.modePos, 1))
-        self.gui.tab.TMRMbutton.clicked.connect(partial(self.modePos, 2))
-        self.gui.tab.TMVMbutton.clicked.connect(partial(self.modePos, 3))
-        self.gui.tab.TMBMbutton.clicked.connect(partial(self.modePos, 4))
+        self.gui.tab.TMTMbutton.clicked.connect(partial(self._mode_position, 1))
+        self.gui.tab.TMRMbutton.clicked.connect(partial(self._mode_position, 2))
+        self.gui.tab.TMVMbutton.clicked.connect(partial(self._mode_position, 3))
+        self.gui.tab.TMBMbutton.clicked.connect(partial(self._mode_position, 4))
 
         # Increment sample and objective stage functionality.
         self.gui.xSN.clicked.connect(partial(self.incPos, "S", "X", "N", self.gui.xSStep))
@@ -233,27 +253,28 @@ class Controller(object):
         self.gui.zOCp.clicked.connect(partial(self.continuousMotion, "O", "Z", "CP"))
 
         # Updating soft limits functionality.
-        self.gui.tab.SSL.clicked.connect(partial(self.updateSoftLimits, 0))
-        self.gui.tab.SMSL.clicked.connect(partial(self.updateSoftLimits, 1))
-        self.gui.tab.SESL.clicked.connect(partial(self.updateSoftLimits, 2))
+        self.gui.tab.SSL.clicked.connect(partial(self._update_soft_lim, 0))
+        self.gui.tab.SMSL.clicked.connect(partial(self._update_soft_lim, 1))
+        self.gui.tab.SESL.clicked.connect(partial(self._update_soft_lim, 2))
 
         # Zero'ing absolute position functionality.
-        self.gui.tab.xSZero.clicked.connect(partial(self.zeroPos, "S", "X"))
-        self.gui.tab.ySZero.clicked.connect(partial(self.zeroPos, "S", "Y"))
-        self.gui.tab.zSZero.clicked.connect(partial(self.zeroPos, "S", "Z"))
-        self.gui.tab.xOZero.clicked.connect(partial(self.zeroPos, "O", "X"))
-        self.gui.tab.yOZero.clicked.connect(partial(self.zeroPos, "O", "Y"))
-        self.gui.tab.zOZero.clicked.connect(partial(self.zeroPos, "O", "Z"))
+        self.gui.tab.xSZero.clicked.connect(partial(self._zero, "S", "X"))
+        self.gui.tab.ySZero.clicked.connect(partial(self._zero, "S", "Y"))
+        self.gui.tab.zSZero.clicked.connect(partial(self._zero, "S", "Z"))
+        self.gui.tab.xOZero.clicked.connect(partial(self._zero, "O", "X"))
+        self.gui.tab.yOZero.clicked.connect(partial(self._zero, "O", "Y"))
+        self.gui.tab.zOZero.clicked.connect(partial(self._zero, "O", "Z"))
 
-        self.gui.tab.SBL.clicked.connect(self.updateBacklash)
+        # Other functionality.
+        self.gui.tab.SBL.clicked.connect(self._update_BL)
+        self.gui.tab.valueType.clicked.connect(self._change_display_vals)
+        self.gui.tab.globals.clicked.connect(self._print_globals)
 
-        self.gui.tab.valueType.clicked.connect(self.changeValues)
-
-        self.gui.tab.globals.clicked.connect(self.displayGlobals)
-
+        # -Simulation----------------------------------------------------------
         print("-*- Widgets connected to control sequences. -*-")
+        # ---------------------------------------------------------------------
 
-    def saveImage(self) -> None:
+    def _save_image(self) -> None:
         """Live stream image capture.
 
         This method saves a capture of the current live stream to the chosen
@@ -274,10 +295,11 @@ class Controller(object):
         plt.axis("off")
         plt.savefig(path, dpi=500, bbox_inches="tight")
 
-        # Simulation
+        # -Simulation----------------------------------------------------------
         print(f"Image capture saved to: {path}")
+        # ---------------------------------------------------------------------
 
-    def modeState(self, mode: Literal[1, 2, 3, 4], modeMotor: Any) -> None:
+    def _mode_state(self, mode: Literal[1, 2, 3, 4], modeMotor: Motor) -> None:
         """Change microscope mode.
 
         This method is called when selecting a mode radio button to change
@@ -300,9 +322,11 @@ class Controller(object):
         pos = self.gui.macros[modeDict[mode]]
         changeMode(pos=pos, modeMotor=modeMotor)
 
+        # -Simulation----------------------------------------------------------
         print(f"Changing mode to mode {mode}.")
+        # ---------------------------------------------------------------------
 
-    def modePos(self, mode: Literal[1, 2, 3, 4]) -> None:
+    def _mode_position(self, mode: Literal[1, 2, 3, 4]) -> None:
         """Change mode position settings.
 
         Parameters
@@ -318,24 +342,24 @@ class Controller(object):
             self.gui.macros["TRANSMISSION_POSITION"] = float(self.gui.tab.TMTM.text())
             self.gui.tab.TMTM.setText(str(self.gui.macros["TRANSMISSION_POSITION"]))
             if self.gui.tab.RDM1.isChecked():
-                self.modeState(1, self.modeMotor)
+                self._mode_state(1, self.modeMotor)
         elif mode == 2:
             self.gui.macros["REFLECTION_POSITION"] = float(self.gui.tab.TMRM.text())
             self.gui.tab.TMRM.setText(str(self.gui.macros["REFLECTION_POSITION"]))
             if self.gui.tab.RDM2.isChecked():
-                self.modeState(2, self.modeMotor)
+                self._mode_state(2, self.modeMotor)
         elif mode == 3:
             self.gui.macros["VISIBLE_IMAGE_POSITION"] = float(self.gui.tab.TMVM.text())
             self.gui.tab.TMVM.setText(str(self.gui.macros["VISIBLE_IMAGE_POSITION"]))
             if self.gui.tab.RDM3.isChecked():
-                self.modeState(3, self.modeMotor)
+                self._mode_state(3, self.modeMotor)
         else:
             self.gui.macros["BEAMSPLITTER_POSITION"] = float(self.gui.tab.TMBM.text())
             self.gui.tab.TMBM.setText(str(self.gui.macros["BEAMSPLITTER_POSITION"]))
             if self.gui.tab.RDM4.isChecked():
-                self.modeState(4, self.modeMotor)
+                self._mode_state(4, self.modeMotor)
 
-    def incPos(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], direction: Literal["N", "P"], step: QLineEdit) -> None:
+    def _increment(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], direction: Literal["N", "P"], step: QLineEdit) -> None:
         """Increment motor position.
 
         Increment the motor defined by 'object' and 'axis' in the direction
@@ -387,7 +411,7 @@ class Controller(object):
         print(f"Incremental movement to {axis}{object}ABSPOS = {absPos}.")
         # ---------------------------------------------------------------------
 
-    def absMove(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
+    def _absolute(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
         """Move sample or objective motor to specified position.
 
         This method moves the motor defined by 'object' and 'axis' to the
@@ -441,7 +465,7 @@ class Controller(object):
         print(f"Absolute movement to {axis}{object}ABSPOS = {absPos}.")
         # ---------------------------------------------------------------------
 
-    def continuousMotion(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], type: Literal["CN", "STOP", "CP"]) -> None:
+    def _continuous(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], type: Literal["CN", "STOP", "CP"]) -> None:
         """Control continuous motion of the sample and objective stages.
 
         This method allows for the continuous motion functionality of the
@@ -478,13 +502,13 @@ class Controller(object):
         print(f"Change continuous movement to -> {type}.")
         # ---------------------------------------------------------------------
 
-    def updateAbsPos(self, **kwargs: Dict) -> None:
+    def _update_abs_pos(self, **kwargs: Union[str, int, float]) -> None:
         """Update absolute value line edit.
 
         Parameters
         ----------
         **kwargs : Dict
-            Extra arguments to `updateAbsPos`: refer to PyEpics documentation
+            Extra arguments to `_update_abs_pos`: refer to PyEpics documentation
             for a list of all possible arguments for PV callback functions.
 
         Returns
@@ -504,13 +528,13 @@ class Controller(object):
         axis = pvKey[0]
         object = pvKey[1]
 
-        lineEdit[(object, axis)].setText(str(value + self.offset(object, axis)))
+        lineEdit[(object, axis)].setText(str(value + self._offset(object, axis)))
 
         # -Simulation----------------------------------------------------------
-        print(f"Updating absolute position line edit to relative position: {value + self.offset(object, axis)}.")
+        print(f"Updating absolute position line edit to relative position: {value + self._offset(object, axis)}.")
         # ---------------------------------------------------------------------
 
-    def offset(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], invert: bool = False) -> float:
+    def _offset(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], invert: bool = False) -> Union[int, float]:
         """Generate offset to convert between actual and relative values.
 
         This method is to always be ADDED (not subtracted) to a value to
@@ -539,7 +563,7 @@ class Controller(object):
             return float(self.gui.macros[f"{axis}{object}_BASE_POSITION"])
         return 0
 
-    def updateSoftLimits(self, buttonID: Literal[0, 1]) -> None:
+    def _update_soft_lim(self, buttonID: Literal[0, 1]) -> None:
         """Update sample and objective soft limits.
 
         This method updates the programs soft limits to the inputted amounts or
@@ -564,33 +588,33 @@ class Controller(object):
 
         if buttonID == 2:
             # Set soft limits to hard limits.
-            self.gui.macros["XSMIN_SOFT_LIMIT"] = float(self.gui.macros["XSMIN_HARD_LIMIT"]) - self.offset("S", "X", True)
-            self.gui.macros["XSMAX_SOFT_LIMIT"] = float(self.gui.macros["XSMAX_HARD_LIMIT"]) - self.offset("S", "X", True)
-            self.gui.macros["YSMIN_SOFT_LIMIT"] = float(self.gui.macros["YSMIN_HARD_LIMIT"]) - self.offset("S", "Y", True)
-            self.gui.macros["YSMAX_SOFT_LIMIT"] = float(self.gui.macros["YSMAX_HARD_LIMIT"]) - self.offset("S", "Y", True)
-            self.gui.macros["ZSMIN_SOFT_LIMIT"] = float(self.gui.macros["ZSMIN_HARD_LIMIT"]) - self.offset("S", "Z", True)
-            self.gui.macros["ZSMAX_SOFT_LIMIT"] = float(self.gui.macros["ZSMAX_HARD_LIMIT"]) - self.offset("S", "Z", True)
-            self.gui.macros["XOMIN_SOFT_LIMIT"] = float(self.gui.macros["XOMIN_HARD_LIMIT"]) - self.offset("O", "X", True)
-            self.gui.macros["XOMAX_SOFT_LIMIT"] = float(self.gui.macros["XOMAX_HARD_LIMIT"]) - self.offset("O", "X", True)
-            self.gui.macros["YOMIN_SOFT_LIMIT"] = float(self.gui.macros["YOMIN_HARD_LIMIT"]) - self.offset("O", "Y", True)
-            self.gui.macros["YOMAX_SOFT_LIMIT"] = float(self.gui.macros["YOMAX_HARD_LIMIT"]) - self.offset("O", "Y", True)
-            self.gui.macros["ZOMIN_SOFT_LIMIT"] = float(self.gui.macros["ZOMIN_HARD_LIMIT"]) - self.offset("O", "Z", True)
-            self.gui.macros["ZOMAX_SOFT_LIMIT"] = float(self.gui.macros["ZOMAX_HARD_LIMIT"]) - self.offset("O", "Z", True)
+            self.gui.macros["XSMIN_SOFT_LIMIT"] = float(self.gui.macros["XSMIN_HARD_LIMIT"]) - self._offset("S", "X", True)
+            self.gui.macros["XSMAX_SOFT_LIMIT"] = float(self.gui.macros["XSMAX_HARD_LIMIT"]) - self._offset("S", "X", True)
+            self.gui.macros["YSMIN_SOFT_LIMIT"] = float(self.gui.macros["YSMIN_HARD_LIMIT"]) - self._offset("S", "Y", True)
+            self.gui.macros["YSMAX_SOFT_LIMIT"] = float(self.gui.macros["YSMAX_HARD_LIMIT"]) - self._offset("S", "Y", True)
+            self.gui.macros["ZSMIN_SOFT_LIMIT"] = float(self.gui.macros["ZSMIN_HARD_LIMIT"]) - self._offset("S", "Z", True)
+            self.gui.macros["ZSMAX_SOFT_LIMIT"] = float(self.gui.macros["ZSMAX_HARD_LIMIT"]) - self._offset("S", "Z", True)
+            self.gui.macros["XOMIN_SOFT_LIMIT"] = float(self.gui.macros["XOMIN_HARD_LIMIT"]) - self._offset("O", "X", True)
+            self.gui.macros["XOMAX_SOFT_LIMIT"] = float(self.gui.macros["XOMAX_HARD_LIMIT"]) - self._offset("O", "X", True)
+            self.gui.macros["YOMIN_SOFT_LIMIT"] = float(self.gui.macros["YOMIN_HARD_LIMIT"]) - self._offset("O", "Y", True)
+            self.gui.macros["YOMAX_SOFT_LIMIT"] = float(self.gui.macros["YOMAX_HARD_LIMIT"]) - self._offset("O", "Y", True)
+            self.gui.macros["ZOMIN_SOFT_LIMIT"] = float(self.gui.macros["ZOMIN_HARD_LIMIT"]) - self._offset("O", "Z", True)
+            self.gui.macros["ZOMAX_SOFT_LIMIT"] = float(self.gui.macros["ZOMAX_HARD_LIMIT"]) - self._offset("O", "Z", True)
 
         elif buttonID == 1:
             # Set soft limits to hard limits.
-            self.gui.macros["XSMIN_SOFT_LIMIT"] = float(0) - self.offset("S", "X", True)
-            self.gui.macros["XSMAX_SOFT_LIMIT"] = float(0) - self.offset("S", "X", True)
-            self.gui.macros["YSMIN_SOFT_LIMIT"] = float(0) - self.offset("S", "Y", True)
-            self.gui.macros["YSMAX_SOFT_LIMIT"] = float(0) - self.offset("S", "Y", True)
-            self.gui.macros["ZSMIN_SOFT_LIMIT"] = float(0) - self.offset("S", "Z", True)
-            self.gui.macros["ZSMAX_SOFT_LIMIT"] = float(0) - self.offset("S", "Z", True)
-            self.gui.macros["XOMIN_SOFT_LIMIT"] = float(0) - self.offset("O", "X", True)
-            self.gui.macros["XOMAX_SOFT_LIMIT"] = float(0) - self.offset("O", "X", True)
-            self.gui.macros["YOMIN_SOFT_LIMIT"] = float(0) - self.offset("O", "Y", True)
-            self.gui.macros["YOMAX_SOFT_LIMIT"] = float(0) - self.offset("O", "Y", True)
-            self.gui.macros["ZOMIN_SOFT_LIMIT"] = float(0) - self.offset("O", "Z", True)
-            self.gui.macros["ZOMAX_SOFT_LIMIT"] = float(0) - self.offset("O", "Z", True)
+            self.gui.macros["XSMIN_SOFT_LIMIT"] = float(0) - self._offset("S", "X", True)
+            self.gui.macros["XSMAX_SOFT_LIMIT"] = float(0) - self._offset("S", "X", True)
+            self.gui.macros["YSMIN_SOFT_LIMIT"] = float(0) - self._offset("S", "Y", True)
+            self.gui.macros["YSMAX_SOFT_LIMIT"] = float(0) - self._offset("S", "Y", True)
+            self.gui.macros["ZSMIN_SOFT_LIMIT"] = float(0) - self._offset("S", "Z", True)
+            self.gui.macros["ZSMAX_SOFT_LIMIT"] = float(0) - self._offset("S", "Z", True)
+            self.gui.macros["XOMIN_SOFT_LIMIT"] = float(0) - self._offset("O", "X", True)
+            self.gui.macros["XOMAX_SOFT_LIMIT"] = float(0) - self._offset("O", "X", True)
+            self.gui.macros["YOMIN_SOFT_LIMIT"] = float(0) - self._offset("O", "Y", True)
+            self.gui.macros["YOMAX_SOFT_LIMIT"] = float(0) - self._offset("O", "Y", True)
+            self.gui.macros["ZOMIN_SOFT_LIMIT"] = float(0) - self._offset("O", "Z", True)
+            self.gui.macros["ZOMAX_SOFT_LIMIT"] = float(0) - self._offset("O", "Z", True)
 
         else:
             # Set soft limits to inputted values
@@ -600,7 +624,7 @@ class Controller(object):
                     min = float(softLimits[(object, axis, 0)].text())
                     max = float(softLimits[(object, axis, 1)].text())
 
-                    offset = self.offset(object, axis, True)
+                    offset = self._offset(object, axis, True)
 
                     if min < self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"]:
                         self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] = float(self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"]) + offset
@@ -613,28 +637,29 @@ class Controller(object):
                         self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] = max + offset
 
         # Update soft limit line edits.
-        self.gui.tab.xSMin.setText(str(self.gui.macros["XSMIN_SOFT_LIMIT"] - self.offset("S", "X", True)))
-        self.gui.tab.xSMax.setText(str(self.gui.macros["XSMAX_SOFT_LIMIT"] - self.offset("S", "X", True)))
-        self.gui.tab.ySMin.setText(str(self.gui.macros["YSMIN_SOFT_LIMIT"] - self.offset("S", "Y", True)))
-        self.gui.tab.ySMax.setText(str(self.gui.macros["YSMAX_SOFT_LIMIT"] - self.offset("S", "Y", True)))
-        self.gui.tab.zSMin.setText(str(self.gui.macros["ZSMIN_SOFT_LIMIT"] - self.offset("S", "Z", True)))
-        self.gui.tab.zSMax.setText(str(self.gui.macros["ZSMAX_SOFT_LIMIT"] - self.offset("S", "Z", True)))
-        self.gui.tab.xOMin.setText(str(self.gui.macros["XOMIN_SOFT_LIMIT"] - self.offset("O", "X", True)))
-        self.gui.tab.xOMax.setText(str(self.gui.macros["XOMAX_SOFT_LIMIT"] - self.offset("O", "X", True)))
-        self.gui.tab.yOMin.setText(str(self.gui.macros["YOMIN_SOFT_LIMIT"] - self.offset("O", "Y", True)))
-        self.gui.tab.yOMax.setText(str(self.gui.macros["YOMAX_SOFT_LIMIT"] - self.offset("O", "Y", True)))
-        self.gui.tab.zOMin.setText(str(self.gui.macros["ZOMIN_SOFT_LIMIT"] - self.offset("O", "Z", True)))
-        self.gui.tab.zOMax.setText(str(self.gui.macros["ZOMAX_SOFT_LIMIT"] - self.offset("O", "Z", True)))
+        self.gui.tab.xSMin.setText(str(self.gui.macros["XSMIN_SOFT_LIMIT"] - self._offset("S", "X", True)))
+        self.gui.tab.xSMax.setText(str(self.gui.macros["XSMAX_SOFT_LIMIT"] - self._offset("S", "X", True)))
+        self.gui.tab.ySMin.setText(str(self.gui.macros["YSMIN_SOFT_LIMIT"] - self._offset("S", "Y", True)))
+        self.gui.tab.ySMax.setText(str(self.gui.macros["YSMAX_SOFT_LIMIT"] - self._offset("S", "Y", True)))
+        self.gui.tab.zSMin.setText(str(self.gui.macros["ZSMIN_SOFT_LIMIT"] - self._offset("S", "Z", True)))
+        self.gui.tab.zSMax.setText(str(self.gui.macros["ZSMAX_SOFT_LIMIT"] - self._offset("S", "Z", True)))
+        self.gui.tab.xOMin.setText(str(self.gui.macros["XOMIN_SOFT_LIMIT"] - self._offset("O", "X", True)))
+        self.gui.tab.xOMax.setText(str(self.gui.macros["XOMAX_SOFT_LIMIT"] - self._offset("O", "X", True)))
+        self.gui.tab.yOMin.setText(str(self.gui.macros["YOMIN_SOFT_LIMIT"] - self._offset("O", "Y", True)))
+        self.gui.tab.yOMax.setText(str(self.gui.macros["YOMAX_SOFT_LIMIT"] - self._offset("O", "Y", True)))
+        self.gui.tab.zOMin.setText(str(self.gui.macros["ZOMIN_SOFT_LIMIT"] - self._offset("O", "Z", True)))
+        self.gui.tab.zOMax.setText(str(self.gui.macros["ZOMAX_SOFT_LIMIT"] - self._offset("O", "Z", True)))
 
         # Update soft limit indicators.
-        self.setSoftLimitInd("S", "X")
-        self.setSoftLimitInd("S", "Y")
-        self.setSoftLimitInd("S", "Z")
-        self.setSoftLimitInd("O", "X")
-        self.setSoftLimitInd("O", "Y")
-        self.setSoftLimitInd("O", "Z")
+        self._soft_lim_indicators("S", "X")
+        self._soft_lim_indicators("S", "Y")
+        self._soft_lim_indicators("S", "Z")
+        self._soft_lim_indicators("O", "X")
+        self._soft_lim_indicators("O", "Y")
+        self._soft_lim_indicators("O", "Z")
 
-        self.checkMotorPos()
+        # Move motors to within soft limits.
+        self._check_motor_position()
 
         # -Simulation----------------------------------------------------------
         print(f"Updating soft limits, buttonID={buttonID}.")
@@ -645,7 +670,7 @@ class Controller(object):
                 print(f"XS SL: min -> {Min}, max -> {Max}")
         # ---------------------------------------------------------------------
 
-    def updateBacklash(self) -> None:
+    def _update_BL(self) -> None:
         """Update backlash variables.
 
         Parameters
@@ -665,6 +690,7 @@ class Controller(object):
         caput(self.gui.macros["YOB"], abs(int(float(self.gui.tab.yOB.text()))))
         caput(self.gui.macros["ZOB"], abs(int(float(self.gui.tab.zOB.text()))))
 
+        # Reset backlash line edits for consistent formatting.
         self.gui.tab.xSB.setText(str(caget(self.gui.macros["XSB"])))
         self.gui.tab.ySB.setText(str(caget(self.gui.macros["YSB"])))
         self.gui.tab.zSB.setText(str(caget(self.gui.macros["ZSB"])))
@@ -676,7 +702,7 @@ class Controller(object):
         print("Updating backlash values.")
         # ---------------------------------------------------------------------
 
-    def zeroPos(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
+    def _zero(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
         """Zero sample or objective axis position.
 
         This method zeros the absolute position line edit of the motor defined
@@ -711,19 +737,19 @@ class Controller(object):
         # Update absolute position line edit widget to 0.
         lineEdit[(object, axis)].setText("0.0")
 
-        self.changeValues()
+        self._change_display_vals()
 
         # -Simulation----------------------------------------------------------
         print(f"Zero'ing the {axis}{object}ABSPOS line edit.")
         # ---------------------------------------------------------------------
 
-    def motorStatus(self, **kwargs: Dict) -> None:
+    def _motor_status(self, **kwargs: Union[str, int, float]) -> None:
         """Check and set motor status indicators.
 
         Parameters
         ----------
         **kwargs : Dict
-            Extra arguments to `motorStatus`: refer to PyEpics documentation
+            Extra arguments to `_motor_status`: refer to PyEpics documentation
             for a list of all possible arguments for PV callback functions.
 
         Returns
@@ -753,7 +779,7 @@ class Controller(object):
         if value == 0:
             motionLabels[(object, axis)].setText("IDLE")
             motionLabels[(object, axis)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-            self.setSoftLimitInd(object, axis)
+            self._soft_lim_indicators(object, axis)
         elif value == 1:
             motionLabels[(object, axis)].setText("POWERING")
             motionLabels[(object, axis)].setStyleSheet("background-color: #ff4747; border: 1px solid black;")
@@ -763,14 +789,14 @@ class Controller(object):
         elif value == 3:
             motionLabels[(object, axis)].setText("RELEASING")
             motionLabels[(object, axis)].setStyleSheet("background-color: #edde07; border: 1px solid black;")
-            self.setSoftLimitInd(object, axis)
+            self._soft_lim_indicators(object, axis)
         elif value == 4:
             motionLabels[(object, axis)].setText("ACTIVE")
             motionLabels[(object, axis)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
         elif value == 5:
             motionLabels[(object, axis)].setText("APPLYING")
             motionLabels[(object, axis)].setStyleSheet("background-color: #edde07; border: 1px solid black;")
-            self.setSoftLimitInd(object, axis)
+            self._soft_lim_indicators(object, axis)
         else:
             motionLabels[(object, axis)].setText("UNPOWERING")
             motionLabels[(object, axis)].setStyleSheet("background-color: #ff4747; border: 1px solid black;")
@@ -779,7 +805,7 @@ class Controller(object):
         absPos = caget(self.gui.macros[f"{axis}{object}ABSPOS"])
         self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"] = absPos - basePos
 
-        lineEdit[(object, axis)].setText(str(absPos - basePos + self.offset(object, axis)))
+        lineEdit[(object, axis)].setText(str(absPos - basePos + self._offset(object, axis)))
 
         # -Simulation----------------------------------------------------------
         print(f"Checking motor status, motor identity: {pvname}, state: {value}")
@@ -787,8 +813,19 @@ class Controller(object):
         print(f"Current relative position -> {relPos}")
         # ---------------------------------------------------------------------
 
-    def checkMotorPos(self):
-        """
+    def _check_motor_position(self) -> None:
+        """Moves motors within soft limits.
+
+        This method checkes each motors position. If a motor is out of the soft
+        limits, it will be moved to the closes limit.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
         """
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
@@ -811,8 +848,19 @@ class Controller(object):
 
                 self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"] = relPos
 
-    def setHardLimitInd(self, **kwargs):
-        """
+    def _hard_lim_indicators(self, **kwargs: Union[str, int, float]) -> None:
+        """Set hard limit indicators.
+
+        Parameters
+        ----------
+        **kwargs : Dict
+            Extra arguments to `_hard_lim_indicators`: refer to PyEpics
+            documentation for a list of all possible arguments for PV callback
+            functions.
+        
+        Returns
+        -------
+        None
         """
         hardLimits = {("S", "X", "N"): self.gui.xSHn, ("S", "X", "P"): self.gui.xSHp,
                       ("S", "Y", "N"): self.gui.ySHn, ("S", "Y", "P"): self.gui.ySHp,
@@ -841,8 +889,19 @@ class Controller(object):
         print("Setting hard limit indicators.")
         # ---------------------------------------------------------------------
 
-    def setSoftLimitInd(self, object, axis):
+    def _soft_lim_indicators(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
         """Set soft limit indicators.
+
+        Parameters
+        ----------
+        **kwargs : Dict
+            Extra arguments to `_hard_lim_indicators`: refer to PyEpics
+            documentation for a list of all possible arguments for PV callback
+            functions.
+        
+        Returns
+        -------
+        None
         """
         softLimits = {("S", "X", 0): self.gui.xSSn, ("S", "X", 1): self.gui.xSSp,
                       ("S", "Y", 0): self.gui.ySSn, ("S", "Y", 1): self.gui.ySSp,
@@ -871,7 +930,7 @@ class Controller(object):
         print("Setting soft limit indicators.")
         # ---------------------------------------------------------------------
 
-    def changeValues(self):
+    def _change_display_vals(self) -> None:
         """Switch displayed values between actual and relative values.
 
         This method changes all position based line edits and labels between
@@ -942,8 +1001,19 @@ class Controller(object):
                     softLimits[(object, axis, 0)].setText(str(minLim))
                     softLimits[(object, axis, 1)].setText(str(maxLim))
 
-    def updateSteps(self, **kwargs):
-        """
+    def _set_current_position(self, **kwargs: Union[str, int, float]) -> None:
+        """Update current position label.
+
+        Parameters
+        ----------
+        **kwargs : Dict
+            Extra arguments to `_hard_lim_indicators`: refer to PyEpics
+            documentation for a list of all possible arguments for PV callback
+            functions.
+        
+        Returns
+        -------
+        None
         """
         stepLineEdit = {("S", "X"): self.gui.xStepS, ("O", "X"): self.gui.xStepO,
                         ("S", "Y"): self.gui.yStepS, ("O", "Y"): self.gui.yStepO,
@@ -959,13 +1029,13 @@ class Controller(object):
         axis = pvKey[0]
         object = pvKey[1]
 
-        offset = self.offset(object, axis, True)
+        offset = self._offset(object, axis, True)
 
         stepText = f"<b>{value - offset} STEPS</b>"
         stepLineEdit[(object, axis)].setText(stepText)
 
-    def displayGlobals(self):
-        """Print out all global variables.
+    def _print_globals(self) -> None:
+        """Display all global variables.
 
         Parameters
         ----------

@@ -8,6 +8,7 @@ to run the FAR-IR horizontal microscope.
 from PyQt5.QtWidgets import QApplication
 import sys
 import json
+from typing import Dict
 
 # Import file dependencies.
 from gui import GUI
@@ -18,8 +19,22 @@ from thorlabs_motor_control import initMotor
 modeMotor = initMotor()
 
 
-def initMacros(baseDict, macroDict):
-    """Initialize macro variables."""
+def initMacros(baseDict: Dict, macroDict: Dict) -> None:
+    """Initialize macro variables.
+    
+    This function transforms a nested dictionary into a planar dictionary.
+
+    Parameters
+    ----------
+    baseDict : Dict
+        Nested dictionary of values.
+    macroDict : Dict
+        New planar dictionary to add key/value pairs to from `baseDict`.
+    
+    Returns
+    -------
+    None
+    """
     keys = baseDict.keys()
     for key in keys:
         try:
@@ -28,8 +43,23 @@ def initMacros(baseDict, macroDict):
             macroDict[key] = baseDict[key]
 
 
-def saveMacros(baseDict, macroDict):
-    """Save macro variables"""
+def saveMacros(baseDict: Dict, macroDict: Dict) -> None:
+    """Save macro variables.
+    
+    This function updates the values of a nested dictionary from the a planar
+    dictionary with common keys.
+
+    Parameters
+    ----------
+    baseDict : Dict
+        Nested dictionary of values.
+    macroDict : Dict
+        New planar dictionary to add key/value pairs to from `baseDict`.
+    
+    Returns
+    -------
+    None
+    """
     keys = baseDict.keys()
     for key in keys:
         try:
@@ -38,8 +68,20 @@ def saveMacros(baseDict, macroDict):
             baseDict[key] = macroDict[key]
 
 
-def exitGUI(data, macros):
-    """Exit the program and save macro variables."""
+def exitGUI(data: Dict, macros: Dict) -> None:
+    """Exit the program and save macro variables.
+
+    Parameters
+    ----------
+    data : Dict
+        Nested dictionary of values from `config.json` file.
+    macroDict : Dict
+        Planar dictionary representing the gui macros attribute.
+    
+    Returns
+    -------
+    None
+    """
     app.exec_()
     saveMacros(data, macros)
     with open("config.json", "w") as jsonfile:

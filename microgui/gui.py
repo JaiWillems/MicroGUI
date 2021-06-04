@@ -9,7 +9,7 @@ Microscope.
 import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.ptime as ptime
-from typing import Any
+from typing import Any, Dict
 from PyQt5.QtGui import QPixmap, QFont, QIcon
 from PyQt5.QtCore import QRectF, QTimer, Qt
 from PyQt5.QtWidgets import QMainWindow, QGridLayout, QVBoxLayout, QWidget,\
@@ -28,7 +28,8 @@ class GUI(QMainWindow):
 
     Parameters
     ----------
-    None
+    macros : Dict
+        Dictionary of macro variables.
 
     Attributes
     ----------
@@ -191,19 +192,19 @@ class GUI(QMainWindow):
 
     Methods
     -------
-    getDiagramWindow()
+    _diagram_window()
         Creates the diagram window.
-    getCameraWindow()
+    _camera_window()
         Creates the camera window.
-    getTabularWindow()
+    _tabular_window()
         Creates the table window.
-    getSampleWindow()
+    _sample_window()
         Creates the sample window.
-    getObjectiveWindow()
+    _objective_window()
         Creates the objective window.
     """
 
-    def __init__(self, macros) -> None:
+    def __init__(self, macros: Dict) -> None:
         """Initialize the GUI."""
 
         super().__init__()
@@ -219,11 +220,11 @@ class GUI(QMainWindow):
 
         # Add sub-windows to main window layout.
         self.layout = QGridLayout()
-        self.layout.addWidget(self.getDiagramWindow(), 0, 0, 2, 1)
-        self.layout.addWidget(self.getCameraWindow(), 0, 1, 2, 1)
-        self.layout.addWidget(self.getTabularWindow(), 0, 2, 2, 1)
-        self.layout.addWidget(self.getSampleWindow(), 2, 0, 1, 3)
-        self.layout.addWidget(self.getObjectiveWindow(), 3, 0, 1, 3)
+        self.layout.addWidget(self._diagram_window(), 0, 0, 2, 1)
+        self.layout.addWidget(self._camera_window(), 0, 1, 2, 1)
+        self.layout.addWidget(self._tabular_window(), 0, 2, 2, 1)
+        self.layout.addWidget(self._sample_window(), 2, 0, 1, 3)
+        self.layout.addWidget(self._objective_window(), 3, 0, 1, 3)
 
         # Set main window layout.
         self.centralWidget = QWidget(self)
@@ -232,7 +233,7 @@ class GUI(QMainWindow):
 
         self.show()
 
-    def getDiagramWindow(self) -> QLabel:
+    def _diagram_window(self) -> QLabel:
         """Create diagram window.
 
         Parameters
@@ -249,7 +250,7 @@ class GUI(QMainWindow):
 
         return window
 
-    def getCameraWindow(self) -> QWidget:
+    def _camera_window(self) -> QWidget:
         """Create camera window.
 
         Parameters
@@ -330,7 +331,7 @@ class GUI(QMainWindow):
 
         return self.cameraWindow
 
-    def getTabularWindow(self) -> QWidget:
+    def _tabular_window(self) -> QWidget:
         """Create tabular window.
 
         Parameters
@@ -345,7 +346,7 @@ class GUI(QMainWindow):
         self.tab = MyTableWidget(self)
         return self.tab
 
-    def getSampleWindow(self) -> QWidget:
+    def _sample_window(self) -> QWidget:
         """Create sample window.
 
         Parameters
@@ -540,7 +541,7 @@ class GUI(QMainWindow):
         window.setLayout(layout)
         return window
 
-    def getObjectiveWindow(self) -> QWidget:
+    def _objective_window(self) -> QWidget:
         """Create objective window.
 
         Parameters
