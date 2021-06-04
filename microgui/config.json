@@ -39,18 +39,18 @@
             "ZOMAX_SOFT_LIMIT": 0
         },
         "hard_limits": {
-            "XSMIN_HARD_LIMIT": -50000,
-            "XSMAX_HARD_LIMIT": 50000,
-            "YSMIN_HARD_LIMIT": -50000,
-            "YSMAX_HARD_LIMIT": 50000,
-            "ZSMIN_HARD_LIMIT": -50000,
-            "ZSMAX_HARD_LIMIT": 50000,
-            "XOMIN_HARD_LIMIT": -50000,
-            "XOMAX_HARD_LIMIT": 50000,
-            "YOMIN_HARD_LIMIT": -50000,
-            "YOMAX_HARD_LIMIT": 50000,
-            "ZOMIN_HARD_LIMIT": -50000,
-            "ZOMAX_HARD_LIMIT": 50000
+            "XSMIN_HARD_LIMIT": -40000,
+            "XSMAX_HARD_LIMIT": 40000,
+            "YSMIN_HARD_LIMIT": -40000,
+            "YSMAX_HARD_LIMIT": 40000,
+            "ZSMIN_HARD_LIMIT": -40000,
+            "ZSMAX_HARD_LIMIT": 40000,
+            "XOMIN_HARD_LIMIT": -40000,
+            "XOMAX_HARD_LIMIT": 40000,
+            "YOMIN_HARD_LIMIT": -40000,
+            "YOMAX_HARD_LIMIT": 40000,
+            "ZOMIN_HARD_LIMIT": -40000,
+            "ZOMAX_HARD_LIMIT": 40000
         }
     },
     "backlash": {
@@ -81,8 +81,8 @@
             "XSPOS": "SMTR1601-1-R10-28:step:fbk"
         },
         "YS": {
-            "YSN": "fihr:SMTR1601-1-R10-29:step:moveDeltaOut",
-            "YSP": "fihr:SMTR1601-1-R10-29:step:moveDeltaIn",
+            "YSN": "fihr:SMTR1601-1-R10-29:step:moveDeltaIn",
+            "YSP": "fihr:SMTR1601-1-R10-29:step:moveDeltaOut",
             "YSSTEP": "fihr:SMTR1601-1-R10-29:step:delta",
             "YSABSPOS": "fihr:SMTR1601-1-R10-29:step:c:target",
             "YSMOVE": "fihr:SMTR1601-1-R10-29:step:c:moveTo",
@@ -99,8 +99,8 @@
             "YSPOS": "SMTR1601-1-R10-29:step:fbk"
         },
         "ZS": {
-            "ZSN": "fihr:SMTR1601-1-R10-30:step:moveDeltaOut",
-            "ZSP": "fihr:SMTR1601-1-R10-30:step:moveDeltaIn",
+            "ZSN": "fihr:SMTR1601-1-R10-30:step:moveDeltaIn",
+            "ZSP": "fihr:SMTR1601-1-R10-30:step:moveDeltaOut",
             "ZSSTEP": "fihr:SMTR1601-1-R10-30:step:delta",
             "ZSABSPOS": "fihr:SMTR1601-1-R10-30:step:c:target",
             "ZSMOVE": "fihr:SMTR1601-1-R10-30:step:c:moveTo",
@@ -153,8 +153,8 @@
             "YOPOS": "SMTR1601-1-R10-31:step:fbk"
         },
         "ZO": {
-            "ZON": "obj:SMTR1601-1-R10-32:step:moveDeltaOut",
-            "ZOP": "obj:SMTR1601-1-R10-32:step:moveDeltaIn",
+            "ZON": "obj:SMTR1601-1-R10-32:step:moveDeltaIn",
+            "ZOP": "obj:SMTR1601-1-R10-32:step:moveDeltaOut",
             "ZOSTEP": "obj:SMTR1601-1-R10-32:step:delta",
             "ZOABSPOS": "obj:SMTR1601-1-R10-32:step:c:target",
             "ZOMOVE": "obj:SMTR1601-1-R10-32:step:c:moveTo",
