@@ -931,11 +931,10 @@ class MyTableWidget(QWidget):
         self.tab2.layout.addWidget(self.RDM4, 3, 0, 1, 1)
 
         # Set position customization widgets
-        self.TMTM = QLineEdit(str(self.parent.macros["TRANSMISSION_POSITION"]))
-        self.TMRM = QLineEdit(str(self.parent.macros["REFLECTION_POSITION"]))
-        self.TMVM = QLineEdit(
-            str(self.parent.macros["VISIBLE_IMAGE_POSITION"]))
-        self.TMBM = QLineEdit(str(self.parent.macros["BEAMSPLITTER_POSITION"]))
+        self.TMTM = QLineEdit(str(float(self.parent.macros["TRANSMISSION_POSITION"])))
+        self.TMRM = QLineEdit(str(float(self.parent.macros["REFLECTION_POSITION"])))
+        self.TMVM = QLineEdit(str(float(self.parent.macros["VISIBLE_IMAGE_POSITION"])))
+        self.TMBM = QLineEdit(str(float(self.parent.macros["BEAMSPLITTER_POSITION"])))
 
         self.tab2.layout.addWidget(self.TMTM, 0, 2, 1, 1)
         self.tab2.layout.addWidget(self.TMRM, 1, 2, 1, 1)
