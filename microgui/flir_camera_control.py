@@ -6,9 +6,10 @@ USB3 camera located within the main GUI display.
 
 
 from simple_pyspin import Camera
+import numpy as np
 
 
-def getImage():
+def getImage() -> np.array:
     """Capture image.
 
     This function interfaces with a compatible and connected FLIR camera to
@@ -20,7 +21,7 @@ def getImage():
 
     Returns
     -------
-    np.ndarray
+    np.array
         Multi-dimensional Numpy array encoding the captured image information.
     """
     with Camera() as cam:

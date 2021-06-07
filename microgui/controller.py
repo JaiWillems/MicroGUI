@@ -211,46 +211,46 @@ class Controller(object):
         self.gui.tab.TMBMbutton.clicked.connect(partial(self._mode_position, 4))
 
         # Increment sample and objective stage functionality.
-        self.gui.xSN.clicked.connect(partial(self.incPos, "S", "X", "N", self.gui.xSStep))
-        self.gui.xSP.clicked.connect(partial(self.incPos, "S", "X", "P", self.gui.xSStep))
-        self.gui.ySN.clicked.connect(partial(self.incPos, "S", "Y", "N", self.gui.ySStep))
-        self.gui.ySP.clicked.connect(partial(self.incPos, "S", "Y", "P", self.gui.ySStep))
-        self.gui.zSN.clicked.connect(partial(self.incPos, "S", "Z", "N", self.gui.zSStep))
-        self.gui.zSP.clicked.connect(partial(self.incPos, "S", "Z", "P", self.gui.zSStep))
-        self.gui.xON.clicked.connect(partial(self.incPos, "O", "X", "N", self.gui.xOStep))
-        self.gui.xOP.clicked.connect(partial(self.incPos, "O", "X", "P", self.gui.xOStep))
-        self.gui.yON.clicked.connect(partial(self.incPos, "O", "Y", "N", self.gui.yOStep))
-        self.gui.yOP.clicked.connect(partial(self.incPos, "O", "Y", "P", self.gui.yOStep))
-        self.gui.zON.clicked.connect(partial(self.incPos, "O", "Z", "N", self.gui.zOStep))
-        self.gui.zOP.clicked.connect(partial(self.incPos, "O", "Z", "P", self.gui.zOStep))
+        self.gui.xSN.clicked.connect(partial(self._increment, "S", "X", "N", self.gui.xSStep))
+        self.gui.xSP.clicked.connect(partial(self._increment, "S", "X", "P", self.gui.xSStep))
+        self.gui.ySN.clicked.connect(partial(self._increment, "S", "Y", "N", self.gui.ySStep))
+        self.gui.ySP.clicked.connect(partial(self._increment, "S", "Y", "P", self.gui.ySStep))
+        self.gui.zSN.clicked.connect(partial(self._increment, "S", "Z", "N", self.gui.zSStep))
+        self.gui.zSP.clicked.connect(partial(self._increment, "S", "Z", "P", self.gui.zSStep))
+        self.gui.xON.clicked.connect(partial(self._increment, "O", "X", "N", self.gui.xOStep))
+        self.gui.xOP.clicked.connect(partial(self._increment, "O", "X", "P", self.gui.xOStep))
+        self.gui.yON.clicked.connect(partial(self._increment, "O", "Y", "N", self.gui.yOStep))
+        self.gui.yOP.clicked.connect(partial(self._increment, "O", "Y", "P", self.gui.yOStep))
+        self.gui.zON.clicked.connect(partial(self._increment, "O", "Z", "N", self.gui.zOStep))
+        self.gui.zOP.clicked.connect(partial(self._increment, "O", "Z", "P", self.gui.zOStep))
 
         # Move sample and objective stage to absolute position functionality.
-        self.gui.xSMove.clicked.connect(partial(self.absMove, "S", "X"))
-        self.gui.ySMove.clicked.connect(partial(self.absMove, "S", "Y"))
-        self.gui.zSMove.clicked.connect(partial(self.absMove, "S", "Z"))
-        self.gui.xOMove.clicked.connect(partial(self.absMove, "O", "X"))
-        self.gui.yOMove.clicked.connect(partial(self.absMove, "O", "Y"))
-        self.gui.zOMove.clicked.connect(partial(self.absMove, "O", "Z"))
+        self.gui.xSMove.clicked.connect(partial(self._absolute, "S", "X"))
+        self.gui.ySMove.clicked.connect(partial(self._absolute, "S", "Y"))
+        self.gui.zSMove.clicked.connect(partial(self._absolute, "S", "Z"))
+        self.gui.xOMove.clicked.connect(partial(self._absolute, "O", "X"))
+        self.gui.yOMove.clicked.connect(partial(self._absolute, "O", "Y"))
+        self.gui.zOMove.clicked.connect(partial(self._absolute, "O", "Z"))
 
         # Continuous motion of the sample and objective stages functionality.
-        self.gui.xSCn.clicked.connect(partial(self.continuousMotion, "S", "X", "CN"))
-        self.gui.xSStop.clicked.connect(partial(self.continuousMotion, "S", "X", "STOP"))
-        self.gui.xSCp.clicked.connect(partial(self.continuousMotion, "S", "X", "CP"))
-        self.gui.ySCn.clicked.connect(partial(self.continuousMotion, "S", "Y", "CN"))
-        self.gui.ySStop.clicked.connect(partial(self.continuousMotion, "S", "Y", "STOP"))
-        self.gui.ySCp.clicked.connect(partial(self.continuousMotion, "S", "Y", "CP"))
-        self.gui.zSCn.clicked.connect(partial(self.continuousMotion, "S", "Z", "CN"))
-        self.gui.zSStop.clicked.connect(partial(self.continuousMotion, "S", "Z", "STOP"))
-        self.gui.zSCp.clicked.connect(partial(self.continuousMotion, "S", "Z", "CP"))
-        self.gui.xOCn.clicked.connect(partial(self.continuousMotion, "O", "X", "CN"))
-        self.gui.xOStop.clicked.connect(partial(self.continuousMotion, "O", "X", "STOP"))
-        self.gui.xOCp.clicked.connect(partial(self.continuousMotion, "O", "X", "CP"))
-        self.gui.yOCn.clicked.connect(partial(self.continuousMotion, "O", "Y", "CN"))
-        self.gui.yOStop.clicked.connect(partial(self.continuousMotion, "O", "Y", "STOP"))
-        self.gui.yOCp.clicked.connect(partial(self.continuousMotion, "O", "Y", "CP"))
-        self.gui.zOCn.clicked.connect(partial(self.continuousMotion, "O", "Z", "CN"))
-        self.gui.zOStop.clicked.connect(partial(self.continuousMotion, "O", "Z", "STOP"))
-        self.gui.zOCp.clicked.connect(partial(self.continuousMotion, "O", "Z", "CP"))
+        self.gui.xSCn.clicked.connect(partial(self._continuous, "S", "X", "CN"))
+        self.gui.xSStop.clicked.connect(partial(self._continuous, "S", "X", "STOP"))
+        self.gui.xSCp.clicked.connect(partial(self._continuous, "S", "X", "CP"))
+        self.gui.ySCn.clicked.connect(partial(self._continuous, "S", "Y", "CN"))
+        self.gui.ySStop.clicked.connect(partial(self._continuous, "S", "Y", "STOP"))
+        self.gui.ySCp.clicked.connect(partial(self._continuous, "S", "Y", "CP"))
+        self.gui.zSCn.clicked.connect(partial(self._continuous, "S", "Z", "CN"))
+        self.gui.zSStop.clicked.connect(partial(self._continuous, "S", "Z", "STOP"))
+        self.gui.zSCp.clicked.connect(partial(self._continuous, "S", "Z", "CP"))
+        self.gui.xOCn.clicked.connect(partial(self._continuous, "O", "X", "CN"))
+        self.gui.xOStop.clicked.connect(partial(self._continuous, "O", "X", "STOP"))
+        self.gui.xOCp.clicked.connect(partial(self._continuous, "O", "X", "CP"))
+        self.gui.yOCn.clicked.connect(partial(self._continuous, "O", "Y", "CN"))
+        self.gui.yOStop.clicked.connect(partial(self._continuous, "O", "Y", "STOP"))
+        self.gui.yOCp.clicked.connect(partial(self._continuous, "O", "Y", "CP"))
+        self.gui.zOCn.clicked.connect(partial(self._continuous, "O", "Z", "CN"))
+        self.gui.zOStop.clicked.connect(partial(self._continuous, "O", "Z", "STOP"))
+        self.gui.zOCp.clicked.connect(partial(self._continuous, "O", "Z", "CP"))
 
         # Updating soft limits functionality.
         self.gui.tab.SSL.clicked.connect(partial(self._update_soft_lim, 0))
@@ -735,7 +735,7 @@ class Controller(object):
         self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"] = 0
 
         # Update absolute position line edit widget to 0.
-        lineEdit[(object, axis)].setText("0.0")
+        lineEdit[(object, axis)].setText(str(float(0)))
 
         self._change_display_vals()
 
@@ -985,7 +985,7 @@ class Controller(object):
                 softLimits[(object, axis, 1)].setText(str(maxLim))
 
                 # Change current step line edit.
-                value = caget(self.gui.macros[f"{axis}{object}POS"])"
+                value = caget(self.gui.macros[f"{axis}{object}POS"])
                 currentStep[(object, axis)].setText(f"<b>{value - offset} STEPS</b>")
 
     def _set_current_position(self, **kwargs: Union[str, int, float]) -> None:
