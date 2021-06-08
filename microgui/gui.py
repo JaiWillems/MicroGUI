@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import QMainWindow, QGridLayout, QVBoxLayout, QWidget,\
     QTabWidget
 
 # Import file dependencies.
-from flir_camera_control import getImage
+from .flir_camera_control import getImage
 
 
 class GUI(QMainWindow):
@@ -810,6 +810,10 @@ class MyTableWidget(QWidget):
         Visual image "Set Position" button.
     TMBMbutton : QPushButton
         Beamsplitter "Set Position" button.
+    enableDisable : QPushButton
+        Enable or Disable the THORLABS/mode motor.
+    home : QPushButton
+        Home THORLABS/mode motor.
     xSMM : QLabel
         Minimum and maximum label for the sample's x dimension.
     ySMM : QLabel
@@ -919,6 +923,8 @@ class MyTableWidget(QWidget):
         # Define tab layout.
         self.tab2.layout = QGridLayout()
 
+        self.tab2.layout.addWidget(QLabel("<b>Mode Selection</b>"), 0, 0, 1, 4)
+
         # Define mode select buttons.
         self.RDM1 = QRadioButton("Transmission")
         self.RDM2 = QRadioButton("Reflection")
@@ -926,10 +932,10 @@ class MyTableWidget(QWidget):
         self.RDM4 = QRadioButton("Beamsplitter")
 
         # Organize widgets on tab layout.
-        self.tab2.layout.addWidget(self.RDM1, 0, 0, 1, 1)
-        self.tab2.layout.addWidget(self.RDM2, 1, 0, 1, 1)
-        self.tab2.layout.addWidget(self.RDM3, 2, 0, 1, 1)
-        self.tab2.layout.addWidget(self.RDM4, 3, 0, 1, 1)
+        self.tab2.layout.addWidget(self.RDM1, 1, 0, 1, 1)
+        self.tab2.layout.addWidget(self.RDM2, 2, 0, 1, 1)
+        self.tab2.layout.addWidget(self.RDM3, 3, 0, 1, 1)
+        self.tab2.layout.addWidget(self.RDM4, 4, 0, 1, 1)
 
         # Set position customization widgets
         self.TMTM = QLineEdit(str(float(self.parent.macros["TRANSMISSION_POSITION"])))
@@ -937,20 +943,28 @@ class MyTableWidget(QWidget):
         self.TMVM = QLineEdit(str(float(self.parent.macros["VISIBLE_IMAGE_POSITION"])))
         self.TMBM = QLineEdit(str(float(self.parent.macros["BEAMSPLITTER_POSITION"])))
 
-        self.tab2.layout.addWidget(self.TMTM, 0, 2, 1, 1)
-        self.tab2.layout.addWidget(self.TMRM, 1, 2, 1, 1)
-        self.tab2.layout.addWidget(self.TMVM, 2, 2, 1, 1)
-        self.tab2.layout.addWidget(self.TMBM, 3, 2, 1, 1)
+        self.tab2.layout.addWidget(self.TMTM, 1, 1, 1, 1)
+        self.tab2.layout.addWidget(self.TMRM, 2, 1, 1, 1)
+        self.tab2.layout.addWidget(self.TMVM, 3, 1, 1, 1)
+        self.tab2.layout.addWidget(self.TMBM, 4, 1, 1, 1)
 
         self.TMTMbutton = QPushButton("Set Position")
         self.TMRMbutton = QPushButton("Set Position")
         self.TMVMbutton = QPushButton("Set Position")
         self.TMBMbutton = QPushButton("Set Position")
 
-        self.tab2.layout.addWidget(self.TMTMbutton, 0, 3, 1, 1)
-        self.tab2.layout.addWidget(self.TMRMbutton, 1, 3, 1, 1)
-        self.tab2.layout.addWidget(self.TMVMbutton, 2, 3, 1, 1)
-        self.tab2.layout.addWidget(self.TMBMbutton, 3, 3, 1, 1)
+        self.tab2.layout.addWidget(self.TMTMbutton, 1, 2, 1, 1)
+        self.tab2.layout.addWidget(self.TMRMbutton, 2, 2, 1, 1)
+        self.tab2.layout.addWidget(self.TMVMbutton, 3, 2, 1, 1)
+        self.tab2.layout.addWidget(self.TMBMbutton, 4, 2, 1, 1)
+
+        self.tab2.layout.addWidget(QLabel("<b>Motor Control</b>"), 5, 0, 1, 4)
+
+        # THORLABS/mode motor controls.
+        self.enableDisable = QPushButton("Enable")
+        self.home = QPushButton("Home Motor")
+        self.tab2.layout.addWidget(self.enableDisable, 6, 0, 1, 1)
+        self.tab2.layout.addWidget(self.home, 6, 1, 1, 2)
 
         # Check mode when in homed position.
         self.RDM3.setChecked(True)
@@ -1085,8 +1099,7 @@ class MyTableWidget(QWidget):
         self.tab4.layout.addWidget(self.SESL, 6, 3, 1, 3)
 
         # Add information labels.
-        softLimLabel = QLabel(
-            "<i>The motors will move 'backlash' steps past the low limit before moving back to the lower limit.</i>")
+        softLimLabel = QLabel("<i>The motors will move 'backlash' steps past the low limit before moving back to the lower limit.</i>")
         softLimLabel.setWordWrap(True)
         self.tab4.layout.addWidget(softLimLabel, 7, 0, 1, 6)
 

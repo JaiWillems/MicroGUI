@@ -11,9 +11,9 @@ import json
 from typing import Dict
 
 # Import file dependencies.
-from gui import GUI
-from controller import Controller
-from thorlabs_motor_control import initMotor
+from .gui import GUI
+from .controller import Controller
+from .thorlabs_motor_control import initMotor
 
 # Define the THORLABS mode stage motor.
 modeMotor = initMotor()

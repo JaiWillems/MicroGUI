@@ -15,8 +15,8 @@ from PyQt5.QtWidgets import QLineEdit, QFileDialog
 from thorlabs_apt import Motor
 
 # Import file dependencies.
-from thorlabs_motor_control import changeMode
-from gui import GUI
+from .thorlabs_motor_control import enable, disable, home, changeMode
+from .gui import GUI
 
 
 # Set up epics environment.
@@ -204,6 +204,10 @@ class Controller(object):
         self.gui.tab.RDM3.pressed.connect(partial(self._mode_state, 3, self.modeMotor))
         self.gui.tab.RDM4.pressed.connect(partial(self._mode_state, 4, self.modeMotor))
 
+        # THORLABS/mode motor functionality.
+        self.gui.tab.enableDisable.clicked.connect(self.enableTHORLABS)
+        self.gui.tab.home.clicked.connect(self.homeTHORLABS)
+
         # Mode position customizarion functionality.
         self.gui.tab.TMTMbutton.clicked.connect(partial(self._mode_position, 1))
         self.gui.tab.TMRMbutton.clicked.connect(partial(self._mode_position, 2))
@@ -358,6 +362,22 @@ class Controller(object):
             self.gui.tab.TMBM.setText(str(self.gui.macros["BEAMSPLITTER_POSITION"]))
             if self.gui.tab.RDM4.isChecked():
                 self._mode_state(4, self.modeMotor)
+    
+    def enableTHORLABS(self):
+        """
+        """
+        label = self.tab.enableDisable.text()
+        if label == "Enable":
+            enable(self.modeMotor)
+            self.tab.enableDisable.setText("Disable")
+        else:
+            disable(self.modeMotor)
+            self.tab.enableDisable.setText("Enable")
+
+    def homeTHORLABS(self):
+        """
+        """
+        home(self.modeMotor)
 
     def _increment(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], direction: Literal["N", "P"], step: QLineEdit) -> None:
         """Increment motor position.
@@ -391,11 +411,11 @@ class Controller(object):
         NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
 
         if direction == "P" and basePos + relPos + incPos > PSL:
-            relPos = PSL - basePos
             incPos = PSL - basePos - relPos
+            relPos = PSL - basePos
         elif direction == "N" and basePos + relPos - incPos < NSL:
+            incPos = basePos + relPos - NSL
             relPos = NSL - basePos
-            incPos = basePos + basePos - NSL
         else:
             if direction == "P":
                 relPos = relPos + incPos

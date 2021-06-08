@@ -35,16 +35,27 @@ def initMotor() -> Motor:
 
     # Initialize motor if detected.
     modeMotor = apt.Motor(motorSerialNumber)
+    return modeMotor
+
+def enable(modeMotor):
+    """
+    """
     modeMotor.set_move_home_parameters(*modeMotor.get_move_home_parameters())
     modeMotor.set_velocity_parameters(*modeMotor.get_velocity_parameters())
     modeMotor.enable()
 
+def disable(modeMotor):
+    """
+    """
+    modeMotor.disable()
+
+def home(modeMotor):
+    """
+    """
     try:
         modeMotor.move_home(True)
     except:
-        raise Exception("Motor cannot be homed.")
-
-    return modeMotor
+        print("Motor cannot be homed.")
 
 
 def changeMode(pos: int, modeMotor: Motor) -> None:
