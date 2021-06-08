@@ -12,12 +12,12 @@ import pyqtgraph.ptime as ptime
 from typing import Any, Dict
 from PyQt5.QtGui import QPixmap, QFont, QIcon
 from PyQt5.QtCore import QRectF, QTimer, Qt
-from PyQt5.QtWidgets import QMainWindow, QGridLayout, QVBoxLayout, QWidget,\
+from PyQt5.QtWidgets import QMainWindow, QGridLayout, QTextBrowser, QVBoxLayout, QWidget,\
     QLabel, QPushButton, QLineEdit, QRadioButton,\
     QTabWidget
 
 # Import file dependencies.
-from .flir_camera_control import getImage
+from flir_camera_control import getImage
 
 
 class GUI(QMainWindow):
@@ -189,6 +189,8 @@ class GUI(QMainWindow):
         Negative hard limit label for the objective's z dimension.
     zOHp : QLineEdit
         Positive hard limit label for the objective's z dimension.
+    textWindow : QTextBrowser
+        Text browser to display Terminal output.
 
     Methods
     -------
@@ -202,6 +204,8 @@ class GUI(QMainWindow):
         Creates the sample window.
     _objective_window()
         Creates the objective window.
+    _text_window()
+        Creates the text browser window.
     """
 
     def __init__(self, macros: Dict) -> None:
@@ -216,7 +220,7 @@ class GUI(QMainWindow):
         # Define main GUI window.
         self.setWindowTitle("Horizontal Microscope Control")
         self.setFixedWidth(1500)
-        self.setFixedHeight(650)
+        self.setFixedHeight(750)
 
         # Add sub-windows to main window layout.
         self.layout = QGridLayout()
@@ -225,6 +229,7 @@ class GUI(QMainWindow):
         self.layout.addWidget(self._tabular_window(), 0, 2, 2, 1)
         self.layout.addWidget(self._sample_window(), 2, 0, 1, 3)
         self.layout.addWidget(self._objective_window(), 3, 0, 1, 3)
+        self.layout.addWidget(self._text_window(), 4, 0, 1, 3)
 
         # Set main window layout.
         self.centralWidget = QWidget(self)
@@ -735,6 +740,15 @@ class GUI(QMainWindow):
         # Set window layout.
         window.setLayout(layout)
         return window
+    
+    def _text_window(self):
+        """
+        """
+        self.textWindow = QTextBrowser()
+        self.textWindow.setAcceptRichText(True)
+        self.textWindow.setOpenExternalLinks(True)
+
+        return self.textWindow
 
 
 class MyTableWidget(QWidget):

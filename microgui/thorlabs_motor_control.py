@@ -52,10 +52,7 @@ def disable(modeMotor):
 def home(modeMotor):
     """
     """
-    try:
-        modeMotor.move_home(True)
-    except:
-        print("Motor cannot be homed.")
+    modeMotor.move_home()
 
 
 def changeMode(pos: int, modeMotor: Motor) -> None:
