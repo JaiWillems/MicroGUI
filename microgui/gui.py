@@ -12,7 +12,7 @@ import pyqtgraph.ptime as ptime
 from typing import Any, Dict
 from PyQt5.QtGui import QPixmap, QFont, QIcon
 from PyQt5.QtCore import QRectF, QTimer, Qt
-from PyQt5.QtWidgets import QMainWindow, QGridLayout, QVBoxLayout, QWidget,\
+from PyQt5.QtWidgets import QMainWindow, QGridLayout, QTextBrowser, QVBoxLayout, QWidget,\
     QLabel, QPushButton, QLineEdit, QRadioButton,\
     QTabWidget
 
@@ -189,6 +189,8 @@ class GUI(QMainWindow):
         Negative hard limit label for the objective's z dimension.
     zOHp : QLineEdit
         Positive hard limit label for the objective's z dimension.
+    textWindow : QTextBrowser
+        Text browser to display Terminal output.
 
     Methods
     -------
@@ -202,6 +204,8 @@ class GUI(QMainWindow):
         Creates the sample window.
     _objective_window()
         Creates the objective window.
+    _text_window()
+        Creates the text browser window.
     """
 
     def __init__(self, macros: Dict) -> None:
@@ -216,7 +220,7 @@ class GUI(QMainWindow):
         # Define main GUI window.
         self.setWindowTitle("Horizontal Microscope Control")
         self.setFixedWidth(1500)
-        self.setFixedHeight(650)
+        self.setFixedHeight(750)
 
         # Add sub-windows to main window layout.
         self.layout = QGridLayout()
@@ -225,6 +229,7 @@ class GUI(QMainWindow):
         self.layout.addWidget(self._tabular_window(), 0, 2, 2, 1)
         self.layout.addWidget(self._sample_window(), 2, 0, 1, 3)
         self.layout.addWidget(self._objective_window(), 3, 0, 1, 3)
+        self.layout.addWidget(self._text_window(), 4, 0, 1, 3)
 
         # Set main window layout.
         self.centralWidget = QWidget(self)
@@ -735,6 +740,15 @@ class GUI(QMainWindow):
         # Set window layout.
         window.setLayout(layout)
         return window
+    
+    def _text_window(self):
+        """
+        """
+        self.textWindow = QTextBrowser()
+        self.textWindow.setAcceptRichText(True)
+        self.textWindow.setOpenExternalLinks(True)
+
+        return self.textWindow
 
 
 class MyTableWidget(QWidget):
@@ -810,6 +824,10 @@ class MyTableWidget(QWidget):
         Visual image "Set Position" button.
     TMBMbutton : QPushButton
         Beamsplitter "Set Position" button.
+    enableDisable : QPushButton
+        Enable or Disable the THORLABS/mode motor.
+    home : QPushButton
+        Home THORLABS/mode motor.
     xSMM : QLabel
         Minimum and maximum label for the sample's x dimension.
     ySMM : QLabel
@@ -919,6 +937,8 @@ class MyTableWidget(QWidget):
         # Define tab layout.
         self.tab2.layout = QGridLayout()
 
+        self.tab2.layout.addWidget(QLabel("<b>Mode Selection</b>"), 0, 0, 1, 4)
+
         # Define mode select buttons.
         self.RDM1 = QRadioButton("Transmission")
         self.RDM2 = QRadioButton("Reflection")
@@ -926,10 +946,10 @@ class MyTableWidget(QWidget):
         self.RDM4 = QRadioButton("Beamsplitter")
 
         # Organize widgets on tab layout.
-        self.tab2.layout.addWidget(self.RDM1, 0, 0, 1, 1)
-        self.tab2.layout.addWidget(self.RDM2, 1, 0, 1, 1)
-        self.tab2.layout.addWidget(self.RDM3, 2, 0, 1, 1)
-        self.tab2.layout.addWidget(self.RDM4, 3, 0, 1, 1)
+        self.tab2.layout.addWidget(self.RDM1, 1, 0, 1, 1)
+        self.tab2.layout.addWidget(self.RDM2, 2, 0, 1, 1)
+        self.tab2.layout.addWidget(self.RDM3, 3, 0, 1, 1)
+        self.tab2.layout.addWidget(self.RDM4, 4, 0, 1, 1)
 
         # Set position customization widgets
         self.TMTM = QLineEdit(str(float(self.parent.macros["TRANSMISSION_POSITION"])))
@@ -937,20 +957,28 @@ class MyTableWidget(QWidget):
         self.TMVM = QLineEdit(str(float(self.parent.macros["VISIBLE_IMAGE_POSITION"])))
         self.TMBM = QLineEdit(str(float(self.parent.macros["BEAMSPLITTER_POSITION"])))
 
-        self.tab2.layout.addWidget(self.TMTM, 0, 2, 1, 1)
-        self.tab2.layout.addWidget(self.TMRM, 1, 2, 1, 1)
-        self.tab2.layout.addWidget(self.TMVM, 2, 2, 1, 1)
-        self.tab2.layout.addWidget(self.TMBM, 3, 2, 1, 1)
+        self.tab2.layout.addWidget(self.TMTM, 1, 1, 1, 1)
+        self.tab2.layout.addWidget(self.TMRM, 2, 1, 1, 1)
+        self.tab2.layout.addWidget(self.TMVM, 3, 1, 1, 1)
+        self.tab2.layout.addWidget(self.TMBM, 4, 1, 1, 1)
 
         self.TMTMbutton = QPushButton("Set Position")
         self.TMRMbutton = QPushButton("Set Position")
         self.TMVMbutton = QPushButton("Set Position")
         self.TMBMbutton = QPushButton("Set Position")
 
-        self.tab2.layout.addWidget(self.TMTMbutton, 0, 3, 1, 1)
-        self.tab2.layout.addWidget(self.TMRMbutton, 1, 3, 1, 1)
-        self.tab2.layout.addWidget(self.TMVMbutton, 2, 3, 1, 1)
-        self.tab2.layout.addWidget(self.TMBMbutton, 3, 3, 1, 1)
+        self.tab2.layout.addWidget(self.TMTMbutton, 1, 2, 1, 1)
+        self.tab2.layout.addWidget(self.TMRMbutton, 2, 2, 1, 1)
+        self.tab2.layout.addWidget(self.TMVMbutton, 3, 2, 1, 1)
+        self.tab2.layout.addWidget(self.TMBMbutton, 4, 2, 1, 1)
+
+        self.tab2.layout.addWidget(QLabel("<b>Motor Control</b>"), 5, 0, 1, 4)
+
+        # THORLABS/mode motor controls.
+        self.enableDisable = QPushButton("Enable")
+        self.home = QPushButton("Home Motor")
+        self.tab2.layout.addWidget(self.enableDisable, 6, 0, 1, 1)
+        self.tab2.layout.addWidget(self.home, 6, 1, 1, 2)
 
         # Check mode when in homed position.
         self.RDM3.setChecked(True)
@@ -1085,8 +1113,7 @@ class MyTableWidget(QWidget):
         self.tab4.layout.addWidget(self.SESL, 6, 3, 1, 3)
 
         # Add information labels.
-        softLimLabel = QLabel(
-            "<i>The motors will move 'backlash' steps past the low limit before moving back to the lower limit.</i>")
+        softLimLabel = QLabel("<i>The motors will move 'backlash' steps past the low limit before moving back to the lower limit.</i>")
         softLimLabel.setWordWrap(True)
         self.tab4.layout.addWidget(softLimLabel, 7, 0, 1, 6)
 
