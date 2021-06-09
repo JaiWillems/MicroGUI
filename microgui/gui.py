@@ -12,9 +12,9 @@ import pyqtgraph.ptime as ptime
 from typing import Any, Dict
 from PyQt5.QtGui import QPixmap, QFont, QIcon
 from PyQt5.QtCore import QRectF, QTimer, Qt
-from PyQt5.QtWidgets import QMainWindow, QGridLayout, QTextBrowser, QVBoxLayout, QWidget,\
+from PyQt5.QtWidgets import QMainWindow, QGridLayout, QScrollBar, QTextBrowser, QVBoxLayout, QWidget,\
     QLabel, QPushButton, QLineEdit, QRadioButton,\
-    QTabWidget
+    QTabWidget, QScrollBar
 
 # Import file dependencies.
 from flir_camera_control import getImage
@@ -251,7 +251,9 @@ class GUI(QMainWindow):
             Window representing the diagram display.
         """
         window = QLabel()
-        window.setPixmap(QPixmap("example_diagram.jpg"))
+        image = QPixmap("GUI Orientation Diagram.jpg")
+        image = image.scaled(350, 350, Qt.KeepAspectRatio)
+        window.setPixmap(QPixmap(image)
 
         return window
 
@@ -747,6 +749,8 @@ class GUI(QMainWindow):
         self.textWindow = QTextBrowser()
         self.textWindow.setAcceptRichText(True)
         self.textWindow.setOpenExternalLinks(True)
+
+        self.textWindow.setVerticalScrollBar(QScrollBar())
 
         return self.textWindow
 

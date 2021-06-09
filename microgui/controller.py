@@ -177,9 +177,7 @@ class Controller(object):
         self.PV_YOPOS = PV(pvname=self.gui.macros["YOPOS"], auto_monitor=True, callback=self._set_current_position)
         self.PV_ZOPOS = PV(pvname=self.gui.macros["ZOPOS"], auto_monitor=True, callback=self._set_current_position)
 
-        # -Simulation----------------------------------------------------------
         self._append_text("-*- PVs configured and initialized. -*-")
-        # ---------------------------------------------------------------------
 
     def _connect_signals(self) -> None:
         """Connect widgets and control sequences.
@@ -274,9 +272,7 @@ class Controller(object):
         self.gui.tab.valueType.clicked.connect(self._change_display_vals)
         self.gui.tab.globals.clicked.connect(self._print_globals)
 
-        # -Simulation----------------------------------------------------------
         self._append_text("-*- Widgets connected to control sequences. -*-")
-        # ---------------------------------------------------------------------
 
     def _save_image(self) -> None:
         """Live stream image capture.
@@ -299,9 +295,7 @@ class Controller(object):
         plt.axis("off")
         plt.savefig(path, dpi=500, bbox_inches="tight")
 
-        # -Simulation----------------------------------------------------------
         self._append_text(f"Image capture saved to: {path}")
-        # ---------------------------------------------------------------------
 
     def _mode_state(self, mode: Literal[1, 2, 3, 4], modeMotor: Motor) -> None:
         """Change microscope mode.
@@ -326,9 +320,7 @@ class Controller(object):
         pos = self.gui.macros[modeDict[mode]]
         changeMode(pos=pos, modeMotor=modeMotor)
 
-        # -Simulation----------------------------------------------------------
-        self._append_text(f"Changing mode to mode {mode}.")
-        # ---------------------------------------------------------------------
+        self._append_text(f"Changing mode.")
 
     def _mode_position(self, mode: Literal[1, 2, 3, 4]) -> None:
         """Change mode position settings.
@@ -384,7 +376,7 @@ class Controller(object):
             self.gui.tab.RDM3.setChecked(False)
             self.gui.tab.RDM4.setChecked(False)
         except:
-            self._append_text("Motor cannot be homed.")
+            self._append_text("ERROR: Motor cannot be homed.")
 
     def _increment(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], direction: Literal["N", "P"], step: QLineEdit) -> None:
         """Increment motor position.
@@ -432,11 +424,6 @@ class Controller(object):
         self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"] = relPos
         caput(self.gui.macros[f"{axis}{object}STEP"], incPos)
         caput(self.gui.macros[f"{axis}{object}{direction}"], 1)
-
-        # -Simulation----------------------------------------------------------
-        absPos = caget(self.gui.macros[f"{axis}{object}ABSPOS"])
-        self._append_text(f"Incremental movement to {axis}{object}ABSPOS = {absPos}.")
-        # ---------------------------------------------------------------------
 
     def _absolute(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
         """Move sample or objective motor to specified position.
@@ -488,10 +475,6 @@ class Controller(object):
         else:
             lineEdit[(object, axis)].setText(str(basePos + relPos))
 
-        # -Simulation----------------------------------------------------------
-        self._append_text(f"Absolute movement to {axis}{object}ABSPOS = {absPos}.")
-        # ---------------------------------------------------------------------
-
     def _continuous(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], type: Literal["CN", "STOP", "CP"]) -> None:
         """Control continuous motion of the sample and objective stages.
 
@@ -525,10 +508,6 @@ class Controller(object):
             caput(self.gui.macros[f"{axis}{object}STOP"], 1)
             caput(self.gui.macros[f"{axis}{object}STOP"], 0)
 
-        # -Simulation----------------------------------------------------------
-        self._append_text(f"Change continuous movement to -> {type}.")
-        # ---------------------------------------------------------------------
-
     def _update_abs_pos(self, **kwargs: Union[str, int, float]) -> None:
         """Update absolute value line edit.
 
@@ -556,10 +535,6 @@ class Controller(object):
         object = pvKey[1]
 
         lineEdit[(object, axis)].setText(str(value + self._offset(object, axis)))
-
-        # -Simulation----------------------------------------------------------
-        self._append_text(f"Updating absolute position line edit to relative position: {value + self._offset(object, axis)}.")
-        # ---------------------------------------------------------------------
 
     def _offset(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], invert: bool = False) -> Union[int, float]:
         """Generate offset to convert between actual and relative values.
@@ -688,14 +663,7 @@ class Controller(object):
         # Move motors to within soft limits.
         self._check_motor_position()
 
-        # -Simulation----------------------------------------------------------
-        self._append_text(f"Updating soft limits, buttonID={buttonID}.")
-        for object in ["S", "O"]:
-            for axis in ["X", "Y", "Z"]:
-                Min = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
-                Max = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
-                self._append_text(f"XS SL: min -> {Min}, max -> {Max}")
-        # ---------------------------------------------------------------------
+        self._append_text(f"Updating soft limits.")
 
     def _update_BL(self) -> None:
         """Update backlash variables.
@@ -725,9 +693,7 @@ class Controller(object):
         self.gui.tab.yOB.setText(str(caget(self.gui.macros["YOB"])))
         self.gui.tab.zOB.setText(str(caget(self.gui.macros["ZOB"])))
 
-        # -Simulation----------------------------------------------------------
         self._append_text("Updating backlash values.")
-        # ---------------------------------------------------------------------
 
     def _zero(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
         """Zero sample or objective axis position.
@@ -766,9 +732,7 @@ class Controller(object):
 
         self._change_display_vals()
 
-        # -Simulation----------------------------------------------------------
         self._append_text(f"Zero'ing the {axis}{object}ABSPOS line edit.")
-        # ---------------------------------------------------------------------
 
     def _motor_status(self, **kwargs: Union[str, int, float]) -> None:
         """Check and set motor status indicators.
@@ -834,12 +798,6 @@ class Controller(object):
 
         lineEdit[(object, axis)].setText(str(absPos - basePos + self._offset(object, axis)))
 
-        # -Simulation----------------------------------------------------------
-        self._append_text(f"Checking motor status, motor identity: {pvname}, state: {value}")
-        relPos = self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"]
-        self._append_text(f"Current relative position -> {relPos}")
-        # ---------------------------------------------------------------------
-
     def _check_motor_position(self) -> None:
         """Moves motors within soft limits.
 
@@ -860,14 +818,14 @@ class Controller(object):
                 NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
 
                 basePos = self.gui.macros[f"{axis}{object}_BASE_POSITION"]
-                relPos = self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"]
+                currPos = caget(self.gui.macros[f"{axis}{object}POS"])
 
-                if basePos + relPos > PSL:
+                if currPos > PSL:
                     relPos = PSL - basePos
                     caput(self.gui.macros[f"{axis}{object}ABSPOS"], PSL)
                     caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
                     caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
-                elif basePos + relPos < NSL:
+                elif currPos < NSL:
                     relPos = NSL - basePos
                     caput(self.gui.macros[f"{axis}{object}ABSPOS"], NSL)
                     caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
@@ -912,9 +870,7 @@ class Controller(object):
         else:
             hardLimits[(object, axis, direction)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
-        # -Simulation----------------------------------------------------------
         self._append_text("Setting hard limit indicators.")
-        # ---------------------------------------------------------------------
 
     def _soft_lim_indicators(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
         """Set soft limit indicators.
@@ -953,9 +909,7 @@ class Controller(object):
         else:
             softLimits[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
-        # -Simulation----------------------------------------------------------
         self._append_text("Setting soft limit indicators.")
-        # ---------------------------------------------------------------------
 
     def _change_display_vals(self) -> None:
         """Switch displayed values between actual and relative values.
@@ -1051,7 +1005,9 @@ class Controller(object):
     def _append_text(self, text):
         """
         """
-        self.tb.append(text)
+        self.gui.textWindow.append(text)
+        maxVal = self.tb.verticalScrollBar().maximum()
+        self.gui.textWindow.verticalScrollBar().setValue(maxVal)
 
     def _print_globals(self) -> None:
         """Display all global variables.
