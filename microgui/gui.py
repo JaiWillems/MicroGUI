@@ -253,7 +253,7 @@ class GUI(QMainWindow):
         window = QLabel()
         image = QPixmap("GUI Orientation Diagram.jpg")
         image = image.scaled(350, 350, Qt.KeepAspectRatio)
-        window.setPixmap(QPixmap(image)
+        window.setPixmap(QPixmap(image))
 
         return window
 
@@ -979,7 +979,7 @@ class MyTableWidget(QWidget):
         self.tab2.layout.addWidget(QLabel("<b>Motor Control</b>"), 5, 0, 1, 4)
 
         # THORLABS/mode motor controls.
-        self.enableDisable = QPushButton("Enable")
+        self.enableDisable = QPushButton("Disable")
         self.home = QPushButton("Home Motor")
         self.tab2.layout.addWidget(self.enableDisable, 6, 0, 1, 1)
         self.tab2.layout.addWidget(self.home, 6, 1, 1, 2)

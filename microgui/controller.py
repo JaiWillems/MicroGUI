@@ -12,6 +12,7 @@ from functools import partial
 from epics import ca, caput, caget, PV
 from typing import Literal, Dict, Any, Union
 from PyQt5.QtWidgets import QLineEdit, QFileDialog
+from PyQt5.QtGui import QColor
 from thorlabs_apt import Motor
 
 # Import file dependencies.
@@ -145,6 +146,11 @@ class Controller(object):
         self.gui.macros["YO_RELATIVE_POSITION"] = caget(self.gui.macros["YOABSPOS"])
         self.gui.macros["ZO_RELATIVE_POSITION"] = caget(self.gui.macros["ZOABSPOS"])
 
+        # Enable Thorlabs motor.
+        enable(self.modeMotor)
+
+        self._append_text("Display values and macros initialized.")
+
         # Set absolute position PV monitoring and callback.
         self.PV_XSABSPOS = PV(pvname=self.gui.macros["XSABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
         self.PV_ySABSPOS = PV(pvname=self.gui.macros["YSABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
@@ -177,7 +183,8 @@ class Controller(object):
         self.PV_YOPOS = PV(pvname=self.gui.macros["YOPOS"], auto_monitor=True, callback=self._set_current_position)
         self.PV_ZOPOS = PV(pvname=self.gui.macros["ZOPOS"], auto_monitor=True, callback=self._set_current_position)
 
-        self._append_text("-*- PVs configured and initialized. -*-")
+
+        self._append_text("PVs configured and initialized.")
 
     def _connect_signals(self) -> None:
         """Connect widgets and control sequences.
@@ -376,7 +383,7 @@ class Controller(object):
             self.gui.tab.RDM3.setChecked(False)
             self.gui.tab.RDM4.setChecked(False)
         except:
-            self._append_text("ERROR: Motor cannot be homed.")
+            self._append_text("Warning: Mode motor cannot be homed, try disabling and enabling the motor.", (255, 0, 0))
 
     def _increment(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], direction: Literal["N", "P"], step: QLineEdit) -> None:
         """Increment motor position.
@@ -818,6 +825,7 @@ class Controller(object):
                 NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
 
                 basePos = self.gui.macros[f"{axis}{object}_BASE_POSITION"]
+                basePos = self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"]
                 currPos = caget(self.gui.macros[f"{axis}{object}POS"])
 
                 if currPos > PSL:
@@ -870,8 +878,6 @@ class Controller(object):
         else:
             hardLimits[(object, axis, direction)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
 
-        self._append_text("Setting hard limit indicators.")
-
     def _soft_lim_indicators(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
         """Set soft limit indicators.
 
@@ -908,8 +914,6 @@ class Controller(object):
             softLimits[(object, axis, 0)].setStyleSheet("background-color: #3ac200; border: 1px solid black;")
         else:
             softLimits[(object, axis, 0)].setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-
-        self._append_text("Setting soft limit indicators.")
 
     def _change_display_vals(self) -> None:
         """Switch displayed values between actual and relative values.
@@ -1002,11 +1006,12 @@ class Controller(object):
         stepText = f"<b>{value - offset} STEPS</b>"
         stepLineEdit[(object, axis)].setText(stepText)
 
-    def _append_text(self, text):
+    def _append_text(self, text, color = (0, 0, 0)):
         """
         """
+        self.gui.textWindow.setTextColor(QColor(color))
         self.gui.textWindow.append(text)
-        maxVal = self.tb.verticalScrollBar().maximum()
+        maxVal = self.gui.textWindow.verticalScrollBar().maximum()
         self.gui.textWindow.verticalScrollBar().setValue(maxVal)
 
     def _print_globals(self) -> None:

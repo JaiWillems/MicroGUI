@@ -37,6 +37,11 @@ def initMotor() -> Motor:
     modeMotor = apt.Motor(motorSerialNumber)
     return modeMotor
 
+def status(modeMotor):
+    """
+    """
+    return modeMotor.
+
 def enable(modeMotor):
     """
     """
