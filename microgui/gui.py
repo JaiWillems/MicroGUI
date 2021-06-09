@@ -12,7 +12,7 @@ import pyqtgraph.ptime as ptime
 from typing import Any, Dict
 from PyQt5.QtGui import QPixmap, QFont, QIcon
 from PyQt5.QtCore import QRectF, QTimer, Qt
-from PyQt5.QtWidgets import QMainWindow, QGridLayout, QScrollBar, QTextBrowser, QVBoxLayout, QWidget,\
+from PyQt5.QtWidgets import QButtonGroup, QMainWindow, QGridLayout, QScrollBar, QTextBrowser, QVBoxLayout, QWidget,\
     QLabel, QPushButton, QLineEdit, QRadioButton,\
     QTabWidget, QScrollBar
 
@@ -43,6 +43,8 @@ class GUI(QMainWindow):
         Current image displayed in an array representation.
     WCB : QPushButton
         Image capture push button.
+    SHC : QPushButton
+        Show Cross Hairs toggle push button.
     tab : MyTableWidget object
         The tabular display located on the main GUI window.
     xSN : QPushButton
@@ -69,6 +71,10 @@ class GUI(QMainWindow):
         Negative hard limit label for the sample's x dimension.
     xSHp : QLineEdit
         Positive hard limit label for the sample's x dimension.
+    xStepS : QLabel
+        STEPS label for the sample's x dimension.
+    xIdleS : QLabel
+        Motor status label for the sample's x dimension.
     ySN : QPushButton
         Negative incrment button for the Sample's y dimension.
     ySP : QPushButton
@@ -93,6 +99,10 @@ class GUI(QMainWindow):
         Negative hard limit label for the sample's y dimension.
     ySHp : QLineEdit
         Positive hard limit label for the sample's y dimension.
+    yStepS : QLabel
+        STEPS label for the sample's y dimension.
+    yIdleS : QLabel
+        Motor status label for the sample's y dimension.
     zSN : QPushButton
         Negative incrment button for the Sample's z dimension.
     zSP : QPushButton
@@ -117,6 +127,10 @@ class GUI(QMainWindow):
         Negative hard limit label for the sample's z dimension.
     zSHp : QLineEdit
         Positive hard limit label for the sample's z dimension.
+    zStepS : QLabel
+        STEPS label for the sample's z dimension.
+    zIdleS : QLabel
+        Motor status label for the sample's z dimension.
     xON : QPushButton
         Negative incrment button for the objective' x dimension.
     xOP : QPushButton
@@ -141,6 +155,10 @@ class GUI(QMainWindow):
         Negative hard limit label for the objective's x dimension.
     xOHp : QLineEdit
         Positive hard limit label for the objective's x dimension.
+    xStepO : QLabel
+        STEPS label for the objective's x dimension.
+    xIdleO : QLabel
+        Motor status label for the objective's x dimension.
     yON : QPushButton
         Negative incrment button for the objective' y dimension.
     yOP : QPushButton
@@ -165,6 +183,10 @@ class GUI(QMainWindow):
         Negative hard limit label for the objective's y dimension.
     yOHp : QLineEdit
         Positive hard limit label for the objective's y dimension.
+    yStepO : QLabel
+        STEPS label for the objective's y dimension.
+    yIdleO : QLabel
+        Motor status label for the objective's y dimension.
     zON : QPushButton
         Negative incrment button for the objective' z dimension.
     zOP : QPushButton
@@ -189,6 +211,10 @@ class GUI(QMainWindow):
         Negative hard limit label for the objective's z dimension.
     zOHp : QLineEdit
         Positive hard limit label for the objective's z dimension.
+    zStepO : QLabel
+        STEPS label for the objective's z dimension.
+    zIdleO : QLabel
+        Motor status label for the objective's z dimension.
     textWindow : QTextBrowser
         Text browser to display Terminal output.
 
@@ -241,10 +267,6 @@ class GUI(QMainWindow):
     def _diagram_window(self) -> QLabel:
         """Create diagram window.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         QLabel
@@ -260,10 +282,6 @@ class GUI(QMainWindow):
     def _camera_window(self) -> QWidget:
         """Create camera window.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         QWidget
@@ -271,14 +289,6 @@ class GUI(QMainWindow):
         """
         def updateData() -> None:
             """Update live feed display.
-
-            Parameters
-            ----------
-            None
-
-            Returns
-            -------
-            None
 
             Notes
             -----
@@ -291,13 +301,14 @@ class GUI(QMainWindow):
             width = self.image.shape[1]
 
             # Generate cross hairs
-            length = int(0.1 * min(height, width))
-            xLine = np.full((5, 2 * length, 3), [225, 0, 0])
-            yLine = np.full((length * 2, 5, 3), [225, 0, 0])
-            self.image[height // 2 - 2:height // 2 + 3,
-                       width // 2 - length:width // 2 + length] = xLine
-            self.image[height // 2 - length:height // 2 +
-                       length:, width // 2 - 2:width // 2 + 3] = yLine
+            if self.SCH.isChecked():
+                length = int(0.1 * min(height, width))
+                xLine = np.full((5, 2 * length, 3), [225, 0, 0])
+                yLine = np.full((length * 2, 5, 3), [225, 0, 0])
+                self.image[height // 2 - 2:height // 2 + 3,
+                        width // 2 - length:width // 2 + length] = xLine
+                self.image[height // 2 - length:height // 2 +
+                        length:, width // 2 - 2:width // 2 + 3] = yLine
 
             # Update image.
             self.img.setImage(np.rot90(self.image, 2))
@@ -328,11 +339,15 @@ class GUI(QMainWindow):
 
         layout = QGridLayout()
 
-        # Create, modify, and place image capture button and line-edit.
+        # Create, modify, and place image buttons.
         self.WCB = QPushButton("Image Capture")
+        self.SCH = QPushButton("Show Cross Hairs")
         self.WCB.setStyleSheet("background-color: lightgrey")
+        self.SCH.setStyleSheet("background-color: lightgrey")
+        self.SCH.setCheckable(True)
         layout.addWidget(win, 0, 0, 1, 2)
-        layout.addWidget(self.WCB, 1, 0, 1, 2)
+        layout.addWidget(self.WCB, 1, 0, 1, 1)
+        layout.addWidget(self.SCH, 1, 1, 1, 1)
 
         self.cameraWindow.setLayout(layout)
 
@@ -340,10 +355,6 @@ class GUI(QMainWindow):
 
     def _tabular_window(self) -> QWidget:
         """Create tabular window.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -355,10 +366,6 @@ class GUI(QMainWindow):
 
     def _sample_window(self) -> QWidget:
         """Create sample window.
-
-        Parameters
-        ----------
-        None
 
         Returns
         -------
@@ -551,10 +558,6 @@ class GUI(QMainWindow):
     def _objective_window(self) -> QWidget:
         """Create objective window.
 
-        Parameters
-        ----------
-        None
-
         Returns
         -------
         QWidget
@@ -743,8 +746,13 @@ class GUI(QMainWindow):
         window.setLayout(layout)
         return window
     
-    def _text_window(self):
-        """
+    def _text_window(self) -> QTextBrowser:
+        """Create text/console window.
+
+        Returns
+        -------
+        QWidget
+            Window representing the objective interactive widgets.
         """
         self.textWindow = QTextBrowser()
         self.textWindow.setAcceptRichText(True)
@@ -780,30 +788,6 @@ class MyTableWidget(QWidget):
         Soft Limits tab of the table window.
     tab5 : QWidget
         Calibration tab of the table window.
-    xIdleS : QLabel
-        Idle label for the sample's x dimension.
-    yIdleS : QLabel
-        Idle label for the sample's y dimension.
-    zIdleS : QLabel
-        Idle label for the sample's z dimension.
-    xStepS : QLabel
-        STEPS label for the sample's x dimension.
-    yStepS : QLabel
-        STEPS label for the sample's y dimension.
-    zStepS : QLabel
-        STEPS label for the sample's z dimension.
-    xIdleO : QLabel
-        Idle label for the objective's x dimension.
-    yIdleO : QLabel
-        Idle label for the objective's y dimension.
-    zIdleO : QLabel
-        Idle label for the objective's z dimension.
-    xStepO : QLabel
-        STEPS label for the objective's x dimension.
-    yStepO : QLabel
-        STEPS label for the objective's y dimension.
-    zStepO : QLabel
-        STEPS label for the objective's z dimension.
     RDM1 : QRadioButton
         Transmission mode radio button.
     RDM2 : QRadioButton
@@ -812,6 +796,8 @@ class MyTableWidget(QWidget):
         Visible Image mode radio button.
     RDM4 : QRadioButton
         Beamsplitter mode radio button.
+    group : QButtonGroup
+        Mode select button group.
     TMTM : QLineEdit
         Transmission mode position line edit.
     TMRM : QLineEdit
@@ -949,6 +935,12 @@ class MyTableWidget(QWidget):
         self.RDM3 = QRadioButton("Visible Image")
         self.RDM4 = QRadioButton("Beamsplitter")
 
+        self.group = QButtonGroup()
+        self.group.addButton(self.RDM1)
+        self.group.addButton(self.RDM2)
+        self.group.addButton(self.RDM3)
+        self.group.addButton(self.RDM4)
+
         # Organize widgets on tab layout.
         self.tab2.layout.addWidget(self.RDM1, 1, 0, 1, 1)
         self.tab2.layout.addWidget(self.RDM2, 2, 0, 1, 1)
@@ -977,15 +969,13 @@ class MyTableWidget(QWidget):
         self.tab2.layout.addWidget(self.TMBMbutton, 4, 2, 1, 1)
 
         self.tab2.layout.addWidget(QLabel("<b>Motor Control</b>"), 5, 0, 1, 4)
-
+        self.tab2.layout.addWidget(QLabel("<i>Enable or disable the THORLABS motor and move to home position.</i>"), 6, 0, 1, 4)
+        
         # THORLABS/mode motor controls.
         self.enableDisable = QPushButton("Disable")
         self.home = QPushButton("Home Motor")
-        self.tab2.layout.addWidget(self.enableDisable, 6, 0, 1, 1)
-        self.tab2.layout.addWidget(self.home, 6, 1, 1, 2)
-
-        # Check mode when in homed position.
-        self.RDM3.setChecked(True)
+        self.tab2.layout.addWidget(self.enableDisable, 7, 0, 1, 1)
+        self.tab2.layout.addWidget(self.home, 7, 1, 1, 2)
 
         # Set tab layout.
         self.tab2.setLayout(self.tab2.layout)

@@ -92,6 +92,7 @@ class Controller(object):
 
     def __init__(self, gui: GUI, modeMotor: Motor) -> None:
         """Initialize the Controller."""
+
         self.gui = gui
         self.modeMotor = modeMotor
 
@@ -104,14 +105,6 @@ class Controller(object):
         This method initializes the line-edits to the PV values on program
         startup. Additionally, it connects PVs that need monitoring to
         callback functions.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
         """
 
         # Set step line edits to current PV values.
@@ -191,15 +184,8 @@ class Controller(object):
 
         This method connects each of the widgets on the gui with a control
         sequence to update the display or interface with hardware.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
         """
+
         # Save image functionality.
         self.gui.WCB.clicked.connect(self._save_image)
 
@@ -279,22 +265,15 @@ class Controller(object):
         self.gui.tab.valueType.clicked.connect(self._change_display_vals)
         self.gui.tab.globals.clicked.connect(self._print_globals)
 
-        self._append_text("-*- Widgets connected to control sequences. -*-")
+        self._append_text("Widgets connected to control sequences.")
 
     def _save_image(self) -> None:
         """Live stream image capture.
 
         This method saves a capture of the current live stream to the chosen
         directory.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
         """
+
         path, _ = QFileDialog.getSaveFileName(self.gui, "Save File", "sample_capture", "Image files (*.jpg *.jpeg *.gif *png)")
 
         plt.figure()
@@ -316,11 +295,8 @@ class Controller(object):
             Encoded mode to move the THORLABS motor to.
         modeMotor : Motor Type
             Motor controlling the mode stage.
-
-        Returns
-        -------
-        None
         """
+
         # Set move_to position based on mode.
         modeDict = {1: "TRANSMISSION_POSITION", 2: "REFLECTION_POSITION",
                     3: "VISIBLE_IMAGE_POSITION", 4: "BEAMSPLITTER_POSITION"}
@@ -336,11 +312,8 @@ class Controller(object):
         ----------
         mode : {1, 2, 3, 4}
             The mode's position to be updated.
-        
-        Returns
-        -------
-        None
         """
+
         if mode == 1:
             self.gui.macros["TRANSMISSION_POSITION"] = float(self.gui.tab.TMTM.text())
             self.gui.tab.TMTM.setText(str(self.gui.macros["TRANSMISSION_POSITION"]))
@@ -362,28 +335,36 @@ class Controller(object):
             if self.gui.tab.RDM4.isChecked():
                 self._mode_state(4, self.modeMotor)
     
-    def enableTHORLABS(self):
-        """
-        """
+    def enableTHORLABS(self) -> None:
+        """Enable or disable the THORLABS motor."""
+
         label = self.gui.tab.enableDisable.text()
         if label == "Enable":
             enable(self.modeMotor)
             self.gui.tab.enableDisable.setText("Disable")
+
+            self._append_text("THORLABS motor enabled.")
         else:
             disable(self.modeMotor)
             self.gui.tab.enableDisable.setText("Enable")
 
-    def homeTHORLABS(self):
-        """
-        """
+            self._append_text("THORLABS motor disabled.")
+
+    def homeTHORLABS(self) -> None:
+        """Home the THORLABS motor."""
+
         try:
             home(self.modeMotor)
+            self.tab.group.setExclusive(False)
             self.gui.tab.RDM1.setChecked(False)
-            self.gui.tab.RDM2.setChecked(False)
-            self.gui.tab.RDM3.setChecked(False)
-            self.gui.tab.RDM4.setChecked(False)
+            self.tab.gui.RDM2.setChecked(False)
+            self.tab.gui.RDM3.setChecked(False)
+            self.tab.gui.RDM4.setChecked(False)
+            self.tab.group.setExclusive(True)
+
+            self._append_text("THORLABS motor homing.")
         except:
-            self._append_text("Warning: Mode motor cannot be homed, try disabling and enabling the motor.", (255, 0, 0))
+            self._append_text("WARNING: THORLABS motor cannot be homed, ensure the motor is enabled.", QColor(255, 0, 0))
 
     def _increment(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], direction: Literal["N", "P"], step: QLineEdit) -> None:
         """Increment motor position.
@@ -404,11 +385,8 @@ class Controller(object):
             "N" and "P", respectively.
         step : QLineEdit
             float(QLineEdit.text()) defines the stepsize to use.
-
-        Returns
-        -------
-        None
         """
+
         basePos = self.gui.macros[f"{axis}{object}_BASE_POSITION"]
         relPos = self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"]
         incPos = float(step.text())
@@ -446,10 +424,6 @@ class Controller(object):
         axis : {"X", "Y", "Z"}
             Defines the motor axis as x, y, or z using "X", "Y", "Z",
             respectively.
-
-        Returns
-        -------
-        None
         """
 
         lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos,
@@ -502,11 +476,8 @@ class Controller(object):
         type : {"CN", "STOP", "CP"}
             Defines button type as either "continuous negative", "stop", or
             "continuous positive" using "CN", "STOP" and "CP", respectively.
-
-        Returns
-        -------
-        None
         """
+
         if type == "CN":
             caput(self.gui.macros[f"{axis}{object}CN"], self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"])
         elif type == "CP":
@@ -523,11 +494,8 @@ class Controller(object):
         **kwargs : Dict
             Extra arguments to `_update_abs_pos`: refer to PyEpics documentation
             for a list of all possible arguments for PV callback functions.
-
-        Returns
-        -------
-        None
         """
+
         lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos, ("S", "Y"): self.gui.ySAbsPos,
                     ("O", "Y"): self.gui.yOAbsPos, ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
 
@@ -566,6 +534,7 @@ class Controller(object):
         float
             Offset to be applied.
         """
+
         if not invert and self.gui.tab.valueType.isChecked():
             return float(self.gui.macros[f"{axis}{object}_BASE_POSITION"])
         elif invert and not self.gui.tab.valueType.isChecked():
@@ -583,11 +552,8 @@ class Controller(object):
         buttonID : {0, 1}
             Integer representing the button pressed as being either SSL or SESL
             using a 0 or 1, respectively.
-
-        Returns
-        -------
-        None
         """
+
         softLimits = {("S", "X", 0): self.gui.tab.xSMin, ("S", "X", 1): self.gui.tab.xSMax,
                       ("S", "Y", 0): self.gui.tab.ySMin, ("S", "Y", 1): self.gui.tab.ySMax,
                       ("S", "Z", 0): self.gui.tab.zSMin, ("S", "Z", 1): self.gui.tab.zSMax,
@@ -673,16 +639,7 @@ class Controller(object):
         self._append_text(f"Updating soft limits.")
 
     def _update_BL(self) -> None:
-        """Update backlash variables.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-        """
+        """Update backlash variables."""
 
         # Set global backlash variables.
         caput(self.gui.macros["XSB"], abs(int(float(self.gui.tab.xSB.text()))))
@@ -717,16 +674,13 @@ class Controller(object):
             Defines the motor axis as x, y, or z using "X", "Y", "Z",
             respectively.
 
-        Returns
-        -------
-        None
-
         Notes
         -----
         The base position deifnes the actual motor position whereas the
         relative position defines the position displayed. Internal workings use
         base position but external workings use relative position.
         """
+
         lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos, ("S", "Y"): self.gui.ySAbsPos,
                     ("O", "Y"): self.gui.yOAbsPos, ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
 
@@ -749,11 +703,8 @@ class Controller(object):
         **kwargs : Dict
             Extra arguments to `_motor_status`: refer to PyEpics documentation
             for a list of all possible arguments for PV callback functions.
-
-        Returns
-        -------
-        None
         """
+
         motionLabels = {("S", "X"): self.gui.xIdleS,
                         ("S", "Y"): self.gui.yIdleS,
                         ("S", "Z"): self.gui.zIdleS,
@@ -810,22 +761,15 @@ class Controller(object):
 
         This method checkes each motors position. If a motor is out of the soft
         limits, it will be moved to the closes limit.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
         """
+
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
                 PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
                 NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
 
                 basePos = self.gui.macros[f"{axis}{object}_BASE_POSITION"]
-                basePos = self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"]
+                relPos = self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"]
                 currPos = caget(self.gui.macros[f"{axis}{object}POS"])
 
                 if currPos > PSL:
@@ -850,11 +794,8 @@ class Controller(object):
             Extra arguments to `_hard_lim_indicators`: refer to PyEpics
             documentation for a list of all possible arguments for PV callback
             functions.
-        
-        Returns
-        -------
-        None
         """
+
         hardLimits = {("S", "X", "N"): self.gui.xSHn, ("S", "X", "P"): self.gui.xSHp,
                       ("S", "Y", "N"): self.gui.ySHn, ("S", "Y", "P"): self.gui.ySHp,
                       ("S", "Z", "N"): self.gui.zSHn, ("S", "Z", "P"): self.gui.zSHp,
@@ -887,11 +828,8 @@ class Controller(object):
             Extra arguments to `_hard_lim_indicators`: refer to PyEpics
             documentation for a list of all possible arguments for PV callback
             functions.
-        
-        Returns
-        -------
-        None
         """
+
         softLimits = {("S", "X", 0): self.gui.xSSn, ("S", "X", 1): self.gui.xSSp,
                       ("S", "Y", 0): self.gui.ySSn, ("S", "Y", 1): self.gui.ySSp,
                       ("S", "Z", 0): self.gui.zSSn, ("S", "Z", 1): self.gui.zSSp,
@@ -921,15 +859,8 @@ class Controller(object):
         This method changes all position based line edits and labels between
         actual values and relative values where relative values are taken with
         reference to the zeroed position.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
         """
+
         lineEdit = {("S", "X"): self.gui.xSAbsPos, ("O", "X"): self.gui.xOAbsPos,
                     ("S", "Y"): self.gui.ySAbsPos, ("O", "Y"): self.gui.yOAbsPos,
                     ("S", "Z"): self.gui.zSAbsPos, ("O", "Z"): self.gui.zOAbsPos}
@@ -982,11 +913,8 @@ class Controller(object):
             Extra arguments to `_hard_lim_indicators`: refer to PyEpics
             documentation for a list of all possible arguments for PV callback
             functions.
-        
-        Returns
-        -------
-        None
         """
+
         stepLineEdit = {("S", "X"): self.gui.xStepS, ("O", "X"): self.gui.xStepO,
                         ("S", "Y"): self.gui.yStepS, ("O", "Y"): self.gui.yStepO,
                         ("S", "Z"): self.gui.zStepS, ("O", "Z"): self.gui.zStepO}
@@ -1006,25 +934,28 @@ class Controller(object):
         stepText = f"<b>{value - offset} STEPS</b>"
         stepLineEdit[(object, axis)].setText(stepText)
 
-    def _append_text(self, text, color = (0, 0, 0)):
+    def _append_text(self, text: str, color: QColor=QColor(0, 0, 0)) -> None:
+        """Append text to console window.
+
+        This method adds `text` of color `color` to the main GUI console
+        window.
+
+        Parameters
+        ----------
+        text : str
+            String of text to be appended to the console window.
+        color : QColor, optional
+            RGB color specification for the appended text.
         """
-        """
-        self.gui.textWindow.setTextColor(QColor(color))
+
+        self.gui.textWindow.setTextColor(color)
         self.gui.textWindow.append(text)
         maxVal = self.gui.textWindow.verticalScrollBar().maximum()
         self.gui.textWindow.verticalScrollBar().setValue(maxVal)
 
     def _print_globals(self) -> None:
-        """Display all global variables.
+        """Display all global variables."""
 
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None     
-        """
         self._append_text("-*- GLOBAL VARIABLES - START -*-")
 
         keys = list(self.gui.macros.keys())
