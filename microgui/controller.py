@@ -315,7 +315,7 @@ class Controller(object):
             changeMode(pos=pos, modeMotor=modeMotor)
             self._append_text(f"Changing mode to {modeDict[mode]}.")
         except:
-            self._append_text("WARNING: Can not change THORLABS motor position.", QColor(255, 0, 0))
+            self._append_text("ERROR: Can not change THORLABS motor position.", QColor(255, 0, 0))
 
     def _mode_position(self, mode: Literal[1, 2, 3, 4]) -> None:
         """Change mode position settings.
@@ -378,7 +378,7 @@ class Controller(object):
 
             self._append_text("THORLABS motor homing.")
         except:
-            self._append_text("WARNING: THORLABS motor cannot be homed, ensure the motor is enabled.", QColor(255, 0, 0))
+            self._append_text("ERROR: THORLABS motor cannot be homed, ensure the motor is enabled.", QColor(255, 0, 0))
 
     def _increment(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], direction: Literal["N", "P"], step: QLineEdit) -> None:
         """Increment motor position.
@@ -405,6 +405,11 @@ class Controller(object):
         relPos = self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"]
         incPos = float(step.text())
 
+        if incPos < 0:
+            incPos = -incPos
+            step.setText(incPos)
+            self._append_text("WARNING: Step must be positive. Step sign has been changed to positive.", QColor(255, 255, 0))
+        
         PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
         NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
 
@@ -616,7 +621,7 @@ class Controller(object):
                     max = float(softLimits[(object, axis, 1)].text()) + offset
 
                     if min > max:
-                        self._append_text(f"WARNING: {axis}{object} soft limits are invalid. Minimum limits must be less then maximum limits.", QColor(255, 0, 0))
+                        self._append_text(f"WARNING: {axis}{object} soft limits are invalid. Minimum limits must be less then maximum limits.", QColor(255, 255, 0))
                     else:
                         if min < self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"]:
                             self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] = float(self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"])
