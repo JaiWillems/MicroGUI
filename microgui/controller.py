@@ -9,7 +9,7 @@ connecting widgets up to control sequences that bring about change.
 import matplotlib.pyplot as plt
 import numpy as np
 from functools import partial
-from epics import ca, PV
+from epics import ca, caput, caget, PV
 from typing import Literal, Dict, Any, Union
 from PyQt5.QtWidgets import QLineEdit, QFileDialog
 from PyQt5.QtGui import QColor
@@ -107,101 +107,50 @@ class Controller(object):
         callback functions.
         """
 
-        # Configure negative increment PVs.
-        self.PV_XSN = PV(pvname=self.gui.macros["XSN"])
-        self.PV_YSN = PV(pvname=self.gui.macros["YSN"])
-        self.PV_ZSN = PV(pvname=self.gui.macros["ZSN"])
-        self.PV_XON = PV(pvname=self.gui.macros["XON"])
-        self.PV_YON = PV(pvname=self.gui.macros["YON"])
-        self.PV_ZON = PV(pvname=self.gui.macros["ZON"])
+        # Set step line edits to current PV values.
+        self.gui.xSStep.setText(str(caget(self.gui.macros["XSSTEP"])))
+        self.gui.ySStep.setText(str(caget(self.gui.macros["YSSTEP"])))
+        self.gui.zSStep.setText(str(caget(self.gui.macros["ZSSTEP"])))
+        self.gui.xOStep.setText(str(caget(self.gui.macros["XOSTEP"])))
+        self.gui.yOStep.setText(str(caget(self.gui.macros["YOSTEP"])))
+        self.gui.zOStep.setText(str(caget(self.gui.macros["ZOSTEP"])))
 
-        # Congigure positive increment PVs.
-        self.PV_XSP = PV(pvname=self.gui.macros["XSP"])
-        self.PV_YSP = PV(pvname=self.gui.macros["YSP"])
-        self.PV_ZSP = PV(pvname=self.gui.macros["ZSP"])
-        self.PV_XOP = PV(pvname=self.gui.macros["XOP"])
-        self.PV_YOP = PV(pvname=self.gui.macros["YOP"])
-        self.PV_ZOP = PV(pvname=self.gui.macros["ZOP"])
+        # Set absolute position line edits to current PV values.
+        self.gui.xSAbsPos.setText(str(caget(self.gui.macros["XSABSPOS"])))
+        self.gui.ySAbsPos.setText(str(caget(self.gui.macros["YSABSPOS"])))
+        self.gui.zSAbsPos.setText(str(caget(self.gui.macros["ZSABSPOS"])))
+        self.gui.xOAbsPos.setText(str(caget(self.gui.macros["XOABSPOS"])))
+        self.gui.yOAbsPos.setText(str(caget(self.gui.macros["YOABSPOS"])))
+        self.gui.zOAbsPos.setText(str(caget(self.gui.macros["ZOABSPOS"])))
 
-        # Configure increment step PVs.
-        self.PV_XSSTEP = PV(pvname=self.gui.macros["XSSTEP"])
-        self.PV_YSSTEP = PV(pvname=self.gui.macros["YSSTEP"])
-        self.PV_ZSSTEP = PV(pvname=self.gui.macros["ZSSTEP"])
-        self.PV_XOSTEP = PV(pvname=self.gui.macros["XOSTEP"])
-        self.PV_YOSTEP = PV(pvname=self.gui.macros["YOSTEP"])
-        self.PV_ZOSTEP = PV(pvname=self.gui.macros["ZOSTEP"])
+        # Set backlash line edits to current PV values.
+        self.gui.tab.xSB.setText(str(caget(self.gui.macros["XSB"])))
+        self.gui.tab.ySB.setText(str(caget(self.gui.macros["YSB"])))
+        self.gui.tab.zSB.setText(str(caget(self.gui.macros["ZSB"])))
+        self.gui.tab.xOB.setText(str(caget(self.gui.macros["XOB"])))
+        self.gui.tab.yOB.setText(str(caget(self.gui.macros["YOB"])))
+        self.gui.tab.zOB.setText(str(caget(self.gui.macros["ZOB"])))
+
+        # Set relative position global variables to current motor position.
+        self.gui.macros["XS_RELATIVE_POSITION"] = caget(self.gui.macros["XSABSPOS"])
+        self.gui.macros["YS_RELATIVE_POSITION"] = caget(self.gui.macros["YSABSPOS"])
+        self.gui.macros["ZS_RELATIVE_POSITION"] = caget(self.gui.macros["ZSABSPOS"])
+        self.gui.macros["XO_RELATIVE_POSITION"] = caget(self.gui.macros["XOABSPOS"])
+        self.gui.macros["YO_RELATIVE_POSITION"] = caget(self.gui.macros["YOABSPOS"])
+        self.gui.macros["ZO_RELATIVE_POSITION"] = caget(self.gui.macros["ZOABSPOS"])
+
+        # Enable Thorlabs motor.
+        enable(self.modeMotor)
+
+        self._append_text("Display values and macros initialized.")
 
         # Set absolute position PV monitoring and callback.
         self.PV_XSABSPOS = PV(pvname=self.gui.macros["XSABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
-        self.PV_YSABSPOS = PV(pvname=self.gui.macros["YSABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
-        self.PV_ZSABSPOS = PV(pvname=self.gui.macros["ZSABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
+        self.PV_ySABSPOS = PV(pvname=self.gui.macros["YSABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
+        self.PV_zSABSPOS = PV(pvname=self.gui.macros["ZSABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
         self.PV_XOABSPOS = PV(pvname=self.gui.macros["XOABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
-        self.PV_YOABSPOS = PV(pvname=self.gui.macros["YOABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
-        self.PV_ZOABSPOS = PV(pvname=self.gui.macros["ZOABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
-
-        # Configure move PVs.
-        self.PV_XSMOVE = PV(pvname=self.gui.macros["XSMOVE"])
-        self.PV_YSMOVE = PV(pvname=self.gui.macros["YSMOVE"])
-        self.PV_ZSMOVE = PV(pvname=self.gui.macros["ZSMOVE"])
-        self.PV_XOMOVE = PV(pvname=self.gui.macros["XOMOVE"])
-        self.PV_YOMOVE = PV(pvname=self.gui.macros["YOMOVE"])
-        self.PV_ZOMOVE = PV(pvname=self.gui.macros["ZOMOVE"])
-
-        # Configure continuous negative PVs.
-        self.PV_XSCN = PV(pvname=self.gui.macros["XSCN"])
-        self.PV_YSCN = PV(pvname=self.gui.macros["YSCN"])
-        self.PV_ZSCN = PV(pvname=self.gui.macros["ZSCN"])
-        self.PV_XOCN = PV(pvname=self.gui.macros["XOCN"])
-        self.PV_YOCN = PV(pvname=self.gui.macros["YOCN"])
-        self.PV_ZOCN = PV(pvname=self.gui.macros["ZOCN"])
-
-        # Configure emergency stop PVs.
-        self.PV_XSSTOP = PV(pvname=self.gui.macros["XSSTOP"])
-        self.PV_YSSTOP = PV(pvname=self.gui.macros["YSSTOP"])
-        self.PV_ZSSTOP = PV(pvname=self.gui.macros["ZSSTOP"])
-        self.PV_XOSTOP = PV(pvname=self.gui.macros["XOSTOP"])
-        self.PV_YOSTOP = PV(pvname=self.gui.macros["YOSTOP"])
-        self.PV_ZOSTOP = PV(pvname=self.gui.macros["ZOSTOP"])
-
-        # Configure continuous positive PVs.
-        self.PV_XSCP = PV(pvname=self.gui.macros["XSCP"])
-        self.PV_YSCP = PV(pvname=self.gui.macros["YSCP"])
-        self.PV_ZSCP = PV(pvname=self.gui.macros["ZSCP"])
-        self.PV_XOCP = PV(pvname=self.gui.macros["XOCP"])
-        self.PV_YOCP = PV(pvname=self.gui.macros["YOCP"])
-        self.PV_ZOCP = PV(pvname=self.gui.macros["ZOCP"])
-
-        # Set hard negative limit position PV monitoring and callback.
-        self.PV_XSHN = PV(pvname=self.gui.macros["XSHN"], auto_monitor=True, callback=self._hard_lim_indicators)
-        self.PV_YSHN = PV(pvname=self.gui.macros["YSHN"], auto_monitor=True, callback=self._hard_lim_indicators)
-        self.PV_ZSHN = PV(pvname=self.gui.macros["ZSHN"], auto_monitor=True, callback=self._hard_lim_indicators)
-        self.PV_XOHN = PV(pvname=self.gui.macros["XOHN"], auto_monitor=True, callback=self._hard_lim_indicators)
-        self.PV_YOHN = PV(pvname=self.gui.macros["YOHN"], auto_monitor=True, callback=self._hard_lim_indicators)
-        self.PV_ZOHN = PV(pvname=self.gui.macros["ZOHN"], auto_monitor=True, callback=self._hard_lim_indicators)
-
-        # Set hard positive limit position PV monitoring and callback.
-        self.PV_XSHP = PV(pvname=self.gui.macros["XSHP"], auto_monitor=True, callback=self._hard_lim_indicators)
-        self.PV_YSHP = PV(pvname=self.gui.macros["YSHP"], auto_monitor=True, callback=self._hard_lim_indicators)
-        self.PV_ZSHP = PV(pvname=self.gui.macros["ZSHP"], auto_monitor=True, callback=self._hard_lim_indicators)
-        self.PV_XOHP = PV(pvname=self.gui.macros["XOHP"], auto_monitor=True, callback=self._hard_lim_indicators)
-        self.PV_YOHP = PV(pvname=self.gui.macros["YOHP"], auto_monitor=True, callback=self._hard_lim_indicators)
-        self.PV_ZOHP = PV(pvname=self.gui.macros["ZOHP"], auto_monitor=True, callback=self._hard_lim_indicators)
-        
-        # Configure zero PVs.
-        self.PV_XSZERO = PV(pvname=self.gui.macros["XSZERO"])
-        self.PV_YSZERO = PV(pvname=self.gui.macros["YSZERO"])
-        self.PV_ZSZERO = PV(pvname=self.gui.macros["ZSZERO"])
-        self.PV_XOZERO = PV(pvname=self.gui.macros["XOZERO"])
-        self.PV_YOZERO = PV(pvname=self.gui.macros["YOZERO"])
-        self.PV_ZOZERO = PV(pvname=self.gui.macros["ZOZERO"])
-
-        # Configure backlash PVs.
-        self.PV_XSB = PV(pvname=self.gui.macros["XSB"])
-        self.PV_YSB = PV(pvname=self.gui.macros["YSB"])
-        self.PV_ZSB = PV(pvname=self.gui.macros["ZSB"])
-        self.PV_XOB = PV(pvname=self.gui.macros["XOB"])
-        self.PV_YOB = PV(pvname=self.gui.macros["YOB"])
-        self.PV_ZOB = PV(pvname=self.gui.macros["ZOB"])
+        self.PV_yOABSPOS = PV(pvname=self.gui.macros["YOABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
+        self.PV_zOABSPOS = PV(pvname=self.gui.macros["ZOABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
 
         # Set state PV monitoring and callback.
         self.PV_XSSTATE = PV(pvname=self.gui.macros["XSSTATE"], auto_monitor=True, callback=self._motor_status)
@@ -211,6 +160,14 @@ class Controller(object):
         self.PV_YOSTATE = PV(pvname=self.gui.macros["YOSTATE"], auto_monitor=True, callback=self._motor_status)
         self.PV_ZOSTATE = PV(pvname=self.gui.macros["ZOSTATE"], auto_monitor=True, callback=self._motor_status)
 
+        # Set hard limit position PV monitoring and callback.
+        self.PV_XSHN = PV(pvname=self.gui.macros["XSHN"], auto_monitor=True, callback=self._hard_lim_indicators)
+        self.PV_XSHP = PV(pvname=self.gui.macros["XSHP"], auto_monitor=True, callback=self._hard_lim_indicators)
+        self.PV_YSHN = PV(pvname=self.gui.macros["YSHN"], auto_monitor=True, callback=self._hard_lim_indicators)
+        self.PV_YSHP = PV(pvname=self.gui.macros["YSHP"], auto_monitor=True, callback=self._hard_lim_indicators)
+        self.PV_ZSHN = PV(pvname=self.gui.macros["ZSHN"], auto_monitor=True, callback=self._hard_lim_indicators)
+        self.PV_ZSHP = PV(pvname=self.gui.macros["ZSHP"], auto_monitor=True, callback=self._hard_lim_indicators)
+
         # Set current position PV monitoring and callback.
         self.PV_XSPOS = PV(pvname=self.gui.macros["XSPOS"], auto_monitor=True, callback=self._set_current_position)
         self.PV_YSPOS = PV(pvname=self.gui.macros["YSPOS"], auto_monitor=True, callback=self._set_current_position)
@@ -219,139 +176,8 @@ class Controller(object):
         self.PV_YOPOS = PV(pvname=self.gui.macros["YOPOS"], auto_monitor=True, callback=self._set_current_position)
         self.PV_ZOPOS = PV(pvname=self.gui.macros["ZOPOS"], auto_monitor=True, callback=self._set_current_position)
 
-        self.PVs = {
-            "XSN": self.PV_XSN,
-            "YSN": self.PV_YSN,
-            "ZSN": self.PV_ZSN,
-            "XON": self.PV_XON,
-            "YON": self.PV_YON,
-            "ZON": self.PV_ZON,
-            "XSP": self.PV_XSP,
-            "YSP": self.PV_YSP,
-            "ZSP": self.PV_ZSP,
-            "XOP": self.PV_XOP,
-            "YOP": self.PV_YOP,
-            "ZOP": self.PV_ZOP,
-            "XSSTEP": self.PV_XSSTEP,
-            "YSSTEP": self.PV_YSSTEP,
-            "ZSSTEP": self.PV_ZSSTEP,
-            "XOSTEP": self.PV_XOSTEP,
-            "YOSTEP": self.PV_YOSTEP,
-            "ZOSTEP": self.PV_ZOSTEP,
-            "XSABSPOS": self.PV_XSABSPOS,
-            "YSABSPOS": self.PV_YSABSPOS,
-            "ZSABSPOS": self.PV_ZSABSPOS,
-            "XOABSPOS": self.PV_XOABSPOS,
-            "YOABSPOS": self.PV_YOABSPOS,
-            "ZOABSPOS": self.PV_ZOABSPOS,
-            "XSMOV": self.PV_XSMOVE,
-            "YSMOV": self.PV_YSMOVE,
-            "ZSMOV": self.PV_ZSMOVE,
-            "XOMOV": self.PV_XOMOVE,
-            "YOMOV": self.PV_YOMOVE,
-            "ZOMOV": self.PV_ZOMOVE,
-            "XSCN": self.PV_XSCN,
-            "YSCN": self.PV_YSCN,
-            "ZSCN": self.PV_ZSCN,
-            "XOCN": self.PV_XOCN,
-            "YOCN": self.PV_YOCN,
-            "ZOCN": self.PV_ZOCN,
-            "XSSTOP": self.PV_XSSTOP,
-            "YSSTOP": self.PV_YSSTOP,
-            "ZSSTOP": self.PV_ZSSTOP,
-            "XOSTOP": self.PV_XOSTOP,
-            "YOSTOP": self.PV_YOSTOP,
-            "ZOSTOP": self.PV_ZOSTOP,
-            "XSCP": self.PV_XSCP,
-            "YSCP": self.PV_YSCP,
-            "ZSCP": self.PV_ZSCP,
-            "XOCP": self.PV_XOCP,
-            "YOCP": self.PV_YOCP,
-            "ZOCP": self.PV_ZOCP,
-            "XSHN": self.PV_XSHN,
-            "YSHN": self.PV_YSHN,
-            "ZSHN": self.PV_ZSHN,
-            "XOHN": self.PV_XOHN,
-            "YOHN": self.PV_YOHN,
-            "ZOHN": self.PV_ZOHN,
-            "XSHP": self.PV_XSHP,
-            "YSHP": self.PV_YSHP,
-            "ZSHP": self.PV_ZSHP,
-            "XOHP": self.PV_XOHP,
-            "YOHP": self.PV_YOHP,
-            "ZOHP": self.PV_ZOHP,
-            "XSZERO": self.PV_XSZERO,
-            "YSZERO": self.PV_YSZERO,
-            "ZSZERO": self.PV_ZSZERO,
-            "XOZERO": self.PV_XOZERO,
-            "YOZERO": self.PV_YOZERO,
-            "ZOZERO": self.PV_ZOZERO,
-            "XSB": self.PV_XSB,
-            "YSB": self.PV_YSB,
-            "ZSB": self.PV_ZSB,
-            "XOB": self.PV_XOB,
-            "YOB": self.PV_YOB,
-            "ZOB": self.PV_ZOB,
-            "XSSTATE": self.PV_XSSTATE,
-            "YSSTATE": self.PV_YSSTATE,
-            "ZSSTATE": self.PV_ZSSTATE,
-            "XOSTATE": self.PV_XOSTATE,
-            "YOSTATE": self.PV_YOSTATE,
-            "ZOSTATE": self.PV_ZOSTATE,
-            "XSPOS": self.PV_XSPOS,
-            "YSPOS": self.PV_YSPOS,
-            "ZSPOS": self.PV_ZSPOS,
-            "XOPOS": self.PV_XOPOS,
-            "YOPOS": self.PV_YOPOS,
-            "ZOPOS": self.PV_ZOPOS,
-        }
 
         self._append_text("PVs configured and initialized.")
-
-        # Set step line edits to current PV values.
-        self.gui.xSStep.setText(str(self.PV_XSSTEP.get()))
-        self.gui.ySStep.setText(str(self.PV_YSSTEP.get()))
-        self.gui.zSStep.setText(str(self.PV_ZSSTEP.get()))
-        self.gui.xOStep.setText(str(self.PV_XOSTEP.get()))
-        self.gui.yOStep.setText(str(self.PV_YOSTEP.get()))
-        self.gui.zOStep.setText(str(self.PV_ZOSTEP.get()))
-
-        # Set absolute position line edits to current PV values.
-        self.gui.xSAbsPos.setText(str(self.PV_XSABSPOS.get()))
-        self.gui.ySAbsPos.setText(str(self.PV_YSABSPOS.get()))
-        self.gui.zSAbsPos.setText(str(self.PV_ZSABSPOS.get()))
-        self.gui.xOAbsPos.setText(str(self.PV_XOABSPOS.get()))
-        self.gui.yOAbsPos.setText(str(self.PV_YOABSPOS.get()))
-        self.gui.zOAbsPos.setText(str(self.PV_ZOABSPOS.get()))
-
-        # Set backlash line edits to current PV values.
-        self.gui.tab.xSB.setText(str(self.PV_XSB.get()))
-        self.gui.tab.ySB.setText(str(self.PV_YSB.get()))
-        self.gui.tab.zSB.setText(str(self.PV_ZSB.get()))
-        self.gui.tab.xOB.setText(str(self.PV_XOB.get()))
-        self.gui.tab.yOB.setText(str(self.PV_YOB.get()))
-        self.gui.tab.zOB.setText(str(self.PV_ZOB.get()))
-
-        # Set current position labels to current PV values.
-        self.gui.xStepS.setText(str(self.PV_XSPOS.get()) + " STEPS")
-        self.gui.yStepS.setText(str(self.PV_XSPOS.get()) + " STEPS")
-        self.gui.zStepS.setText(str(self.PV_XSPOS.get()) + " STEPS")
-        self.gui.xStepO.setText(str(self.PV_XSPOS.get()) + " STEPS")
-        self.gui.yStepO.setText(str(self.PV_XSPOS.get()) + " STEPS")
-        self.gui.zStepO.setText(str(self.PV_XSPOS.get()) + " STEPS")
-
-        # Set relative position global variables to current motor position.
-        self.gui.macros["XS_RELATIVE_POSITION"] = self.PV_XSABSPOS.get()
-        self.gui.macros["YS_RELATIVE_POSITION"] = self.PV_YSABSPOS.get()
-        self.gui.macros["ZS_RELATIVE_POSITION"] = self.PV_ZSABSPOS.get()
-        self.gui.macros["XO_RELATIVE_POSITION"] = self.PV_XOABSPOS.get()
-        self.gui.macros["YO_RELATIVE_POSITION"] = self.PV_YOABSPOS.get()
-        self.gui.macros["ZO_RELATIVE_POSITION"] = self.PV_ZOABSPOS.get()
-
-        # Enable Thorlabs motor.
-        enable(self.modeMotor)
-
-        self._append_text("Display values and macros initialized.")
 
     def _connect_signals(self) -> None:
         """Connect widgets and control sequences.
@@ -472,17 +298,12 @@ class Controller(object):
         """
 
         # Set move_to position based on mode.
-        modeDict = {1: "TRANSMISSION_POSITION",
-                    2: "REFLECTION_POSITION",
-                    3: "VISIBLE_IMAGE_POSITION",
-                    4: "BEAMSPLITTER_POSITION"}
+        modeDict = {1: "TRANSMISSION_POSITION", 2: "REFLECTION_POSITION",
+                    3: "VISIBLE_IMAGE_POSITION", 4: "BEAMSPLITTER_POSITION"}
         pos = self.gui.macros[modeDict[mode]]
+        changeMode(pos=pos, modeMotor=modeMotor)
 
-        try:
-            changeMode(pos=pos, modeMotor=modeMotor)
-            self._append_text(f"Changing mode to {modeDict[mode]}.")
-        except:
-            self._append_text("WARNING: Can not change THORLABS motor position.", QColor(255, 0, 0))
+        self._append_text(f"Changing mode.")
 
     def _mode_position(self, mode: Literal[1, 2, 3, 4]) -> None:
         """Change mode position settings.
@@ -513,8 +334,6 @@ class Controller(object):
             self.gui.tab.TMBM.setText(str(self.gui.macros["BEAMSPLITTER_POSITION"]))
             if self.gui.tab.RDM4.isChecked():
                 self._mode_state(4, self.modeMotor)
-        
-        self._append_text("Setting new mode positions.")
     
     def enableTHORLABS(self) -> None:
         """Enable or disable the THORLABS motor."""
@@ -545,7 +364,7 @@ class Controller(object):
 
             self._append_text("THORLABS motor homing.")
         except:
-            self._append_text("WARNING: THORLABS motor not homed, ensure motor is enabled.", QColor(255, 0, 0))
+            self._append_text("WARNING: THORLABS motor cannot be homed, ensure the motor is enabled.", QColor(255, 0, 0))
 
     def _increment(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], direction: Literal["N", "P"], step: QLineEdit) -> None:
         """Increment motor position.
@@ -588,8 +407,8 @@ class Controller(object):
                 relPos = relPos - incPos
 
         self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"] = relPos
-        self.PVs[f"PV_{axis}{object}STEP"].put(incPos)
-        self.PVs[f"PV_{axis}{object}{direction}"].put(1)
+        caput(self.gui.macros[f"{axis}{object}STEP"], incPos)
+        caput(self.gui.macros[f"{axis}{object}{direction}"], 1)
 
     def _absolute(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"]) -> None:
         """Move sample or objective motor to specified position.
@@ -628,9 +447,9 @@ class Controller(object):
             absPos += basePos
 
         self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"] = relPos
-        self.PVs[f"PV_{axis}{object}ABSPOS"].put(absPos)
-        self.PVs[f"PV_{axis}{object}MOVE"].put(1)
-        self.PVs[f"PV_{axis}{object}MOVE"].put(0)
+        caput(self.gui.macros[f"{axis}{object}ABSPOS"], absPos)
+        caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
+        caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
 
         if not self.gui.tab.valueType.isChecked():
             lineEdit[(object, axis)].setText(str(relPos))
@@ -660,12 +479,12 @@ class Controller(object):
         """
 
         if type == "CN":
-            self.PVs[f"PV_{axis}{object}CN"].put(self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"])
+            caput(self.gui.macros[f"{axis}{object}CN"], self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"])
         elif type == "CP":
-            self.PVs[f"PV_{axis}{object}CP"].put(self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"])
+            caput(self.gui.macros[f"{axis}{object}CP"], self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"])
         else:
-            self.PVs[f"PV_{axis}{object}STOP"].put(1)
-            self.PVs[f"PV_{axis}{object}STOP"].put(0)
+            caput(self.gui.macros[f"{axis}{object}STOP"], 1)
+            caput(self.gui.macros[f"{axis}{object}STOP"], 0)
 
     def _update_abs_pos(self, **kwargs: Union[str, int, float]) -> None:
         """Update absolute value line edit.
@@ -823,20 +642,20 @@ class Controller(object):
         """Update backlash variables."""
 
         # Set global backlash variables.
-        self.PVs[f"PV_XSB"].put(abs(int(float(self.gui.tab.xSB.text()))))
-        self.PVs[f"PV_YSB"].put(abs(int(float(self.gui.tab.ySB.text()))))
-        self.PVs[f"PV_ZSB"].put(abs(int(float(self.gui.tab.zSB.text()))))
-        self.PVs[f"PV_XOB"].put(abs(int(float(self.gui.tab.xOB.text()))))
-        self.PVs[f"PV_YOB"].put(abs(int(float(self.gui.tab.yOB.text()))))
-        self.PVs[f"PV_ZOB"].put(abs(int(float(self.gui.tab.zOB.text()))))
+        caput(self.gui.macros["XSB"], abs(int(float(self.gui.tab.xSB.text()))))
+        caput(self.gui.macros["YSB"], abs(int(float(self.gui.tab.ySB.text()))))
+        caput(self.gui.macros["ZSB"], abs(int(float(self.gui.tab.zSB.text()))))
+        caput(self.gui.macros["XOB"], abs(int(float(self.gui.tab.xOB.text()))))
+        caput(self.gui.macros["YOB"], abs(int(float(self.gui.tab.yOB.text()))))
+        caput(self.gui.macros["ZOB"], abs(int(float(self.gui.tab.zOB.text()))))
 
         # Reset backlash line edits for consistent formatting.
-        self.gui.tab.xSB.setText(str(self.PVs["PV_XSB"].get()))
-        self.gui.tab.ySB.setText(str(self.PVs["PV_YSB"].get()))
-        self.gui.tab.zSB.setText(str(self.PVs["PV_ZSB"].get()))
-        self.gui.tab.xOB.setText(str(self.PVs["PV_XOB"].get()))
-        self.gui.tab.yOB.setText(str(self.PVs["PV_YOB"].get()))
-        self.gui.tab.zOB.setText(str(self.PVs["PV_ZOB"].get()))
+        self.gui.tab.xSB.setText(str(caget(self.gui.macros["XSB"])))
+        self.gui.tab.ySB.setText(str(caget(self.gui.macros["YSB"])))
+        self.gui.tab.zSB.setText(str(caget(self.gui.macros["ZSB"])))
+        self.gui.tab.xOB.setText(str(caget(self.gui.macros["XOB"])))
+        self.gui.tab.yOB.setText(str(caget(self.gui.macros["YOB"])))
+        self.gui.tab.zOB.setText(str(caget(self.gui.macros["ZOB"])))
 
         self._append_text("Updating backlash values.")
 
@@ -932,7 +751,7 @@ class Controller(object):
             motionLabels[(object, axis)].setStyleSheet("background-color: #ff4747; border: 1px solid black;")
 
         basePos = self.gui.macros[f"{axis}{object}_BASE_POSITION"]
-        absPos = self.PVs[f"PV_{axis}{object}ABSPOS"].get()
+        absPos = caget(self.gui.macros[f"{axis}{object}ABSPOS"])
         self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"] = absPos - basePos
 
         lineEdit[(object, axis)].setText(str(absPos - basePos + self._offset(object, axis)))
@@ -951,18 +770,18 @@ class Controller(object):
 
                 basePos = self.gui.macros[f"{axis}{object}_BASE_POSITION"]
                 relPos = self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"]
-                currPos = self.PVs[f"PV_{axis}{object}POS"].get()
+                currPos = caget(self.gui.macros[f"{axis}{object}POS"])
 
                 if currPos > PSL:
                     relPos = PSL - basePos
-                    self.PVs[f"PV_{axis}{object}ABSPOS"].put(PSL)
-                    self.PVs[f"PV_{axis}{object}MOVE"].put(1)
-                    self.PVs[f"PV_{axis}{object}MOVE"].put(0)
+                    caput(self.gui.macros[f"{axis}{object}ABSPOS"], PSL)
+                    caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
+                    caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
                 elif currPos < NSL:
                     relPos = NSL - basePos
-                    self.PVs[f"PV_{axis}{object}ABSPOS"].put(NSL)
-                    self.PVs[f"PV_{axis}{object}MOVE"].put(1)
-                    self.PVs[f"PV_{axis}{object}MOVE"].put(0)
+                    caput(self.gui.macros[f"{axis}{object}ABSPOS"], NSL)
+                    caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
+                    caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
 
                 self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"] = relPos
 
@@ -1018,7 +837,7 @@ class Controller(object):
                       ("O", "Y", 0): self.gui.yOSn, ("O", "Y", 1): self.gui.yOSp,
                       ("O", "Z", 0): self.gui.zOSn, ("O", "Z", 1): self.gui.zOSp}
 
-        value = self.PVs[f"PV_{axis}{object}POS"].get()
+        value = caget(self.gui.macros[f"{axis}{object}POS"])
         minSoftLim = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
         maxSoftLim = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
 
@@ -1082,7 +901,7 @@ class Controller(object):
                 softLimits[(object, axis, 1)].setText(str(maxLim))
 
                 # Change current step line edit.
-                value = self.PVs[f"PV_{axis}{object}POS"].get()
+                value = caget(self.gui.macros[f"{axis}{object}POS"])
                 currentStep[(object, axis)].setText(f"<b>{value - offset} STEPS</b>")
 
     def _set_current_position(self, **kwargs: Union[str, int, float]) -> None:
