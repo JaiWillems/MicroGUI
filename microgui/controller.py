@@ -152,13 +152,13 @@ class Controller(object):
         self.PV_yOABSPOS = PV(pvname=self.gui.macros["YOABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
         self.PV_zOABSPOS = PV(pvname=self.gui.macros["ZOABSPOS"], auto_monitor=True, callback=self._update_abs_pos)
 
-        # Set state PV monitoring and callback.
-        self.PV_XSSTATE = PV(pvname=self.gui.macros["XSSTATE"], auto_monitor=True, callback=self._motor_status)
-        self.PV_YSSTATE = PV(pvname=self.gui.macros["YSSTATE"], auto_monitor=True, callback=self._motor_status)
-        self.PV_ZSSTATE = PV(pvname=self.gui.macros["ZSSTATE"], auto_monitor=True, callback=self._motor_status)
-        self.PV_XOSTATE = PV(pvname=self.gui.macros["XOSTATE"], auto_monitor=True, callback=self._motor_status)
-        self.PV_YOSTATE = PV(pvname=self.gui.macros["YOSTATE"], auto_monitor=True, callback=self._motor_status)
-        self.PV_ZOSTATE = PV(pvname=self.gui.macros["ZOSTATE"], auto_monitor=True, callback=self._motor_status)
+        # Configure emergency stop PVs.
+        self.PV_XSSTOP = PV(pvname=self.gui.macros["XSSTOP"])
+        self.PV_YSSTOP = PV(pvname=self.gui.macros["YSSTOP"])
+        self.PV_ZSSTOP = PV(pvname=self.gui.macros["ZSSTOP"])
+        self.PV_XOSTOP = PV(pvname=self.gui.macros["XOSTOP"])
+        self.PV_YOSTOP = PV(pvname=self.gui.macros["YOSTOP"])
+        self.PV_ZOSTOP = PV(pvname=self.gui.macros["ZOSTOP"])
 
         # Set hard limit position PV monitoring and callback.
         self.PV_XSHN = PV(pvname=self.gui.macros["XSHN"], auto_monitor=True, callback=self._hard_lim_indicators)
@@ -167,6 +167,14 @@ class Controller(object):
         self.PV_YSHP = PV(pvname=self.gui.macros["YSHP"], auto_monitor=True, callback=self._hard_lim_indicators)
         self.PV_ZSHN = PV(pvname=self.gui.macros["ZSHN"], auto_monitor=True, callback=self._hard_lim_indicators)
         self.PV_ZSHP = PV(pvname=self.gui.macros["ZSHP"], auto_monitor=True, callback=self._hard_lim_indicators)
+
+        # Set state PV monitoring and callback.
+        self.PV_XSSTATE = PV(pvname=self.gui.macros["XSSTATE"], auto_monitor=True, callback=self._motor_status)
+        self.PV_YSSTATE = PV(pvname=self.gui.macros["YSSTATE"], auto_monitor=True, callback=self._motor_status)
+        self.PV_ZSSTATE = PV(pvname=self.gui.macros["ZSSTATE"], auto_monitor=True, callback=self._motor_status)
+        self.PV_XOSTATE = PV(pvname=self.gui.macros["XOSTATE"], auto_monitor=True, callback=self._motor_status)
+        self.PV_YOSTATE = PV(pvname=self.gui.macros["YOSTATE"], auto_monitor=True, callback=self._motor_status)
+        self.PV_ZOSTATE = PV(pvname=self.gui.macros["ZOSTATE"], auto_monitor=True, callback=self._motor_status)
 
         # Set current position PV monitoring and callback.
         self.PV_XSPOS = PV(pvname=self.gui.macros["XSPOS"], auto_monitor=True, callback=self._set_current_position)

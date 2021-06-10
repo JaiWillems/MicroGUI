@@ -335,8 +335,6 @@ class GUI(QMainWindow):
         self.updateTime = ptime.time()
         self.fps = 0
 
-        updateData()
-
         layout = QGridLayout()
 
         # Create, modify, and place image buttons.
@@ -350,6 +348,8 @@ class GUI(QMainWindow):
         layout.addWidget(self.SCH, 1, 1, 1, 1)
 
         self.cameraWindow.setLayout(layout)
+
+        updateData()
 
         return self.cameraWindow
 

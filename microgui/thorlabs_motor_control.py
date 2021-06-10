@@ -55,13 +55,17 @@ def disable(modeMotor: apt.Motor) -> None:
     """
     modeMotor.disable()
 
-def home(modeMotor):
-    """
+def home(modeMotor: apt.Motor) -> None:
+    """Home THORLABS motor.
+
+    Parameters
+    ----------
+    modeMotor : Motor
+        Motor object representing the modeMotor.
     """
     modeMotor.move_home()
 
-
-def changeMode(pos: int, modeMotor: Motor) -> None:
+def changeMode(pos: int, modeMotor: apt.Motor) -> None:
     """
     Change THORLAB motor position by pre-set ammount.
 
