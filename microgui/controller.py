@@ -311,7 +311,11 @@ class Controller(object):
         pos = self.gui.macros[modeDict[mode]]
         changeMode(pos=pos, modeMotor=modeMotor)
 
-        self._append_text(f"Changing mode.")
+        try:
+            changeMode(pos=pos, modeMotor=modeMotor)
+            self._append_text(f"Changing mode to {modeDict[mode]}.")
+        except:
+            self._append_text("WARNING: Can not change THORLABS motor position.", QColor(255, 0, 0))
 
     def _mode_position(self, mode: Literal[1, 2, 3, 4]) -> None:
         """Change mode position settings.
@@ -342,6 +346,8 @@ class Controller(object):
             self.gui.tab.TMBM.setText(str(self.gui.macros["BEAMSPLITTER_POSITION"]))
             if self.gui.tab.RDM4.isChecked():
                 self._mode_state(4, self.modeMotor)
+        
+        self._append_text("Setting new mode positions.")
     
     def enableTHORLABS(self) -> None:
         """Enable or disable the THORLABS motor."""
@@ -609,15 +615,18 @@ class Controller(object):
                     min = float(softLimits[(object, axis, 0)].text()) + offset
                     max = float(softLimits[(object, axis, 1)].text()) + offset
 
-                    if min < self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"]:
-                        self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] = float(self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"])
+                    if min > max:
+                        self._append_text(f"WARNING: {axis}{object} soft limits are invalid. Minimum limits must be less then maximum limits.", QColor(255, 0, 0))
                     else:
-                        self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] = min
+                        if min < self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"]:
+                            self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] = float(self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"])
+                        else:
+                            self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] = min
 
-                    if max > self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"]:
-                        self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] = float(self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"])
-                    else:
-                        self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] = max
+                        if max > self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"]:
+                            self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] = float(self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"])
+                        else:
+                            self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] = max
 
         # Update soft limit line edits.
         self.gui.tab.xSMin.setText(str(self.gui.macros["XSMIN_SOFT_LIMIT"] - self._offset("S", "X", True)))
@@ -845,7 +854,11 @@ class Controller(object):
                       ("O", "Y", 0): self.gui.yOSn, ("O", "Y", 1): self.gui.yOSp,
                       ("O", "Z", 0): self.gui.zOSn, ("O", "Z", 1): self.gui.zOSp}
 
-        value = caget(self.gui.macros[f"{axis}{object}POS"])
+        posPVs = {("S", "X"): self.PV_XSPOS, ("O", "X"): self.PV_XOPOS,
+                  ("S", "Y"): self.PV_YSPOS, ("O", "Y"): self.PV_YOPOS,
+                  ("S", "Z"): self.PV_ZSPOS, ("O", "Z"): self.PV_ZOPOS,}
+
+        value = posPVs[(object, axis)].get()
         minSoftLim = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
         maxSoftLim = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
 
