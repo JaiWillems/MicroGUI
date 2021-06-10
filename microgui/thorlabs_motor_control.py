@@ -6,10 +6,9 @@ horizontal microscope mode.
 
 
 import thorlabs_apt as apt
-from thorlabs_apt import Motor
 
 
-def initMotor() -> Motor:
+def initMotor() -> apt.Motor:
     """
     Defines and instantiates the mode motor.
 
@@ -17,15 +16,12 @@ def initMotor() -> Motor:
     initiates the velocity and acceleration constraints. Additionally, the
     motor will be moved to the homing position.
 
-    Parameters
-    ----------
-    None
-
     Returns
     -------
     Motor
         Motor object defined by thorlabs_apt.
     """
+
     devices = apt.list_available_devices()
 
     try:
@@ -37,25 +33,39 @@ def initMotor() -> Motor:
     modeMotor = apt.Motor(motorSerialNumber)
     return modeMotor
 
-def enable(modeMotor):
-    """
+def enable(modeMotor: apt.Motor) -> None:
+    """Enable THORLABS motor.
+
+    Parameters
+    ----------
+    modeMotor : Motor
+        Motor object representing the modeMotor.
     """
     modeMotor.set_move_home_parameters(*modeMotor.get_move_home_parameters())
     modeMotor.set_velocity_parameters(*modeMotor.get_velocity_parameters())
     modeMotor.enable()
 
-def disable(modeMotor):
-    """
+def disable(modeMotor: apt.Motor) -> None:
+    """Enable THORLABS motor.
+
+    Parameters
+    ----------
+    modeMotor : Motor
+        Motor object representing the modeMotor.
     """
     modeMotor.disable()
 
-def home(modeMotor):
-    """
+def home(modeMotor: apt.Motor) -> None:
+    """Home THORLABS motor.
+
+    Parameters
+    ----------
+    modeMotor : Motor
+        Motor object representing the modeMotor.
     """
     modeMotor.move_home()
 
-
-def changeMode(pos: int, modeMotor: Motor) -> None:
+def changeMode(pos: int, modeMotor: apt.Motor) -> None:
     """
     Change THORLAB motor position by pre-set ammount.
 
