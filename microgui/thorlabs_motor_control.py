@@ -61,7 +61,7 @@ def home(modeMotor):
     modeMotor.move_home()
 
 
-def changeMode(pos: int, modeMotor: Motor) -> None:
+def changeMode(pos: int, modeMotor: apt.Motor) -> None:
     """
     Change THORLAB motor position by pre-set ammount.
 

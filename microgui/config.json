@@ -43,7 +43,7 @@
             "XSMAX_HARD_LIMIT": 11398,
             "YSMIN_HARD_LIMIT": -32211,
             "YSMAX_HARD_LIMIT": 17396,
-            "ZSMIN_HARD_LIMIT": 11000,
+            "ZSMIN_HARD_LIMIT": -11000,
             "ZSMAX_HARD_LIMIT": 40000,
             "XOMIN_HARD_LIMIT": -40000,
             "XOMAX_HARD_LIMIT": 40000,
