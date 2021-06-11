@@ -241,7 +241,7 @@ class GUI(QMainWindow):
 
         self.macros = macros
 
-        self.setWindowIcon(QIcon('CLS_logo.png'))
+        self.setWindowIcon(QIcon('figures/CLS_logo.png'))
 
         # Define main GUI window.
         self.setWindowTitle("Horizontal Microscope Control")
@@ -279,7 +279,7 @@ class GUI(QMainWindow):
             Window representing the diagram display.
         """
         window = QLabel()
-        image = QPixmap("GUI Orientation Diagram.jpg")
+        image = QPixmap("figures/diagram.jpg")
         image = image.scaled(350, 350, Qt.KeepAspectRatio)
         window.setPixmap(QPixmap(image))
 

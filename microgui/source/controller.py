@@ -282,7 +282,7 @@ class Controller(object):
         directory.
         """
 
-        path, _ = QFileDialog.getSaveFileName(self.gui, "Save File", "sample_capture", "Image files (*.jpg *.jpeg *.png)")
+        path, _ = QFileDialog.getSaveFileName(parent=self.gui, caption="Save File", directory="../captures", filter="Image files (*.jpg *.jpeg *.png)")
 
         plt.figure()
         plt.imshow(np.rot90(self.gui.image, 3))
