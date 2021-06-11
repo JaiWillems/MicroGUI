@@ -7,7 +7,6 @@ to run the FAR-IR horizontal microscope.
 # Import package dependencies.
 from PyQt5.QtWidgets import QApplication
 import sys
-import json
 from typing import Dict
 
 # Import file dependencies.
