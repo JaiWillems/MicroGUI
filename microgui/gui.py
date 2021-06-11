@@ -12,9 +12,9 @@ import pyqtgraph.ptime as ptime
 from typing import Any, Dict
 from PyQt5.QtGui import QPixmap, QFont, QIcon
 from PyQt5.QtCore import QRectF, QTimer, Qt
-from PyQt5.QtWidgets import QButtonGroup, QMainWindow, QGridLayout, QScrollBar, QTextBrowser, QVBoxLayout, QWidget,\
-    QLabel, QPushButton, QLineEdit, QRadioButton,\
-    QTabWidget, QScrollBar
+from PyQt5.QtWidgets import QButtonGroup, QMainWindow, QGridLayout,\
+    QScrollBar, QTextBrowser, QVBoxLayout, QWidget, QLabel, QPushButton,\
+    QLineEdit, QRadioButton, QTabWidget, QScrollBar, QDesktopWidget
 
 # Import file dependencies.
 from flir_camera_control import getImage
@@ -247,6 +247,12 @@ class GUI(QMainWindow):
         self.setWindowTitle("Horizontal Microscope Control")
         self.setFixedWidth(1500)
         self.setFixedHeight(750)
+
+        # Center frame.
+        rect = self.findGeometry()
+        centerPoint = QDesktopWidget().availableGeometry().center()
+        rect.moveCenter(centerPoint)
+        self.move(rect.topLeft())
 
         # Add sub-windows to main window layout.
         self.layout = QGridLayout()
