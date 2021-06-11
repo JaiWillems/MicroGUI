@@ -234,11 +234,12 @@ class GUI(QMainWindow):
         Creates the text browser window.
     """
 
-    def __init__(self, macros: Dict) -> None:
+    def __init__(self, data: Dict, macros: Dict) -> None:
         """Initialize the GUI."""
 
         super().__init__()
 
+        self.data = data
         self.macros = macros
 
         self.setWindowIcon(QIcon('figures/CLS_logo.png'))
@@ -256,12 +257,13 @@ class GUI(QMainWindow):
 
         # Add sub-windows to main window layout.
         self.layout = QGridLayout()
-        self.layout.addWidget(self._diagram_window(), 0, 0, 2, 1)
-        self.layout.addWidget(self._camera_window(), 0, 1, 2, 1)
-        self.layout.addWidget(self._tabular_window(), 0, 2, 2, 1)
-        self.layout.addWidget(self._sample_window(), 2, 0, 1, 3)
-        self.layout.addWidget(self._objective_window(), 3, 0, 1, 3)
-        self.layout.addWidget(self._text_window(), 4, 0, 1, 3)
+        self.layout.addWidget(self._diagram_window(), 0, 0, 2, 5)
+        self.layout.addWidget(self._camera_window(), 0, 5, 2, 5)
+        self.layout.addWidget(self._tabular_window(), 0, 10, 2, 5)
+        self.layout.addWidget(self._sample_window(), 2, 0, 1, 15)
+        self.layout.addWidget(self._objective_window(), 3, 0, 1, 15)
+        self.layout.addWidget(self._text_window(), 4, 0, 2, 14)
+        self.layout.addWidget(self._config_file(), 4, 14, 1, 1)
 
         # Set main window layout.
         self.centralWidget = QWidget(self)
@@ -767,6 +769,29 @@ class GUI(QMainWindow):
         self.textWindow.setVerticalScrollBar(QScrollBar())
 
         return self.textWindow
+    
+    def _config_file(self) -> QWidget:
+        """Create configuration window.
+
+        Returns
+        -------
+        QWidget
+            Window for file configuration access.
+        """
+        self.conifgWindow = QWidget()
+
+        self.loadConfig = QPushButton("Load Config")
+        self.saveConfig = QPushButton("Save Config")
+
+        self.loadConfig.setStyleSheet("background-color: lightgrey")
+        self.saveConfig.setStyleSheet("background-color: lightgrey")
+
+        layout = QGridLayout()
+        layout.addWidget(self.loadConfig)
+        layout.addWidget(self.saveConfig)
+        self.conifgWindow.setLayout(layout)
+
+        return self.configWindow
 
 
 class MyTableWidget(QWidget):

@@ -33,6 +33,7 @@ def initMotor() -> apt.Motor:
     modeMotor = apt.Motor(motorSerialNumber)
     return modeMotor
 
+
 def enable(modeMotor: apt.Motor) -> None:
     """Enable THORLABS motor.
 
@@ -45,6 +46,7 @@ def enable(modeMotor: apt.Motor) -> None:
     modeMotor.set_velocity_parameters(*modeMotor.get_velocity_parameters())
     modeMotor.enable()
 
+
 def disable(modeMotor: apt.Motor) -> None:
     """Enable THORLABS motor.
 
@@ -55,6 +57,7 @@ def disable(modeMotor: apt.Motor) -> None:
     """
     modeMotor.disable()
 
+
 def home(modeMotor: apt.Motor) -> None:
     """Home THORLABS motor.
 
@@ -64,6 +67,7 @@ def home(modeMotor: apt.Motor) -> None:
         Motor object representing the modeMotor.
     """
     modeMotor.move_home()
+
 
 def changeMode(pos: int, modeMotor: apt.Motor) -> None:
     """

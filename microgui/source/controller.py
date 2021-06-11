@@ -18,6 +18,7 @@ from thorlabs_apt import Motor
 # Import file dependencies.
 from thorlabs_motor_control import enable, disable, home, changeMode
 from gui import GUI
+from configuration import load_config, save_config
 
 
 # Set up epics environment.
@@ -106,6 +107,34 @@ class Controller(object):
         startup. Additionally, it connects PVs that need monitoring to
         callback functions.
         """
+
+        # Set THORLABS motor position line edits.
+        self.gui.tab.TMTM.setText(self.gui.macros["TRANSMISSION_POSITION"])
+        self.gui.tab.TMRM.setText(self.gui.macros["REFLECTION_POSITION"])
+        self.gui.tab.TMVM.setText(self.gui.macros["VISIBLE_IMAGE_POSITION"])
+        self.gui.tab.TMBM.setText(self.gui.macros["BEAMSPLITTER_POSITION"])
+
+        # Set soft limit line edits.
+        self.gui.tab.xSMin.setText(str(float(self.gui.macros["SXMIN_SOFT_LIMIT"])))
+        self.gui.tab.xSMax.setText(str(float(self.gui.macros["SXMAX_SOFT_LIMIT"])))
+        self.gui.tab.ySMin.setText(str(float(self.gui.macros["SYMIN_SOFT_LIMIT"])))
+        self.gui.tab.ySMax.setText(str(float(self.gui.macros["SYMAX_SOFT_LIMIT"])))
+        self.gui.tab.zSMin.setText(str(float(self.gui.macros["SZMIN_SOFT_LIMIT"])))
+        self.gui.tab.zSMax.setText(str(float(self.gui.macros["SZMAX_SOFT_LIMIT"])))
+        self.gui.tab.xOMin.setText(str(float(self.gui.macros["OXMIN_SOFT_LIMIT"])))
+        self.gui.tab.xOMax.setText(str(float(self.gui.macros["OXMAX_SOFT_LIMIT"])))
+        self.gui.tab.yOMin.setText(str(float(self.gui.macros["OYMIN_SOFT_LIMIT"])))
+        self.gui.tab.yOMax.setText(str(float(self.gui.macros["OYMAX_SOFT_LIMIT"])))
+        self.gui.tab.zOMin.setText(str(float(self.gui.macros["OZMIN_SOFT_LIMIT"])))
+        self.gui.tab.zOMax.setText(str(float(self.gui.macros["OZMAX_SOFT_LIMIT"])))
+
+        # Set backlash value line edits.
+        self.gui.tab.xSB.setText(str(float(self.gui.macros["XS_BACKLASH"])))
+        self.gui.tab.ySB.setText(str(float(self.gui.macros["YS_BACKLASH"])))
+        self.gui.tab.zSB.setText(str(float(self.gui.macros["ZS_BACKLASH"])))
+        self.gui.tab.xOB.setText(str(float(self.gui.macros["XO_BACKLASH"])))
+        self.gui.tab.yOB.setText(str(float(self.gui.macros["YO_BACKLASH"])))
+        self.gui.tab.zOB.setText(str(float(self.gui.macros["ZO_BACKLASH"])))
 
         # Set step line edits to current PV values.
         self.gui.xSStep.setText(str(caget(self.gui.macros["XSSTEP"])))
@@ -272,6 +301,10 @@ class Controller(object):
         self.gui.tab.SBL.clicked.connect(self._update_BL)
         self.gui.tab.valueType.clicked.connect(self._change_display_vals)
         self.gui.tab.globals.clicked.connect(self._print_globals)
+
+        # Configuration functionality.
+        self.gui.loadConfig.clicked.connect(self._load_config)
+        self.gui.saveConfig.clicked.connect(self._save_config)
 
         self._append_text("Widgets connected to control sequences.")
 
@@ -989,3 +1022,18 @@ class Controller(object):
             self._append_text(f"{key} -> {self.gui.macros[key]}")
 
         self._append_text("-*- GLOBAL VARIABLES - END -*-")
+    
+    def _load_config(self) -> None:
+        """Load new configuration"""
+        
+        path, _ = QFileDialog.getOpenFileName(parent=self, caption="Open File", directory="../Config Files", filter="Configuration files (*.json)")
+        data, macros = load_config(path)
+        self.gui.data = data
+        self.gui.macros = macros
+        self._initialize_GUI()
+
+    def _save_config(self) -> None:
+        """Save current configuration."""
+        
+        path, _ = QFileDialog.getSaveFileName(self, caption="Save File", directory="../Config Files", filter="Configuration files (*.json)")
+        save_config(path, self.gui.data, self.gui.macros)
