@@ -253,10 +253,10 @@ class GUI(QMainWindow):
         self.setFixedHeight(750)
 
         # Center frame.
-        rect = self.findGeometry()
-        centerPoint = QDesktopWidget().availableGeometry().center()
-        rect.moveCenter(centerPoint)
-        self.move(rect.topLeft())
+        #rect = self.findGeometry()
+        #centerPoint = QDesktopWidget().availableGeometry().center()
+        #rect.moveCenter(centerPoint)
+        #self.move(rect.topLeft())
 
         # Add sub-windows to main window layout.
         self.layout = QGridLayout()
@@ -782,7 +782,7 @@ class GUI(QMainWindow):
         QWidget
             Window for file configuration access.
         """
-        self.conifgWindow = QWidget()
+        self.configWindow = QWidget()
 
         # Define configuration widgets.
         self.loadConfig = QPushButton("Load Config")
@@ -796,7 +796,7 @@ class GUI(QMainWindow):
         layout = QGridLayout()
         layout.addWidget(self.loadConfig)
         layout.addWidget(self.saveConfig)
-        self.conifgWindow.setLayout(layout)
+        self.configWindow.setLayout(layout)
 
         return self.configWindow
 
@@ -1026,12 +1026,12 @@ class MyTableWidget(QWidget):
         self.tab3.layout = QGridLayout()
 
         # Define interactive sample widgets.
-        xHardMin = self.parent.macros["XSMIN_HARD_LIMIT"]
-        xHardMax = self.parent.macros["XSMAX_HARD_LIMIT"]
-        yHardMin = self.parent.macros["YSMIN_HARD_LIMIT"]
-        yHardMax = self.parent.macros["YSMAX_HARD_LIMIT"]
-        zHardMin = self.parent.macros["ZSMIN_HARD_LIMIT"]
-        zHardMax = self.parent.macros["ZSMAX_HARD_LIMIT"]
+        xHardMin = self.parent.macros["XS_STEP2MICRON"] * self.parent.macros["XSMIN_HARD_LIMIT"]
+        xHardMax = self.parent.macros["XS_STEP2MICRON"] * self.parent.macros["XSMAX_HARD_LIMIT"]
+        yHardMin = self.parent.macros["YS_STEP2MICRON"] * self.parent.macros["YSMIN_HARD_LIMIT"]
+        yHardMax = self.parent.macros["YS_STEP2MICRON"] * self.parent.macros["YSMAX_HARD_LIMIT"]
+        zHardMin = self.parent.macros["ZS_STEP2MICRON"] * self.parent.macros["ZSMIN_HARD_LIMIT"]
+        zHardMax = self.parent.macros["ZS_STEP2MICRON"] * self.parent.macros["ZSMAX_HARD_LIMIT"]
         self.xSMM = QLabel(f"{xHardMin} to {xHardMax}")
         self.ySMM = QLabel(f"{yHardMin} to {yHardMax}")
         self.zSMM = QLabel(f"{zHardMin} to {zHardMax}")
@@ -1047,12 +1047,12 @@ class MyTableWidget(QWidget):
         self.tab3.layout.addWidget(self.zSMM, 4, 1, 1, 1)
 
         # Define interactive objective widgets.
-        xHardMin = self.parent.macros["XOMIN_HARD_LIMIT"]
-        xHardMax = self.parent.macros["XOMAX_HARD_LIMIT"]
-        yHardMin = self.parent.macros["YOMIN_HARD_LIMIT"]
-        yHardMax = self.parent.macros["YOMAX_HARD_LIMIT"]
-        zHardMin = self.parent.macros["ZOMIN_HARD_LIMIT"]
-        zHardMax = self.parent.macros["ZOMAX_HARD_LIMIT"]
+        xHardMin = self.parent.macros["XO_STEP2MICRON"] * self.parent.macros["XOMIN_HARD_LIMIT"]
+        xHardMax = self.parent.macros["XO_STEP2MICRON"] * self.parent.macros["XOMAX_HARD_LIMIT"]
+        yHardMin = self.parent.macros["YO_STEP2MICRON"] * self.parent.macros["YOMIN_HARD_LIMIT"]
+        yHardMax = self.parent.macros["YO_STEP2MICRON"] * self.parent.macros["YOMAX_HARD_LIMIT"]
+        zHardMin = self.parent.macros["ZO_STEP2MICRON"] * self.parent.macros["ZOMIN_HARD_LIMIT"]
+        zHardMax = self.parent.macros["ZO_STEP2MICRON"] * self.parent.macros["ZOMAX_HARD_LIMIT"]
         self.xOMM = QLabel(f"{xHardMin} to {xHardMax}")
         self.yOMM = QLabel(f"{yHardMin} to {yHardMax}")
         self.zOMM = QLabel(f"{zHardMin} to {zHardMax}")
@@ -1078,18 +1078,12 @@ class MyTableWidget(QWidget):
         self.tab4.layout = QGridLayout()
 
         # Define interactive sample widgets.
-        self.xSMin = QLineEdit(
-            str(float(self.parent.macros["XSMIN_SOFT_LIMIT"])))
-        self.ySMin = QLineEdit(
-            str(float(self.parent.macros["YSMIN_SOFT_LIMIT"])))
-        self.zSMin = QLineEdit(
-            str(float(self.parent.macros["ZSMIN_SOFT_LIMIT"])))
-        self.xSMax = QLineEdit(
-            str(float(self.parent.macros["XSMAX_SOFT_LIMIT"])))
-        self.ySMax = QLineEdit(
-            str(float(self.parent.macros["YSMAX_SOFT_LIMIT"])))
-        self.zSMax = QLineEdit(
-            str(float(self.parent.macros["ZSMAX_SOFT_LIMIT"])))
+        self.xSMin = QLineEdit(str(float(self.parent.macros["XS_STEP2MICRON"] * self.parent.macros["XSMIN_SOFT_LIMIT"])))
+        self.ySMin = QLineEdit(str(float(self.parent.macros["YS_STEP2MICRON"] * self.parent.macros["YSMIN_SOFT_LIMIT"])))
+        self.zSMin = QLineEdit(str(float(self.parent.macros["ZS_STEP2MICRON"] * self.parent.macros["ZSMIN_SOFT_LIMIT"])))
+        self.xSMax = QLineEdit(str(float(self.parent.macros["XS_STEP2MICRON"] * self.parent.macros["XSMAX_SOFT_LIMIT"])))
+        self.ySMax = QLineEdit(str(float(self.parent.macros["YS_STEP2MICRON"] * self.parent.macros["YSMAX_SOFT_LIMIT"])))
+        self.zSMax = QLineEdit(str(float(self.parent.macros["ZS_STEP2MICRON"] * self.parent.macros["ZSMAX_SOFT_LIMIT"])))
 
         # Organize sample widgets in the tab layout.
         self.tab4.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 3)
@@ -1106,18 +1100,12 @@ class MyTableWidget(QWidget):
         self.tab4.layout.addWidget(self.zSMax, 4, 2, 1, 1)
 
         # Define interactive objective widgets.
-        self.xOMin = QLineEdit(
-            str(float(self.parent.macros["XOMIN_SOFT_LIMIT"])))
-        self.yOMin = QLineEdit(
-            str(float(self.parent.macros["YOMIN_SOFT_LIMIT"])))
-        self.zOMin = QLineEdit(
-            str(float(self.parent.macros["ZOMIN_SOFT_LIMIT"])))
-        self.xOMax = QLineEdit(
-            str(float(self.parent.macros["XOMAX_SOFT_LIMIT"])))
-        self.yOMax = QLineEdit(
-            str(float(self.parent.macros["YOMAX_SOFT_LIMIT"])))
-        self.zOMax = QLineEdit(
-            str(float(self.parent.macros["ZOMAX_SOFT_LIMIT"])))
+        self.xOMin = QLineEdit(str(float(self.parent.macros["XO_STEP2MICRON"] * self.parent.macros["XOMIN_SOFT_LIMIT"])))
+        self.yOMin = QLineEdit(str(float(self.parent.macros["YO_STEP2MICRON"] * self.parent.macros["YOMIN_SOFT_LIMIT"])))
+        self.zOMin = QLineEdit(str(float(self.parent.macros["ZO_STEP2MICRON"] * self.parent.macros["ZOMIN_SOFT_LIMIT"])))
+        self.xOMax = QLineEdit(str(float(self.parent.macros["XO_STEP2MICRON"] * self.parent.macros["XOMAX_SOFT_LIMIT"])))
+        self.yOMax = QLineEdit(str(float(self.parent.macros["YO_STEP2MICRON"] * self.parent.macros["YOMAX_SOFT_LIMIT"])))
+        self.zOMax = QLineEdit(str(float(self.parent.macros["ZO_STEP2MICRON"] * self.parent.macros["ZOMAX_SOFT_LIMIT"])))
 
         # Organize objective widgets in the tab layout.
         self.tab4.layout.addWidget(QLabel("<b>Objective</b>"), 0, 3, 1, 3)
@@ -1163,9 +1151,9 @@ class MyTableWidget(QWidget):
         self.xSZero = QPushButton("ZERO")
         self.ySZero = QPushButton("ZERO")
         self.zSZero = QPushButton("ZERO")
-        xB = self.parent.macros["XS_BACKLASH"]
-        yB = self.parent.macros["YS_BACKLASH"]
-        zB = self.parent.macros["ZS_BACKLASH"]
+        xB = self.parent.macros["XS_STEP2MICRON"] * self.parent.macros["XS_BACKLASH"]
+        yB = self.parent.macros["YS_STEP2MICRON"] * self.parent.macros["YS_BACKLASH"]
+        zB = self.parent.macros["ZS_STEP2MICRON"] * self.parent.macros["ZS_BACKLASH"]
         self.xSB = QLineEdit(str(xB))
         self.ySB = QLineEdit(str(yB))
         self.zSB = QLineEdit(str(zB))
@@ -1192,9 +1180,9 @@ class MyTableWidget(QWidget):
         self.xOZero = QPushButton("ZERO")
         self.yOZero = QPushButton("ZERO")
         self.zOZero = QPushButton("ZERO")
-        xB = self.parent.macros["XO_BACKLASH"]
-        yB = self.parent.macros["YO_BACKLASH"]
-        zB = self.parent.macros["ZO_BACKLASH"]
+        xB = self.parent.macros["XO_STEP2MICRON"] * self.parent.macros["XO_BACKLASH"]
+        yB = self.parent.macros["YO_STEP2MICRON"] * self.parent.macros["YO_BACKLASH"]
+        zB = self.parent.macros["ZO_STEP2MICRON"] * self.parent.macros["ZO_BACKLASH"]
         self.xOB = QLineEdit(str(xB))
         self.yOB = QLineEdit(str(yB))
         self.zOB = QLineEdit(str(zB))
