@@ -9,7 +9,7 @@ from simple_pyspin import Camera
 import numpy as np
 
 
-def getImage() -> np.array:
+def get_image() -> np.array:
     """Capture image.
 
     This function interfaces with a compatible and connected FLIR camera to

@@ -69,7 +69,7 @@ def home(modeMotor: apt.Motor) -> None:
     modeMotor.move_home()
 
 
-def changeMode(pos: int, modeMotor: apt.Motor) -> None:
+def changeMode(pos: int, modeMotor: apt.Motor) -> float:
     """
     Change THORLAB motor position by pre-set ammount.
 
@@ -86,10 +86,16 @@ def changeMode(pos: int, modeMotor: apt.Motor) -> None:
 
     Returns
     -------
-    None
+    float
+        A positive value signifies the positon moved to whereas `-1` indicates
+        error in changing modes.
 
     Notes
     -----
     modeMotor must have been initiated using initMotor().
     """
-    modeMotor.move_to(value=pos, blocking=False)
+    try:
+        modeMotor.move_to(value=pos, blocking=False)
+        return pos
+    except:
+        return -1

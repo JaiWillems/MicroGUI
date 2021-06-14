@@ -23,6 +23,14 @@
             "ZO_RELATIVE_POSITION": 0
         }
     },
+    "conversions": {
+        "XS_STEP2MICRON": 0.98935,
+        "YS_STEP2MICRON": 0.23618,
+        "ZS_STEP2MICRON": 0.99765,
+        "XO_STEP2MICRON": 1,
+        "YO_STEP2MICRON": 1,
+        "ZO_STEP2MICRON": 1
+    },
     "limits": {
         "soft_limits": {
             "XSMIN_SOFT_LIMIT": -9000,

@@ -14,10 +14,10 @@ from PyQt5.QtGui import QPixmap, QFont, QIcon
 from PyQt5.QtCore import QRectF, QTimer, Qt
 from PyQt5.QtWidgets import QButtonGroup, QMainWindow, QGridLayout,\
     QScrollBar, QTextBrowser, QVBoxLayout, QWidget, QLabel, QPushButton,\
-    QLineEdit, QRadioButton, QTabWidget, QScrollBar, QDesktopWidget
+    QLineEdit, QRadioButton, QTabWidget, QScrollBar, QDesktopWidget, QWidget
 
 # Import file dependencies.
-from flir_camera_control import getImage
+from flir_camera_control import get_image
 
 
 class GUI(QMainWindow):
@@ -28,6 +28,8 @@ class GUI(QMainWindow):
 
     Parameters
     ----------
+    data : Dict
+        Dictionary of raw variable data.
     macros : Dict
         Dictionary of macro variables.
 
@@ -242,6 +244,7 @@ class GUI(QMainWindow):
         self.data = data
         self.macros = macros
 
+        # Set CLS logo.
         self.setWindowIcon(QIcon('figures/CLS_logo.png'))
 
         # Define main GUI window.
@@ -288,7 +291,7 @@ class GUI(QMainWindow):
         return window
 
     def _camera_window(self) -> QWidget:
-        """Create camera window.
+        """Create live feed window.
 
         Returns
         -------
@@ -304,7 +307,7 @@ class GUI(QMainWindow):
             columns of pixels in the image to red (RGB=[225, 0, 0]).
             """
             # Get new image.
-            self.image = np.copy(np.rot90(getImage()))
+            self.image = np.copy(np.rot90(get_image()))
             height = self.image.shape[0]
             width = self.image.shape[1]
 
@@ -767,7 +770,6 @@ class GUI(QMainWindow):
         self.textWindow = QTextBrowser()
         self.textWindow.setAcceptRichText(True)
         self.textWindow.setOpenExternalLinks(True)
-
         self.textWindow.setVerticalScrollBar(QScrollBar())
 
         return self.textWindow
@@ -782,12 +784,15 @@ class GUI(QMainWindow):
         """
         self.conifgWindow = QWidget()
 
+        # Define configuration widgets.
         self.loadConfig = QPushButton("Load Config")
         self.saveConfig = QPushButton("Save Config")
 
+        # Style configuration widgets.
         self.loadConfig.setStyleSheet("background-color: lightgrey")
         self.saveConfig.setStyleSheet("background-color: lightgrey")
 
+        # Set configuration button layout.
         layout = QGridLayout()
         layout.addWidget(self.loadConfig)
         layout.addWidget(self.saveConfig)
@@ -1218,8 +1223,7 @@ class MyTableWidget(QWidget):
         self.tab5.layout.addWidget(self.SBL, 5, 0, 1, 3)
 
         # Add information labels.
-        backlashLabel = QLabel(
-            "<i>Backlash is applied when moving negitively. The motor will move 'backlash' steps past the target position before returning to the target position</i>")
+        backlashLabel = QLabel("<i>Backlash is applied when moving negitively. The motor will move 'backlash' steps past the target position before returning to the target position</i>")
         zeroLabel = QLabel("<i>Cannot zero when displaying actual values.</i>")
         backlashLabel.setWordWrap(True)
         zeroLabel.setWordWrap(True)

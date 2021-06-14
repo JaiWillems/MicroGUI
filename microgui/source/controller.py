@@ -109,24 +109,24 @@ class Controller(object):
         """
 
         # Set THORLABS motor position line edits.
-        self.gui.tab.TMTM.setText(self.gui.macros["TRANSMISSION_POSITION"])
-        self.gui.tab.TMRM.setText(self.gui.macros["REFLECTION_POSITION"])
-        self.gui.tab.TMVM.setText(self.gui.macros["VISIBLE_IMAGE_POSITION"])
-        self.gui.tab.TMBM.setText(self.gui.macros["BEAMSPLITTER_POSITION"])
+        self.gui.tab.TMTM.setText(str(float(self.gui.macros["TRANSMISSION_POSITION"])))
+        self.gui.tab.TMRM.setText(str(float(self.gui.macros["REFLECTION_POSITION"])))
+        self.gui.tab.TMVM.setText(str(float(self.gui.macros["VISIBLE_IMAGE_POSITION"])))
+        self.gui.tab.TMBM.setText(str(float(self.gui.macros["BEAMSPLITTER_POSITION"])))
 
         # Set soft limit line edits.
-        self.gui.tab.xSMin.setText(str(float(self.gui.macros["SXMIN_SOFT_LIMIT"])))
-        self.gui.tab.xSMax.setText(str(float(self.gui.macros["SXMAX_SOFT_LIMIT"])))
-        self.gui.tab.ySMin.setText(str(float(self.gui.macros["SYMIN_SOFT_LIMIT"])))
-        self.gui.tab.ySMax.setText(str(float(self.gui.macros["SYMAX_SOFT_LIMIT"])))
-        self.gui.tab.zSMin.setText(str(float(self.gui.macros["SZMIN_SOFT_LIMIT"])))
-        self.gui.tab.zSMax.setText(str(float(self.gui.macros["SZMAX_SOFT_LIMIT"])))
-        self.gui.tab.xOMin.setText(str(float(self.gui.macros["OXMIN_SOFT_LIMIT"])))
-        self.gui.tab.xOMax.setText(str(float(self.gui.macros["OXMAX_SOFT_LIMIT"])))
-        self.gui.tab.yOMin.setText(str(float(self.gui.macros["OYMIN_SOFT_LIMIT"])))
-        self.gui.tab.yOMax.setText(str(float(self.gui.macros["OYMAX_SOFT_LIMIT"])))
-        self.gui.tab.zOMin.setText(str(float(self.gui.macros["OZMIN_SOFT_LIMIT"])))
-        self.gui.tab.zOMax.setText(str(float(self.gui.macros["OZMAX_SOFT_LIMIT"])))
+        self.gui.tab.xSMin.setText(str(float(self.gui.macros["XSMIN_SOFT_LIMIT"])))
+        self.gui.tab.xSMax.setText(str(float(self.gui.macros["XSMAX_SOFT_LIMIT"])))
+        self.gui.tab.ySMin.setText(str(float(self.gui.macros["YSMIN_SOFT_LIMIT"])))
+        self.gui.tab.ySMax.setText(str(float(self.gui.macros["YSMAX_SOFT_LIMIT"])))
+        self.gui.tab.zSMin.setText(str(float(self.gui.macros["ZSMIN_SOFT_LIMIT"])))
+        self.gui.tab.zSMax.setText(str(float(self.gui.macros["ZSMAX_SOFT_LIMIT"])))
+        self.gui.tab.xOMin.setText(str(float(self.gui.macros["XOMIN_SOFT_LIMIT"])))
+        self.gui.tab.xOMax.setText(str(float(self.gui.macros["XOMAX_SOFT_LIMIT"])))
+        self.gui.tab.yOMin.setText(str(float(self.gui.macros["YOMIN_SOFT_LIMIT"])))
+        self.gui.tab.yOMax.setText(str(float(self.gui.macros["YOMAX_SOFT_LIMIT"])))
+        self.gui.tab.zOMin.setText(str(float(self.gui.macros["ZOMIN_SOFT_LIMIT"])))
+        self.gui.tab.zOMax.setText(str(float(self.gui.macros["ZOMAX_SOFT_LIMIT"])))
 
         # Set backlash value line edits.
         self.gui.tab.xSB.setText(str(float(self.gui.macros["XS_BACKLASH"])))
@@ -344,11 +344,11 @@ class Controller(object):
         pos = self.gui.macros[modeDict[mode]]
         changeMode(pos=pos, modeMotor=modeMotor)
 
-        try:
-            changeMode(pos=pos, modeMotor=modeMotor)
-            self._append_text(f"Changing mode to {modeDict[mode]}.")
-        except:
+        status = changeMode(pos=pos, modeMotor=modeMotor)
+        if status == -1:
             self._append_text("ERROR: Can not change THORLABS motor position.", QColor(255, 0, 0))
+        else:
+            self._append_text(f"Changing mode to {modeDict[mode]}.")
 
     def _mode_position(self, mode: Literal[1, 2, 3, 4]) -> None:
         """Change mode position settings.
@@ -440,8 +440,8 @@ class Controller(object):
 
         if incPos < 0:
             incPos = -incPos
-            step.setText(incPos)
-            self._append_text("WARNING: Step must be positive. Step sign has been changed to positive.", QColor(255, 255, 0))
+            step.setText(str(incPos))
+            self._append_text("WARNING: Step must be positive. Step sign has been changed to positive.", QColor(250, 215, 0))
         
         PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
         NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
@@ -654,7 +654,7 @@ class Controller(object):
                     max = float(softLimits[(object, axis, 1)].text()) + offset
 
                     if min > max:
-                        self._append_text(f"WARNING: {axis}{object} soft limits are invalid. Minimum limits must be less then maximum limits.", QColor(255, 255, 0))
+                        self._append_text(f"WARNING: {axis}{object} soft limits are invalid. Minimum limits must be less then maximum limits.", QColor(250, 215, 0))
                     else:
                         if min < self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"]:
                             self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] = float(self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"])
@@ -787,9 +787,11 @@ class Controller(object):
         elif value == 1:
             motionLabels[(object, axis)].setText("POWERING")
             motionLabels[(object, axis)].setStyleSheet("background-color: #ff4747; border: 1px solid black;")
+            self._soft_lim_indicators(object, axis)
         elif value == 2:
             motionLabels[(object, axis)].setText("POWERED")
             motionLabels[(object, axis)].setStyleSheet("background-color: #ff4747; border: 1px solid black;")
+            self._soft_lim_indicators(object, axis)
         elif value == 3:
             motionLabels[(object, axis)].setText("RELEASING")
             motionLabels[(object, axis)].setStyleSheet("background-color: #edde07; border: 1px solid black;")
@@ -1026,6 +1028,7 @@ class Controller(object):
     def _load_config(self) -> None:
         """Load new configuration"""
         
+        self._append_text("Loading new program configuration.")
         path, _ = QFileDialog.getOpenFileName(parent=self, caption="Open File", directory="../Config Files", filter="Configuration files (*.json)")
         data, macros = load_config(path)
         self.gui.data = data
@@ -1037,3 +1040,5 @@ class Controller(object):
         
         path, _ = QFileDialog.getSaveFileName(self, caption="Save File", directory="../Config Files", filter="Configuration files (*.json)")
         save_config(path, self.gui.data, self.gui.macros)
+
+        self._append_text(f"Configuration saved to {path}")

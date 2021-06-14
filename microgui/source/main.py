@@ -7,7 +7,6 @@ to run the FAR-IR horizontal microscope.
 # Import package dependencies.
 from PyQt5.QtWidgets import QApplication
 import sys
-from typing import Dict
 from epics import PV
 
 # Import file dependencies.
@@ -16,7 +15,7 @@ from controller import Controller
 from thorlabs_motor_control import initMotor
 from configuration import load_config
 
-# Define the THORLABS mode stage motor.
+# Define the THORLABS "mode" motor.
 modeMotor = initMotor()
 
 # Define macro variables.
