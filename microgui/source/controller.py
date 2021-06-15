@@ -1029,7 +1029,7 @@ class Controller(object):
         """Load new configuration"""
         
         self._append_text("Loading new program configuration.")
-        path, _ = QFileDialog.getOpenFileName(parent=self, caption="Open File", directory="../Config Files", filter="Configuration files (*.json)")
+        path, _ = QFileDialog.getOpenFileName(parent=self.gui, caption="Open File", directory="../Config Files", filter="Configuration files (*.json)")
         data, macros = load_config(path)
         self.gui.data = data
         self.gui.macros = macros
@@ -1038,7 +1038,7 @@ class Controller(object):
     def _save_config(self) -> None:
         """Save current configuration."""
         
-        path, _ = QFileDialog.getSaveFileName(self, caption="Save File", directory="../Config Files", filter="Configuration files (*.json)")
+        path, _ = QFileDialog.getSaveFileName(parent=self.gui, caption="Save File", directory="../Config Files", filter="Configuration files (*.json)")
         save_config(path, self.gui.data, self.gui.macros)
 
         self._append_text(f"Configuration saved to {path}")
