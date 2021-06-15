@@ -1026,12 +1026,12 @@ class MyTableWidget(QWidget):
         self.tab3.layout = QGridLayout()
 
         # Define interactive sample widgets.
-        xHardMin = round(self.parent.macros["XS_STEP2MICRON"] * self.parent.macros["XSMIN_HARD_LIMIT"], 1)
-        xHardMax = round(self.parent.macros["XS_STEP2MICRON"] * self.parent.macros["XSMAX_HARD_LIMIT"], 1)
-        yHardMin = round(self.parent.macros["YS_STEP2MICRON"] * self.parent.macros["YSMIN_HARD_LIMIT"], 1)
-        yHardMax = round(self.parent.macros["YS_STEP2MICRON"] * self.parent.macros["YSMAX_HARD_LIMIT"], 1)
-        zHardMin = round(self.parent.macros["ZS_STEP2MICRON"] * self.parent.macros["ZSMIN_HARD_LIMIT"], 1)
-        zHardMax = round(self.parent.macros["ZS_STEP2MICRON"] * self.parent.macros["ZSMAX_HARD_LIMIT"], 1)
+        xHardMin = self.parent.macros["XS_STEP2MICRON"] * self.parent.macros["XSMIN_HARD_LIMIT"]
+        xHardMax = self.parent.macros["XS_STEP2MICRON"] * self.parent.macros["XSMAX_HARD_LIMIT"]
+        yHardMin = self.parent.macros["YS_STEP2MICRON"] * self.parent.macros["YSMIN_HARD_LIMIT"]
+        yHardMax = self.parent.macros["YS_STEP2MICRON"] * self.parent.macros["YSMAX_HARD_LIMIT"]
+        zHardMin = self.parent.macros["ZS_STEP2MICRON"] * self.parent.macros["ZSMIN_HARD_LIMIT"]
+        zHardMax = self.parent.macros["ZS_STEP2MICRON"] * self.parent.macros["ZSMAX_HARD_LIMIT"]
         self.xSMM = QLabel(f"{xHardMin} to {xHardMax}")
         self.ySMM = QLabel(f"{yHardMin} to {yHardMax}")
         self.zSMM = QLabel(f"{zHardMin} to {zHardMax}")
@@ -1047,12 +1047,12 @@ class MyTableWidget(QWidget):
         self.tab3.layout.addWidget(self.zSMM, 4, 1, 1, 1)
 
         # Define interactive objective widgets.
-        xHardMin = round(self.parent.macros["XO_STEP2MICRON"] * self.parent.macros["XOMIN_HARD_LIMIT"], 1)
-        xHardMax = round(self.parent.macros["XO_STEP2MICRON"] * self.parent.macros["XOMAX_HARD_LIMIT"], 1)
-        yHardMin = round(self.parent.macros["YO_STEP2MICRON"] * self.parent.macros["YOMIN_HARD_LIMIT"], 1)
-        yHardMax = round(self.parent.macros["YO_STEP2MICRON"] * self.parent.macros["YOMAX_HARD_LIMIT"], 1)
-        zHardMin = round(self.parent.macros["ZO_STEP2MICRON"] * self.parent.macros["ZOMIN_HARD_LIMIT"], 1)
-        zHardMax = round(self.parent.macros["ZO_STEP2MICRON"] * self.parent.macros["ZOMAX_HARD_LIMIT"], 1)
+        xHardMin = self.parent.macros["XO_STEP2MICRON"] * self.parent.macros["XOMIN_HARD_LIMIT"]
+        xHardMax = self.parent.macros["XO_STEP2MICRON"] * self.parent.macros["XOMAX_HARD_LIMIT"]
+        yHardMin = self.parent.macros["YO_STEP2MICRON"] * self.parent.macros["YOMIN_HARD_LIMIT"]
+        yHardMax = self.parent.macros["YO_STEP2MICRON"] * self.parent.macros["YOMAX_HARD_LIMIT"]
+        zHardMin = self.parent.macros["ZO_STEP2MICRON"] * self.parent.macros["ZOMIN_HARD_LIMIT"]
+        zHardMax = self.parent.macros["ZO_STEP2MICRON"] * self.parent.macros["ZOMAX_HARD_LIMIT"]
         self.xOMM = QLabel(f"{xHardMin} to {xHardMax}")
         self.yOMM = QLabel(f"{yHardMin} to {yHardMax}")
         self.zOMM = QLabel(f"{zHardMin} to {zHardMax}")

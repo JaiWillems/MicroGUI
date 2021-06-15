@@ -137,28 +137,28 @@ class Controller(object):
         caput(self.gui.macros["ZOB"], self.gui.macros["ZO_BACKLASH"])
 
         # Set step line edits to current PV values.
-        self.gui.xSStep.setText(str(round(self.gui.macros["XS_STEP2MICRON"] * caget(self.gui.macros["XSSTEP"]), 1)))
-        self.gui.ySStep.setText(str(round(self.gui.macros["YS_STEP2MICRON"] * caget(self.gui.macros["YSSTEP"]), 1)))
-        self.gui.zSStep.setText(str(round(self.gui.macros["ZS_STEP2MICRON"] * caget(self.gui.macros["ZSSTEP"]), 1)))
-        self.gui.xOStep.setText(str(round(self.gui.macros["XO_STEP2MICRON"] * caget(self.gui.macros["XOSTEP"]), 1)))
-        self.gui.yOStep.setText(str(round(self.gui.macros["YO_STEP2MICRON"] * caget(self.gui.macros["YOSTEP"]), 1)))
-        self.gui.zOStep.setText(str(round(self.gui.macros["ZO_STEP2MICRON"] * caget(self.gui.macros["ZOSTEP"]), 1)))
+        self.gui.xSStep.setText(str(round(self.gui.macros["XS_STEP2MICRON"] * caget(self.gui.macros["XSSTEP"], 1))))
+        self.gui.ySStep.setText(str(round(self.gui.macros["YS_STEP2MICRON"] * caget(self.gui.macros["YSSTEP"], 1))))
+        self.gui.zSStep.setText(str(round(self.gui.macros["ZS_STEP2MICRON"] * caget(self.gui.macros["ZSSTEP"], 1))))
+        self.gui.xOStep.setText(str(round(self.gui.macros["XO_STEP2MICRON"] * caget(self.gui.macros["XOSTEP"], 1))))
+        self.gui.yOStep.setText(str(round(self.gui.macros["YO_STEP2MICRON"] * caget(self.gui.macros["YOSTEP"], 1))))
+        self.gui.zOStep.setText(str(round(self.gui.macros["ZO_STEP2MICRON"] * caget(self.gui.macros["ZOSTEP"], 1))))
 
         # Set absolute position line edits to current PV values.
-        self.gui.xSAbsPos.setText(str(round(self.gui.macros["XS_STEP2MICRON"] * caget(self.gui.macros["XSABSPOS"]), 1)))
-        self.gui.ySAbsPos.setText(str(round(self.gui.macros["YS_STEP2MICRON"] * caget(self.gui.macros["YSABSPOS"]), 1)))
-        self.gui.zSAbsPos.setText(str(round(self.gui.macros["ZS_STEP2MICRON"] * caget(self.gui.macros["ZSABSPOS"]), 1)))
-        self.gui.xOAbsPos.setText(str(round(self.gui.macros["XO_STEP2MICRON"] * caget(self.gui.macros["XOABSPOS"]), 1)))
-        self.gui.yOAbsPos.setText(str(round(self.gui.macros["YO_STEP2MICRON"] * caget(self.gui.macros["YOABSPOS"]), 1)))
-        self.gui.zOAbsPos.setText(str(round(self.gui.macros["ZO_STEP2MICRON"] * caget(self.gui.macros["ZOABSPOS"]), 1)))
+        self.gui.xSAbsPos.setText(str(round(self.gui.macros["XS_STEP2MICRON"] * caget(self.gui.macros["XSABSPOS"], 1))))
+        self.gui.ySAbsPos.setText(str(round(self.gui.macros["YS_STEP2MICRON"] * caget(self.gui.macros["YSABSPOS"], 1))))
+        self.gui.zSAbsPos.setText(str(round(self.gui.macros["ZS_STEP2MICRON"] * caget(self.gui.macros["ZSABSPOS"], 1))))
+        self.gui.xOAbsPos.setText(str(round(self.gui.macros["XO_STEP2MICRON"] * caget(self.gui.macros["XOABSPOS"], 1))))
+        self.gui.yOAbsPos.setText(str(round(self.gui.macros["YO_STEP2MICRON"] * caget(self.gui.macros["YOABSPOS"], 1))))
+        self.gui.zOAbsPos.setText(str(round(self.gui.macros["ZO_STEP2MICRON"] * caget(self.gui.macros["ZOABSPOS"], 1))))
 
         # Set backlash line edits to current PV values.
-        self.gui.tab.xSB.setText(str(round(self.gui.macros["XS_STEP2MICRON"] * self.gui.macros["XS_BACKLASH"], 1)))
-        self.gui.tab.ySB.setText(str(round(self.gui.macros["YS_STEP2MICRON"] * self.gui.macros["YS_BACKLASH"], 1)))
-        self.gui.tab.zSB.setText(str(round(self.gui.macros["ZS_STEP2MICRON"] * self.gui.macros["ZS_BACKLASH"], 1)))
-        self.gui.tab.xOB.setText(str(round(self.gui.macros["XO_STEP2MICRON"] * self.gui.macros["XO_BACKLASH"], 1)))
-        self.gui.tab.yOB.setText(str(round(self.gui.macros["YO_STEP2MICRON"] * self.gui.macros["YO_BACKLASH"], 1)))
-        self.gui.tab.zOB.setText(str(round(self.gui.macros["ZO_STEP2MICRON"] * self.gui.macros["ZO_BACKLASH"], 1)))
+        self.gui.tab.xSB.setText(str(round(self.gui.macros["XS_STEP2MICRON"] * caget(self.gui.macros["XSB"], 1))))
+        self.gui.tab.ySB.setText(str(round(self.gui.macros["YS_STEP2MICRON"] * caget(self.gui.macros["YSB"], 1))))
+        self.gui.tab.zSB.setText(str(round(self.gui.macros["ZS_STEP2MICRON"] * caget(self.gui.macros["ZSB"], 1))))
+        self.gui.tab.xOB.setText(str(round(self.gui.macros["XO_STEP2MICRON"] * caget(self.gui.macros["XOB"], 1))))
+        self.gui.tab.yOB.setText(str(round(self.gui.macros["YO_STEP2MICRON"] * caget(self.gui.macros["YOB"], 1))))
+        self.gui.tab.zOB.setText(str(round(self.gui.macros["ZO_STEP2MICRON"] * caget(self.gui.macros["ZOB"])))
 
         # Set relative position global variables to current motor position.
         self.gui.macros["XS_RELATIVE_POSITION"] = caget(self.gui.macros["XSABSPOS"])
@@ -561,7 +561,7 @@ class Controller(object):
         axis = pvKey[0]
         object = pvKey[1]
 
-        lineEdit[(object, axis)].setText(str(round(self.gui.macros[f"{axis}{object}_STEP2MICRON"] * (value + self._offset(object, axis)), 1)))
+        lineEdit[(object, axis)].setText(str(round(self.gui.macros[f"{axis}{object}_STEP2MICRON"] * (value + self._offset(object, axis), 1))))
 
     def _offset(self, object: Literal["S", "O"], axis: Literal["X", "Y", "Z"], invert: bool = False) -> Union[int, float]:
         """Generate offset to convert between actual and relative values.
@@ -667,18 +667,18 @@ class Controller(object):
                             self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] = max
 
         # Update soft limit line edits.
-        self.gui.tab.xSMin.setText(str(round(self.gui.macros["XS_STEP2MICRON"] * self.gui.macros["XSMIN_SOFT_LIMIT"] - self._offset("S", "X", True), 1)))
-        self.gui.tab.xSMax.setText(str(round(self.gui.macros["XS_STEP2MICRON"] * self.gui.macros["XSMAX_SOFT_LIMIT"] - self._offset("S", "X", True), 1)))
-        self.gui.tab.ySMin.setText(str(round(self.gui.macros["YS_STEP2MICRON"] * self.gui.macros["YSMIN_SOFT_LIMIT"] - self._offset("S", "Y", True), 1)))
-        self.gui.tab.ySMax.setText(str(round(self.gui.macros["YS_STEP2MICRON"] * self.gui.macros["YSMAX_SOFT_LIMIT"] - self._offset("S", "Y", True), 1)))
-        self.gui.tab.zSMin.setText(str(round(self.gui.macros["ZS_STEP2MICRON"] * self.gui.macros["ZSMIN_SOFT_LIMIT"] - self._offset("S", "Z", True), 1)))
-        self.gui.tab.zSMax.setText(str(round(self.gui.macros["ZS_STEP2MICRON"] * self.gui.macros["ZSMAX_SOFT_LIMIT"] - self._offset("S", "Z", True), 1)))
-        self.gui.tab.xOMin.setText(str(round(self.gui.macros["XO_STEP2MICRON"] * self.gui.macros["XOMIN_SOFT_LIMIT"] - self._offset("O", "X", True), 1)))
-        self.gui.tab.xOMax.setText(str(round(self.gui.macros["XO_STEP2MICRON"] * self.gui.macros["XOMAX_SOFT_LIMIT"] - self._offset("O", "X", True), 1)))
-        self.gui.tab.yOMin.setText(str(round(self.gui.macros["YO_STEP2MICRON"] * self.gui.macros["YOMIN_SOFT_LIMIT"] - self._offset("O", "Y", True), 1)))
-        self.gui.tab.yOMax.setText(str(round(self.gui.macros["YO_STEP2MICRON"] * self.gui.macros["YOMAX_SOFT_LIMIT"] - self._offset("O", "Y", True), 1)))
-        self.gui.tab.zOMin.setText(str(round(self.gui.macros["ZO_STEP2MICRON"] * self.gui.macros["ZOMIN_SOFT_LIMIT"] - self._offset("O", "Z", True), 1)))
-        self.gui.tab.zOMax.setText(str(round(self.gui.macros["ZO_STEP2MICRON"] * self.gui.macros["ZOMAX_SOFT_LIMIT"] - self._offset("O", "Z", True), 1)))
+        self.gui.tab.xSMin.setText(str(round(self.gui.macros["XS_STEP2MICRON"] * (self.gui.macros["XSMIN_SOFT_LIMIT"] - self._offset("S", "X", True), 1))))
+        self.gui.tab.xSMax.setText(str(round(self.gui.macros["XS_STEP2MICRON"] * (self.gui.macros["XSMAX_SOFT_LIMIT"] - self._offset("S", "X", True), 1))))
+        self.gui.tab.ySMin.setText(str(round(self.gui.macros["YS_STEP2MICRON"] * (self.gui.macros["YSMIN_SOFT_LIMIT"] - self._offset("S", "Y", True), 1))))
+        self.gui.tab.ySMax.setText(str(round(self.gui.macros["YS_STEP2MICRON"] * (self.gui.macros["YSMAX_SOFT_LIMIT"] - self._offset("S", "Y", True), 1))))
+        self.gui.tab.zSMin.setText(str(round(self.gui.macros["ZS_STEP2MICRON"] * (self.gui.macros["ZSMIN_SOFT_LIMIT"] - self._offset("S", "Z", True), 1))))
+        self.gui.tab.zSMax.setText(str(round(self.gui.macros["ZS_STEP2MICRON"] * (self.gui.macros["ZSMAX_SOFT_LIMIT"] - self._offset("S", "Z", True), 1))))
+        self.gui.tab.xOMin.setText(str(round(self.gui.macros["XO_STEP2MICRON"] * (self.gui.macros["XOMIN_SOFT_LIMIT"] - self._offset("O", "X", True), 1))))
+        self.gui.tab.xOMax.setText(str(round(self.gui.macros["XO_STEP2MICRON"] * (self.gui.macros["XOMAX_SOFT_LIMIT"] - self._offset("O", "X", True), 1))))
+        self.gui.tab.yOMin.setText(str(round(self.gui.macros["YO_STEP2MICRON"] * (self.gui.macros["YOMIN_SOFT_LIMIT"] - self._offset("O", "Y", True), 1))))
+        self.gui.tab.yOMax.setText(str(round(self.gui.macros["YO_STEP2MICRON"] * (self.gui.macros["YOMAX_SOFT_LIMIT"] - self._offset("O", "Y", True), 1))))
+        self.gui.tab.zOMin.setText(str(round(self.gui.macros["ZO_STEP2MICRON"] * (self.gui.macros["ZOMIN_SOFT_LIMIT"] - self._offset("O", "Z", True), 1))))
+        self.gui.tab.zOMax.setText(str(round(self.gui.macros["ZO_STEP2MICRON"] * (self.gui.macros["ZOMAX_SOFT_LIMIT"] - self._offset("O", "Z", True), 1))))
 
         # Update soft limit indicators.
         self._soft_lim_indicators("S", "X")
@@ -696,37 +696,21 @@ class Controller(object):
     def _update_BL(self) -> None:
         """Update backlash variables."""
 
-        xSB = abs(int(float(self.gui.tab.xSB.text()) / self.gui.macros["XS_STEP2MICRON"]))
-        ySB = abs(int(float(self.gui.tab.ySB.text()) / self.gui.macros["YS_STEP2MICRON"]))
-        zSB = abs(int(float(self.gui.tab.zSB.text()) / self.gui.macros["ZS_STEP2MICRON"]))
-        xOB = abs(int(float(self.gui.tab.xOB.text()) / self.gui.macros["XO_STEP2MICRON"]))
-        yOB = abs(int(float(self.gui.tab.yOB.text()) / self.gui.macros["YO_STEP2MICRON"]))
-        zOB = abs(int(float(self.gui.tab.zOB.text()) / self.gui.macros["ZO_STEP2MICRON"]))
-
         # Set global backlash variables.
-        caput(self.gui.macros["XSB"], xSB)
-        caput(self.gui.macros["YSB"], ySB)
-        caput(self.gui.macros["ZSB"], zSB)
-        caput(self.gui.macros["XOB"], xOB)
-        caput(self.gui.macros["YOB"], yOB)
-        caput(self.gui.macros["ZOB"], zOB)
-
-        xSB = str(round(self.gui.macros["XS_STEP2MICRON"] * caget(self.gui.macros["XSB"]), 1))
-        ySB = str(round(self.gui.macros["YS_STEP2MICRON"] * caget(self.gui.macros["YSB"]), 1))
-        zSB = str(round(self.gui.macros["ZS_STEP2MICRON"] * caget(self.gui.macros["ZSB"]), 1))
-        xOB = str(round(self.gui.macros["XO_STEP2MICRON"] * caget(self.gui.macros["XOB"]), 1))
-        yOB = str(round(self.gui.macros["YO_STEP2MICRON"] * caget(self.gui.macros["YOB"]), 1))
-        zOB = str(round(self.gui.macros["ZO_STEP2MICRON"] * caget(self.gui.macros["ZOB"]), 1))
+        caput(self.gui.macros["XSB"], abs(int(float(self.gui.tab.xSB.text()) / self.gui.macros["XS_STEP2MICRON"])))
+        caput(self.gui.macros["YSB"], abs(int(float(self.gui.tab.ySB.text()) / self.gui.macros["YS_STEP2MICRON"])))
+        caput(self.gui.macros["ZSB"], abs(int(float(self.gui.tab.zSB.text()) / self.gui.macros["ZS_STEP2MICRON"])))
+        caput(self.gui.macros["XOB"], abs(int(float(self.gui.tab.xOB.text()) / self.gui.macros["XO_STEP2MICRON"])))
+        caput(self.gui.macros["YOB"], abs(int(float(self.gui.tab.yOB.text()) / self.gui.macros["YO_STEP2MICRON"])))
+        caput(self.gui.macros["ZOB"], abs(int(float(self.gui.tab.zOB.text()) / self.gui.macros["ZO_STEP2MICRON"])))
 
         # Reset backlash line edits for consistent formatting.
-        self.gui.tab.xSB.setText(xSB)
-        self.gui.tab.ySB.setText(ySB)
-        self.gui.tab.zSB.setText(zSB)
-        self.gui.tab.xOB.setText(xOB)
-        self.gui.tab.yOB.setText(yOB)
-        self.gui.tab.zOB.setText(zOB)
-
-        
+        self.gui.tab.xSB.setText(round(str(self.gui.macros["XS_STEP2MICRON"] * caget(self.gui.macros["XSB"]))), 1)
+        self.gui.tab.ySB.setText(round(str(self.gui.macros["YS_STEP2MICRON"] * caget(self.gui.macros["YSB"]))), 1)
+        self.gui.tab.zSB.setText(round(str(self.gui.macros["ZS_STEP2MICRON"] * caget(self.gui.macros["ZSB"]))), 1)
+        self.gui.tab.xOB.setText(round(str(self.gui.macros["XO_STEP2MICRON"] * caget(self.gui.macros["XOB"]))), 1)
+        self.gui.tab.yOB.setText(round(str(self.gui.macros["YO_STEP2MICRON"] * caget(self.gui.macros["YOB"]))), 1)
+        self.gui.tab.zOB.setText(round(str(self.gui.macros["ZO_STEP2MICRON"] * caget(self.gui.macros["ZOB"])))
 
         self._append_text("Updating backlash values.")
 
@@ -827,7 +811,7 @@ class Controller(object):
         absPos = caget(self.gui.macros[f"{axis}{object}ABSPOS"])
         self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"] = absPos - basePos
 
-        lineEdit[(object, axis)].setText(str(round(self.gui.macros[f"{axis}{object}_STEP2MICRON"] * (absPos - basePos + self._offset(object, axis)), 1)))
+        lineEdit[(object, axis)].setText(round(str(self.gui.macros[f"{axis}{object}_STEP2MICRON"] * (absPos - basePos + self._offset(object, axis)))), 1)
 
     def _check_motor_position(self) -> None:
         """Moves motors within soft limits.
@@ -962,7 +946,7 @@ class Controller(object):
 
                 # Change absolute position line edit.
                 relPos = self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"]
-                lineEdit[(object, axis)].setText(str(round(self.gui.macros[f"{axis}{object}_STEP2MICRON"] * (relPos + self._offset(object, axis)), 1)))
+                lineEdit[(object, axis)].setText(round(str(self.gui.macros[f"{axis}{object}_STEP2MICRON"] * (relPos + self._offset(object, axis)))), 1)
 
                 offset = self._offset(object, axis, True)
 
@@ -980,7 +964,7 @@ class Controller(object):
                 # Change current step line edit.
                 value = caget(self.gui.macros[f"{axis}{object}POS"])
                 factor = self.gui.macros[f"{axis}{object}_STEP2MICRON"]
-                currentStep[(object, axis)].setText("<b>%5.1f microns</b>" % round(factor * (value - offset), 1))
+                currentStep[(object, axis)].setText(f"<b>%5.1f microns</b>" % round(factor * (value - offset), 1))
 
     def _set_current_position(self, **kwargs: Union[str, int, float]) -> None:
         """Update current position label.
@@ -1010,7 +994,7 @@ class Controller(object):
         offset = self._offset(object, axis, True)
 
         factor = self.gui.macros[f"{axis}{object}_STEP2MICRON"]
-        stepLineEdit[(object, axis)].setText("<b>%5.1f microns</b>" % round(factor * (value - offset), 1))
+        stepLineEdit[(object, axis)].setText(f"<b>{round(factor * (value - offset), 1)} STEPS</b>")
 
     def _append_text(self, text: str, color: QColor=QColor(0, 0, 0)) -> None:
         """Append text to console window.
