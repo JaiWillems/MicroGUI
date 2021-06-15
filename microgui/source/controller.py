@@ -128,13 +128,13 @@ class Controller(object):
         self.gui.tab.zOMin.setText(str(float(self.gui.macros["ZOMIN_SOFT_LIMIT"])))
         self.gui.tab.zOMax.setText(str(float(self.gui.macros["ZOMAX_SOFT_LIMIT"])))
 
-        # Set backlash value line edits.
-        self.gui.tab.xSB.setText(str(float(self.gui.macros["XS_BACKLASH"])))
-        self.gui.tab.ySB.setText(str(float(self.gui.macros["YS_BACKLASH"])))
-        self.gui.tab.zSB.setText(str(float(self.gui.macros["ZS_BACKLASH"])))
-        self.gui.tab.xOB.setText(str(float(self.gui.macros["XO_BACKLASH"])))
-        self.gui.tab.yOB.setText(str(float(self.gui.macros["YO_BACKLASH"])))
-        self.gui.tab.zOB.setText(str(float(self.gui.macros["ZO_BACKLASH"])))
+        # Set backlash PV values.
+        caput(self.gui.macros["XSB"], self.gui.macros["XS_BACKLASH"])
+        caput(self.gui.macros["YSB"], self.gui.macros["YS_BACKLASH"])
+        caput(self.gui.macros["ZSB"], self.gui.macros["ZS_BACKLASH"])
+        caput(self.gui.macros["XOB"], self.gui.macros["XO_BACKLASH"])
+        caput(self.gui.macros["YOB"], self.gui.macros["YO_BACKLASH"])
+        caput(self.gui.macros["ZOB"], self.gui.macros["ZO_BACKLASH"])
 
         # Set step line edits to current PV values.
         self.gui.xSStep.setText(str(caget(self.gui.macros["XSSTEP"])))
