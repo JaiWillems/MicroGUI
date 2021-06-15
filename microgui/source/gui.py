@@ -253,10 +253,10 @@ class GUI(QMainWindow):
         self.setFixedHeight(750)
 
         # Center frame.
-        rect = self.findGeometry()
-        centerPoint = QDesktopWidget().availableGeometry().center()
-        rect.moveCenter(centerPoint)
-        self.move(rect.topLeft())
+        #rect = self.findGeometry()
+        #centerPoint = QDesktopWidget().availableGeometry().center()
+        #rect.moveCenter(centerPoint)
+        #self.move(rect.topLeft())
 
         # Add sub-windows to main window layout.
         self.layout = QGridLayout()
@@ -782,7 +782,7 @@ class GUI(QMainWindow):
         QWidget
             Window for file configuration access.
         """
-        self.conifgWindow = QWidget()
+        self.configWindow = QWidget()
 
         # Define configuration widgets.
         self.loadConfig = QPushButton("Load Config")
@@ -796,7 +796,7 @@ class GUI(QMainWindow):
         layout = QGridLayout()
         layout.addWidget(self.loadConfig)
         layout.addWidget(self.saveConfig)
-        self.conifgWindow.setLayout(layout)
+        self.configWindow.setLayout(layout)
 
         return self.configWindow
 
