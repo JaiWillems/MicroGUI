@@ -266,7 +266,7 @@ class GUI(QMainWindow):
         self.layout.addWidget(self._sample_window(), 2, 0, 1, 15)
         self.layout.addWidget(self._objective_window(), 3, 0, 1, 15)
         self.layout.addWidget(self._text_window(), 4, 0, 2, 14)
-        self.layout.addWidget(self._config_file(), 4, 14, 1, 1)
+        self.layout.addWidget(self._miscelaneous(), 4, 14, 1, 1)
 
         # Set main window layout.
         self.centralWidget = QWidget(self)
@@ -774,28 +774,33 @@ class GUI(QMainWindow):
 
         return self.textWindow
     
-    def _config_file(self) -> QWidget:
-        """Create configuration window.
+    def _miscelaneous(self) -> QWidget:
+        """Create a window for miscelaneous controls.
 
         Returns
         -------
         QWidget
-            Window for file configuration access.
+            Window for miscelaneous functionality.
         """
         self.configWindow = QWidget()
 
         # Define configuration widgets.
         self.loadConfig = QPushButton("Load Config")
         self.saveConfig = QPushButton("Save Config")
+        self.positionUnits = QPushButton("Microns")
 
         # Style configuration widgets.
         self.loadConfig.setStyleSheet("background-color: lightgrey")
         self.saveConfig.setStyleSheet("background-color: lightgrey")
+        self.positionUnits.setStyleSheet("background-color: lightgrey")
 
         # Set configuration button layout.
         layout = QGridLayout()
-        layout.addWidget(self.loadConfig)
-        layout.addWidget(self.saveConfig)
+        layout.addWidget(QLabel("<b>Program Config</b>"), 0, 0, 1, 1)
+        layout.addWidget(self.loadConfig, 1, 0, 1, 1)
+        layout.addWidget(self.saveConfig, 2, 0, 1, 1)
+        layout.addWidget(QLabel("<b>Current Position Units</b>"), 0, 1, 1, 1)
+        layout.addWidget(self.positionUnits, 1, 1, 2, 1)
         self.configWindow.setLayout(layout)
 
         return self.configWindow

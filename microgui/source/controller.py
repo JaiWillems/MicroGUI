@@ -301,6 +301,7 @@ class Controller(object):
         self.gui.tab.SBL.clicked.connect(self._update_BL)
         self.gui.tab.valueType.clicked.connect(self._change_display_vals)
         self.gui.tab.globals.clicked.connect(self._print_globals)
+        self.gui.positionUnits.clicked.connect(self._change_units)
 
         # Configuration functionality.
         self.gui.loadConfig.clicked.connect(self._load_config)
@@ -963,7 +964,12 @@ class Controller(object):
 
                 # Change current step line edit.
                 value = caget(self.gui.macros[f"{axis}{object}POS"])
-                currentStep[(object, axis)].setText(f"<b>{value - offset} STEPS</b>")
+                if self.gui.positionUnits.isChecked():
+                    factor = self.gui.macros[f"{axis}{object}_STEP2MICRON"]
+                    stepText = f"<b>{factor * (value - offset)} MICRONS</b>"
+                else:
+                    stepText = f"<b>{value - offset} STEPS</b>"
+                currentStep[(object, axis)].setText(stepText)
 
     def _set_current_position(self, **kwargs: Union[str, int, float]) -> None:
         """Update current position label.
@@ -992,7 +998,12 @@ class Controller(object):
 
         offset = self._offset(object, axis, True)
 
-        stepText = f"<b>{value - offset} STEPS</b>"
+        if self.gui.positionUnits.isChecked():
+            factor = self.gui.macros[f"{axis}{object}_STEP2MICRON"]
+            stepText = f"<b>{factor * (value - offset)} MICRONS</b>"
+        else:
+            stepText = f"<b>{value - offset} STEPS</b>"
+
         stepLineEdit[(object, axis)].setText(stepText)
 
     def _append_text(self, text: str, color: QColor=QColor(0, 0, 0)) -> None:
@@ -1042,3 +1053,24 @@ class Controller(object):
         save_config(path, self.gui.data, self.gui.macros)
 
         self._append_text(f"Configuration saved to {path}")
+    
+    def _change_units(self) -> None:
+        """
+        """
+        currentStep = {("S", "X"): self.gui.xStepS, ("O", "X"): self.gui.xStepO,
+                       ("S", "Y"): self.gui.yStepS, ("O", "Y"): self.gui.yStepO,
+                       ("S", "Z"): self.gui.zStepS, ("O", "Z"): self.gui.zStepO}
+
+        for object in ["O", "S"]:
+            for axis in ["X", "Y", "Z"]:
+
+                offset = self._offset(object, axis, True)
+                value = caget(self.gui.macros[f"{axis}{object}POS"])
+
+                if self.gui.positionUnits.isChecked():
+                    factor = self.gui.macros[f"{axis}{object}_STEP2MICRON"]
+                    stepText = f"<b>{factor * (value - offset)} MICRONS</b>"
+                else:
+                    stepText = f"<b>{value - offset} STEPS</b>"
+                
+                currentStep[(object, axis)].setText(stepText)
