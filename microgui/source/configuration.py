@@ -16,7 +16,7 @@ def load_config(path: str) -> Dict:
     ----------
     path : str
         Path to configuration file to upload.
-    
+
     Returns
     -------
     Dict
@@ -29,7 +29,7 @@ def load_config(path: str) -> Dict:
         jsonfile.close()
     macros = {}
     init_macros(data, macros)
-    
+
     return data, macros
 
 
@@ -53,7 +53,7 @@ def save_config(path: str, data: Dict, macros: Dict) -> None:
 
 def init_macros(baseDict: Dict, macroDict: Dict) -> None:
     """Initialize macro variables.
-    
+
     This function transforms, in place, a nested dictionary into a planar
     dictionary.
 
@@ -63,7 +63,7 @@ def init_macros(baseDict: Dict, macroDict: Dict) -> None:
         Nested dictionary of values.
     macroDict : Dict
         New planar dictionary to add key/value pairs to from `baseDict`.
-    
+
     Returns
     -------
     None
@@ -78,7 +78,7 @@ def init_macros(baseDict: Dict, macroDict: Dict) -> None:
 
 def condense_macros(baseDict: Dict, macroDict: Dict) -> None:
     """Save macro variables.
-    
+
     This function updates the values of a nested dictionary from the a planar
     dictionary with common keys.
 
@@ -88,7 +88,7 @@ def condense_macros(baseDict: Dict, macroDict: Dict) -> None:
         Nested dictionary of values.
     macroDict : Dict
         New planar dictionary to add key/value pairs to from `baseDict`.
-    
+
     Returns
     -------
     None

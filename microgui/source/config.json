@@ -62,9 +62,9 @@
         }
     },
     "backlash": {
-        "XS_BACKLASH": 0,
-        "YS_BACKLASH": 0,
-        "ZS_BACKLASH": 0,
+        "XS_BACKLASH": 7,
+        "YS_BACKLASH": 40,
+        "ZS_BACKLASH": 16,
         "XO_BACKLASH": 0,
         "YO_BACKLASH": 0,
         "ZO_BACKLASH": 0
