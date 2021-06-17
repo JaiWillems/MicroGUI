@@ -15,6 +15,7 @@ MicroGUI's documentation
    modules/controller
    modules/configuration
    modules/flir_camera_control
+   modules/thorlabs_motor_control
 
 
 

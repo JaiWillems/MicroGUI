@@ -1,5 +1,5 @@
 Controller
-=========
+==========
 
 .. automodule:: controller
    :members:

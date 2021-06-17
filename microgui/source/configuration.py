@@ -63,10 +63,6 @@ def init_macros(baseDict: Dict, macroDict: Dict) -> None:
         Nested dictionary of values.
     macroDict : Dict
         New planar dictionary to add key/value pairs to from `baseDict`.
-
-    Returns
-    -------
-    None
     """
     keys = baseDict.keys()
     for key in keys:
@@ -88,10 +84,6 @@ def condense_macros(baseDict: Dict, macroDict: Dict) -> None:
         Nested dictionary of values.
     macroDict : Dict
         New planar dictionary to add key/value pairs to from `baseDict`.
-
-    Returns
-    -------
-    None
     """
     keys = baseDict.keys()
     for key in keys:

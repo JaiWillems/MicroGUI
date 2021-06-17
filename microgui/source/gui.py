@@ -667,8 +667,8 @@ class GUI(QMainWindow):
         self.xOCn.setStyleSheet("background-color: lightgrey")
         self.xOStop.setStyleSheet("background-color: red")
         self.xOCp.setStyleSheet("background-color: lightgrey")
-        self.xOSn.setStyleSheet
-        ("background-color: lightgrey; border: 1px solid black;")
+        self.xOSn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
         self.xOSp.setStyleSheet(
             "background-color: lightgrey; border: 1px solid black;")
         self.xOHn.setStyleSheet(

@@ -215,105 +215,18 @@ class Controller(object):
         callback functions.
         """
 
-        # Set THORLABS motor position line edits.
-        self.gui.tab.TMTM.setText(
-            str(float(self.gui.macros["TRANSMISSION_POSITION"])))
-        self.gui.tab.TMRM.setText(
-            str(float(self.gui.macros["REFLECTION_POSITION"])))
-        self.gui.tab.TMVM.setText(
-            str(float(self.gui.macros["VISIBLE_IMAGE_POSITION"])))
-        self.gui.tab.TMBM.setText(
-            str(float(self.gui.macros["BEAMSPLITTER_POSITION"])))
-
-        # Set soft limit line edits.
-        self.gui.tab.xSMin.setText(
-            str(float(self.gui.macros["XSMIN_SOFT_LIMIT"])))
-        self.gui.tab.xSMax.setText(
-            str(float(self.gui.macros["XSMAX_SOFT_LIMIT"])))
-        self.gui.tab.ySMin.setText(
-            str(float(self.gui.macros["YSMIN_SOFT_LIMIT"])))
-        self.gui.tab.ySMax.setText(
-            str(float(self.gui.macros["YSMAX_SOFT_LIMIT"])))
-        self.gui.tab.zSMin.setText(
-            str(float(self.gui.macros["ZSMIN_SOFT_LIMIT"])))
-        self.gui.tab.zSMax.setText(
-            str(float(self.gui.macros["ZSMAX_SOFT_LIMIT"])))
-        self.gui.tab.xOMin.setText(
-            str(float(self.gui.macros["XOMIN_SOFT_LIMIT"])))
-        self.gui.tab.xOMax.setText(
-            str(float(self.gui.macros["XOMAX_SOFT_LIMIT"])))
-        self.gui.tab.yOMin.setText(
-            str(float(self.gui.macros["YOMIN_SOFT_LIMIT"])))
-        self.gui.tab.yOMax.setText(
-            str(float(self.gui.macros["YOMAX_SOFT_LIMIT"])))
-        self.gui.tab.zOMin.setText(
-            str(float(self.gui.macros["ZOMIN_SOFT_LIMIT"])))
-        self.gui.tab.zOMax.setText(
-            str(float(self.gui.macros["ZOMAX_SOFT_LIMIT"])))
-
-        # Set backlash PV values.
-        caput(self.gui.macros["XSB"], self.gui.macros["XS_BACKLASH"])
-        caput(self.gui.macros["YSB"], self.gui.macros["YS_BACKLASH"])
-        caput(self.gui.macros["ZSB"], self.gui.macros["ZS_BACKLASH"])
-        caput(self.gui.macros["XOB"], self.gui.macros["XO_BACKLASH"])
-        caput(self.gui.macros["YOB"], self.gui.macros["YO_BACKLASH"])
-        caput(self.gui.macros["ZOB"], self.gui.macros["ZO_BACKLASH"])
-
-        # Set step line edits to current PV values.
-        self.gui.xSStep.setText(str(caget(self.gui.macros["XSSTEP"])))
-        self.gui.ySStep.setText(str(caget(self.gui.macros["YSSTEP"])))
-        self.gui.zSStep.setText(str(caget(self.gui.macros["ZSSTEP"])))
-        self.gui.xOStep.setText(str(caget(self.gui.macros["XOSTEP"])))
-        self.gui.yOStep.setText(str(caget(self.gui.macros["YOSTEP"])))
-        self.gui.zOStep.setText(str(caget(self.gui.macros["ZOSTEP"])))
-
-        # Set absolute position line edits to current PV values.
-        self.gui.xSAbsPos.setText(str(caget(self.gui.macros["XSABSPOS"])))
-        self.gui.ySAbsPos.setText(str(caget(self.gui.macros["YSABSPOS"])))
-        self.gui.zSAbsPos.setText(str(caget(self.gui.macros["ZSABSPOS"])))
-        self.gui.xOAbsPos.setText(str(caget(self.gui.macros["XOABSPOS"])))
-        self.gui.yOAbsPos.setText(str(caget(self.gui.macros["YOABSPOS"])))
-        self.gui.zOAbsPos.setText(str(caget(self.gui.macros["ZOABSPOS"])))
-
-        # Set backlash line edits to current PV values.
-        self.gui.tab.xSB.setText(str(caget(self.gui.macros["XSB"])))
-        self.gui.tab.ySB.setText(str(caget(self.gui.macros["YSB"])))
-        self.gui.tab.zSB.setText(str(caget(self.gui.macros["ZSB"])))
-        self.gui.tab.xOB.setText(str(caget(self.gui.macros["XOB"])))
-        self.gui.tab.yOB.setText(str(caget(self.gui.macros["YOB"])))
-        self.gui.tab.zOB.setText(str(caget(self.gui.macros["ZOB"])))
-
-        # Set relative position global variables to current motor position.
-        self.gui.macros["XS_RELATIVE_POSITION"] = caget(
-            self.gui.macros["XSABSPOS"])
-        self.gui.macros["YS_RELATIVE_POSITION"] = caget(
-            self.gui.macros["YSABSPOS"])
-        self.gui.macros["ZS_RELATIVE_POSITION"] = caget(
-            self.gui.macros["ZSABSPOS"])
-        self.gui.macros["XO_RELATIVE_POSITION"] = caget(
-            self.gui.macros["XOABSPOS"])
-        self.gui.macros["YO_RELATIVE_POSITION"] = caget(
-            self.gui.macros["YOABSPOS"])
-        self.gui.macros["ZO_RELATIVE_POSITION"] = caget(
-            self.gui.macros["ZOABSPOS"])
-
-        # Enable Thorlabs motor.
-        enable(self.modeMotor)
-
-        self._append_text("Display values and macros initialized.")
-
         # Set absolute position PV monitoring and callback.
         self.PV_XSABSPOS = PV(pvname=self.gui.macros["XSABSPOS"],
                               auto_monitor=True, callback=self._update_abs_pos)
-        self.PV_ySABSPOS = PV(pvname=self.gui.macros["YSABSPOS"],
+        self.PV_YSABSPOS = PV(pvname=self.gui.macros["YSABSPOS"],
                               auto_monitor=True, callback=self._update_abs_pos)
-        self.PV_zSABSPOS = PV(pvname=self.gui.macros["ZSABSPOS"],
+        self.PV_ZSABSPOS = PV(pvname=self.gui.macros["ZSABSPOS"],
                               auto_monitor=True, callback=self._update_abs_pos)
         self.PV_XOABSPOS = PV(pvname=self.gui.macros["XOABSPOS"],
                               auto_monitor=True, callback=self._update_abs_pos)
-        self.PV_yOABSPOS = PV(pvname=self.gui.macros["YOABSPOS"],
+        self.PV_YOABSPOS = PV(pvname=self.gui.macros["YOABSPOS"],
                               auto_monitor=True, callback=self._update_abs_pos)
-        self.PV_zOABSPOS = PV(pvname=self.gui.macros["ZOABSPOS"],
+        self.PV_ZOABSPOS = PV(pvname=self.gui.macros["ZOABSPOS"],
                               auto_monitor=True, callback=self._update_abs_pos)
 
         # Configure emergency stop PVs.
@@ -379,6 +292,105 @@ class Controller(object):
                            callback=self._set_current_position)
 
         self._append_text("PVs configured and initialized.")
+
+        # Set THORLABS motor position line edits.
+        self.gui.tab.TMTM.setText(
+            str(float(self.gui.macros["TRANSMISSION_POSITION"])))
+        self.gui.tab.TMRM.setText(
+            str(float(self.gui.macros["REFLECTION_POSITION"])))
+        self.gui.tab.TMVM.setText(
+            str(float(self.gui.macros["VISIBLE_IMAGE_POSITION"])))
+        self.gui.tab.TMBM.setText(
+            str(float(self.gui.macros["BEAMSPLITTER_POSITION"])))
+
+        # Set soft limit line edits.
+        self.gui.tab.xSMin.setText(
+            str(float(self.gui.macros["XSMIN_SOFT_LIMIT"])))
+        self.gui.tab.xSMax.setText(
+            str(float(self.gui.macros["XSMAX_SOFT_LIMIT"])))
+        self.gui.tab.ySMin.setText(
+            str(float(self.gui.macros["YSMIN_SOFT_LIMIT"])))
+        self.gui.tab.ySMax.setText(
+            str(float(self.gui.macros["YSMAX_SOFT_LIMIT"])))
+        self.gui.tab.zSMin.setText(
+            str(float(self.gui.macros["ZSMIN_SOFT_LIMIT"])))
+        self.gui.tab.zSMax.setText(
+            str(float(self.gui.macros["ZSMAX_SOFT_LIMIT"])))
+        self.gui.tab.xOMin.setText(
+            str(float(self.gui.macros["XOMIN_SOFT_LIMIT"])))
+        self.gui.tab.xOMax.setText(
+            str(float(self.gui.macros["XOMAX_SOFT_LIMIT"])))
+        self.gui.tab.yOMin.setText(
+            str(float(self.gui.macros["YOMIN_SOFT_LIMIT"])))
+        self.gui.tab.yOMax.setText(
+            str(float(self.gui.macros["YOMAX_SOFT_LIMIT"])))
+        self.gui.tab.zOMin.setText(
+            str(float(self.gui.macros["ZOMIN_SOFT_LIMIT"])))
+        self.gui.tab.zOMax.setText(
+            str(float(self.gui.macros["ZOMAX_SOFT_LIMIT"])))
+
+        # Set backlash PV values.
+        caput(self.gui.macros["XSB"], self.gui.macros["XS_BACKLASH"])
+        caput(self.gui.macros["YSB"], self.gui.macros["YS_BACKLASH"])
+        caput(self.gui.macros["ZSB"], self.gui.macros["ZS_BACKLASH"])
+        caput(self.gui.macros["XOB"], self.gui.macros["XO_BACKLASH"])
+        caput(self.gui.macros["YOB"], self.gui.macros["YO_BACKLASH"])
+        caput(self.gui.macros["ZOB"], self.gui.macros["ZO_BACKLASH"])
+
+        # Set backlash line edits to current PV values.
+        self.gui.tab.xSB.setText(str(self.gui.macros["XS_BACKLASH"]))
+        self.gui.tab.ySB.setText(str(self.gui.macros["YS_BACKLASH"]))
+        self.gui.tab.zSB.setText(str(self.gui.macros["ZS_BACKLASH"]))
+        self.gui.tab.xOB.setText(str(self.gui.macros["XO_BACKLASH"]))
+        self.gui.tab.yOB.setText(str(self.gui.macros["YO_BACKLASH"]))
+        self.gui.tab.zOB.setText(str(self.gui.macros["ZO_BACKLASH"]))
+
+        # Set step line edits to current PV values.
+        self.gui.xSStep.setText(str(caget(self.gui.macros["XSSTEP"])))
+        self.gui.ySStep.setText(str(caget(self.gui.macros["YSSTEP"])))
+        self.gui.zSStep.setText(str(caget(self.gui.macros["ZSSTEP"])))
+        self.gui.xOStep.setText(str(caget(self.gui.macros["XOSTEP"])))
+        self.gui.yOStep.setText(str(caget(self.gui.macros["YOSTEP"])))
+        self.gui.zOStep.setText(str(caget(self.gui.macros["ZOSTEP"])))
+
+        # Set PV's to uploaded motor position.
+        self.PV_XSABSPOS.put(self.gui.macros["XS_BASE_POSITION"] +
+                             self.gui.macros["XS_RELATIVE_POSITION"])
+        caput(self.gui.macros["XSMOVE"], 1)
+        caput(self.gui.macros["XSMOVE"], 0)
+        self.PV_YSABSPOS.put(self.gui.macros["YS_BASE_POSITION"] +
+                             self.gui.macros["YS_RELATIVE_POSITION"])
+        caput(self.gui.macros["YSMOVE"], 1)
+        caput(self.gui.macros["YSMOVE"], 0)
+        self.PV_ZSABSPOS.put(self.gui.macros["ZS_BASE_POSITION"] +
+                             self.gui.macros["ZS_RELATIVE_POSITION"])
+        caput(self.gui.macros["ZSMOVE"], 1)
+        caput(self.gui.macros["ZSMOVE"], 0)
+        self.PV_XOABSPOS.put(self.gui.macros["XO_BASE_POSITION"] +
+                             self.gui.macros["XO_RELATIVE_POSITION"])
+        caput(self.gui.macros["XOMOVE"], 1)
+        caput(self.gui.macros["XOMOVE"], 0)
+        self.PV_YOABSPOS.put(self.gui.macros["YO_BASE_POSITION"] +
+                             self.gui.macros["YO_RELATIVE_POSITION"])
+        caput(self.gui.macros["YOMOVE"], 1)
+        caput(self.gui.macros["YOMOVE"], 0)
+        self.PV_ZOABSPOS.put(self.gui.macros["ZO_BASE_POSITION"] +
+                             self.gui.macros["ZO_RELATIVE_POSITION"])
+        caput(self.gui.macros["ZOMOVE"], 1)
+        caput(self.gui.macros["ZOMOVE"], 0)
+    
+        # Set absolute position line edits to current PV values.
+        self.gui.xSAbsPos.setText(str(caget(self.gui.macros["XSABSPOS"])))
+        self.gui.ySAbsPos.setText(str(caget(self.gui.macros["YSABSPOS"])))
+        self.gui.zSAbsPos.setText(str(caget(self.gui.macros["ZSABSPOS"])))
+        self.gui.xOAbsPos.setText(str(caget(self.gui.macros["XOABSPOS"])))
+        self.gui.yOAbsPos.setText(str(caget(self.gui.macros["YOABSPOS"])))
+        self.gui.zOAbsPos.setText(str(caget(self.gui.macros["ZOABSPOS"])))
+
+        # Enable Thorlabs motor.
+        enable(self.modeMotor)
+
+        self._append_text("Display values and macros initialized.")
 
     def _connect_signals(self) -> None:
         """Connect widgets and control sequences.

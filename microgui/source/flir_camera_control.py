@@ -15,10 +15,6 @@ def get_image() -> np.array:
     This function interfaces with a compatible and connected FLIR camera to
     capture an image and return the image data.
 
-    Parameters
-    ----------
-    None
-
     Returns
     -------
     np.array
