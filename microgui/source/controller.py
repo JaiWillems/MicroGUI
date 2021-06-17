@@ -968,11 +968,11 @@ class Controller(object):
             int(float(self.gui.tab.ySB.text())))
         self.gui.macros["ZS_BACKLASH"] = abs(
             int(float(self.gui.tab.zSB.text())))
-        self.gui.macros["XS_BACKLASH"] = abs(
+        self.gui.macros["XO_BACKLASH"] = abs(
             int(float(self.gui.tab.xOB.text())))
-        self.gui.macros["YS_BACKLASH"] = abs(
+        self.gui.macros["YO_BACKLASH"] = abs(
             int(float(self.gui.tab.yOB.text())))
-        self.gui.macros["ZS_BACKLASH"] = abs(
+        self.gui.macros["ZO_BACKLASH"] = abs(
             int(float(self.gui.tab.zOB.text())))
 
         # Set backlash PV's.

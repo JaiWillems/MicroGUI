@@ -41,7 +41,7 @@ def program_exit(gui: GUI) -> None:
             pv.put(0)
 
 
-# Run the GUI.
+# Start GUI execution.
 app = QApplication([])
 app.setStyle("Windows")
 gui = GUI(data=data, macros=macros)
