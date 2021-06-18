@@ -1442,30 +1442,34 @@ class Controller(object):
         
     def _save_position(self):
         """Save the current position to the program."""
-        posLabel = self.posLabel.text()
+        label = self.posLabel.text()
         position = {}
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
                 position[(object, axis)] = caget(self.gui.macros[f"{axis}{object}POS"])
-        self.savedPos[posLabel] = position
+        self.savedPos[label] = position
 
-        if self.comboBox.findText(posLabel) == -1:
-            self.comboBox.insertItem(1, posLabel)
+        if self.comboBox.findText(label) == -1:
+            self.comboBox.insertItem(1, label)
             save_pos_config(path="saved_positions.json", data=self.savedPos)
+            self._append_text(f"Position, \"{label}\", saved.")
         else:
             self._append_text("ERROR: Position label already exists, change the position label and try again.",
                               QColor(255, 0, 0))
 
     def _load_position(self):
         """Load the selected position to the program."""
-        posLabel = self.comboBox.currentText()
-        position = self.savePos[posLabel]
+        label = self.comboBox.currentText()
 
-        for object in ["S", "O"]:
-            for axis in ["X", "Y", "Z"]:
-                caput(self.gui.macros[f"{axis}{object}ABSPOS"], position[(object, axis)])
-                caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
-                caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
+        if label != "--None--":
+            position = self.savePos[label]
+            for object in ["S", "O"]:
+                for axis in ["X", "Y", "Z"]:
+                    caput(self.gui.macros[f"{axis}{object}ABSPOS"], position[(object, axis)])
+                    caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
+                    caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
+            
+            self._append_text(f"Position, \"{label}\", loaded.")
 
     def _delete_position(self):
         """Delete the selected position from the program."""
@@ -1474,7 +1478,8 @@ class Controller(object):
         if index != 0:
             self.comboBox.removeItem(index)
             del self.savedPos[label]
-        save_pos_config(path="saved_positions.json", data=self.savedPos)
+            save_pos_config(path="saved_positions.json", data=self.savedPos)
+            self._append_text(f"Position, \"{label}\", deleted.")
 
     def _clear_position(self):
         """Clear all saved positions from the program."""
@@ -1483,4 +1488,5 @@ class Controller(object):
             self.comboBox.removeItem(index)
         self.comboBox = {}
         save_pos_config(path="saved_positions.json", data=self.savedPos)
+        self._append_text("All positions cleared.")
         
