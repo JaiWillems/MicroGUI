@@ -37,7 +37,8 @@ from PyQt5.QtWidgets import (
     QRadioButton,
     QTabWidget,
     QScrollBar,
-    QWidget
+    QWidget,
+    QComboBox
 )
 
 # Import file dependencies.
@@ -56,6 +57,8 @@ class GUI(QMainWindow):
         Dictionary of raw variable data.
     macros : Dict
         Dictionary of macro variables.
+    savedPos : Dict
+        Dictionary of saved positions.
 
     Attributes
     ----------
@@ -264,19 +267,18 @@ class GUI(QMainWindow):
         Creates the sample window.
     _objective_window()
         Creates the objective window.
-    _text_window()
-        Creates the text browser window.
-    _miscelaneous()
-        Create window for miscelaneous controls.
+    _base_window()
+        Creates the GUI's base window.
     """
 
-    def __init__(self, data: Dict, macros: Dict) -> None:
+    def __init__(self, data: Dict, macros: Dict, savedPos: Dict) -> None:
         """Initialize the GUI."""
 
         super().__init__()
 
         self.data = data
         self.macros = macros
+        self.savedPos = savedPos
 
         # Set CLS logo.
         self.setWindowIcon(QIcon('figures/CLS_logo.png'))
@@ -293,8 +295,7 @@ class GUI(QMainWindow):
         self.layout.addWidget(self._tabular_window(), 0, 10, 2, 5)
         self.layout.addWidget(self._sample_window(), 2, 0, 1, 15)
         self.layout.addWidget(self._objective_window(), 3, 0, 1, 15)
-        self.layout.addWidget(self._text_window(), 4, 0, 2, 14)
-        self.layout.addWidget(self._miscelaneous(), 4, 14, 1, 1)
+        self.layout.addWidget(self._base_window(), 4, 0, 3, 15)
 
         # Set main window layout.
         self.centralWidget = QWidget(self)
@@ -817,50 +818,85 @@ class GUI(QMainWindow):
         window.setLayout(layout)
         return window
 
-    def _text_window(self) -> QTextBrowser:
-        """Create text/console window.
+    def _base_window(self) -> QTextBrowser:
+        """Create GUI's base window.
 
         Returns
         -------
         QWidget
             Window representing the objective interactive widgets.
         """
+        # Initialize the text browser window.
         self.textWindow = QTextBrowser()
         self.textWindow.setAcceptRichText(True)
         self.textWindow.setOpenExternalLinks(True)
         self.textWindow.setVerticalScrollBar(QScrollBar())
 
-        return self.textWindow
+        # Save and load position functionality.
+        self.savePos = QPushButton("Save Position")
+        self.loadPos = QPushButton("Load Position")
+        self.deletePos = QPushButton("Delete Position")
+        self.clearPos = QPushButton("Clear All Positions")
+        self.posSelect = QComboBox()
+        self.posLabel = QLineEdit("Position Label")
 
-    def _miscelaneous(self) -> QWidget:
-        """Create a window for miscelaneous controls.
+        self.posSelect.addItem("--None--")
+        for key in self.savedPos.keys():
+            self.posSelect.addItem(key)
 
-        Returns
-        -------
-        QWidget
-            Window for miscelaneous functionality.
-        """
+        self.savePos.setStyleSheet("background-color: lightgrey")
+        self.loadPos.setStyleSheet("background-color: lightgrey")
+        self.deletePos.setStyleSheet("background-color: lightgrey")
+        self.clearPos.setStyleSheet("background-color: lightgrey")
+
+        self.posWindow = QWidget()
+        layout = QGridLayout()
+        layout.addWidget(QLabel("<b>Save and Load Position</b>"), 0, 0, 1, 5)
+        layout.addWidget(self.posSelect, 1, 0, 1, 2)
+        layout.addWidget(self.loadPos, 2, 0, 1, 1)
+        layout.addWidget(self.deletePos, 2, 1, 1, 1)
+        layout.addWidget(self.posLabel, 1, 2, 1, 1)
+        layout.addWidget(self.savePos, 1, 3, 1, 1)
+        layout.addWidget(self.clearPos, 2, 2, 1, 2)
+        self.posWindow.setLayout(layout)
+
+        # Progran-configuration functionality.
         self.configWindow = QWidget()
 
-        # Define configuration widgets.
         self.loadConfig = QPushButton("Load Config")
         self.saveConfig = QPushButton("Save Config")
-        self.positionUnits = QPushButton("Microns")
 
-        # Style configuration widgets.
         self.loadConfig.setStyleSheet("background-color: lightgrey")
         self.saveConfig.setStyleSheet("background-color: lightgrey")
+
+        self.configWindow = QWidget()
+        layout = QGridLayout()
+        layout.addWidget(QLabel("<b>Program Configuration</b>"), 0, 0, 1, 2)
+        layout.addWidget(self.loadConfig, 1, 0, 1, 2)
+        layout.addWidget(self.saveConfig, 2, 0, 1, 2)
+        self.configWindow.setLayout(layout)
+
+        # Unit conversion functionality.
+        self.positionUnits = QPushButton("Microns")
+
         self.positionUnits.setStyleSheet("background-color: lightgrey")
         self.positionUnits.setCheckable(True)
 
         # Set configuration button layout.
+        self.unitsWindow = QWidget()
         layout = QGridLayout()
-        layout.addWidget(QLabel("<b>Program Config</b>"), 0, 0, 1, 1)
-        layout.addWidget(self.loadConfig, 1, 0, 1, 1)
-        layout.addWidget(self.saveConfig, 2, 0, 1, 1)
-        layout.addWidget(QLabel("<b>Current Position Units</b>"), 0, 1, 1, 1)
-        layout.addWidget(self.positionUnits, 1, 1, 2, 1)
+        layout.addWidget(QLabel("<b>Current Position Units</b>"), 0, 0, 1, 1)
+        layout.addWidget(self.positionUnits, 1, 0, 2, 1)
         self.configWindow.setLayout(layout)
+
+        # Create base window.
+        self.baseWindow = QWidget()
+        layout = QGridLayout()
+        layout.addWidget(self.textbrowser, 0, 0, 3, 5)
+        layout.addWidget(self.posWindow, 0, 5, 3, 5)
+        layout.addWidget(self.configWindow, 0, 10, 3, 2)
+        layout.addWidget(self.unitsWindow, 0, 12, 3, 2)
+        self.baseWindow.setLayout(layout)
 
         return self.configWindow
 

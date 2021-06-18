@@ -91,3 +91,20 @@ def condense_macros(baseDict: Dict, macroDict: Dict) -> None:
             condense_macros(baseDict[key], macroDict)
         except:
             baseDict[key] = macroDict[key]
+
+
+def load_pos_config(path: str) -> Dict:
+    """
+    """
+    with open(path, "r") as jsonfile:
+        data = json.load(jsonfile)
+        jsonfile.close()
+    return data
+
+
+def save_pos_config(path: str, data: Dict) -> None:
+    """
+    """
+    with open(path, "w") as jsonfile:
+        myJSON = json.dumps(data, indent=4)
+        jsonfile.write(myJSON)

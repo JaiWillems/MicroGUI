@@ -9,6 +9,8 @@ connecting widgets up to control sequences that bring about change.
 import matplotlib.pyplot as plt
 import numpy as np
 from functools import partial
+from PyQt5.QtGui import QColor
+from thorlabs_apt import Motor
 from epics import (
     ca,
     caput,
@@ -25,20 +27,19 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QFileDialog
 )
-from PyQt5.QtGui import QColor
-from thorlabs_apt import Motor
 
 # Import file dependencies.
+from gui import GUI
 from thorlabs_motor_control import (
     enable,
     disable,
     home,
     changeMode
 )
-from gui import GUI
 from configuration import (
     load_config,
-    save_config
+    save_config,
+    save_pos_config
 )
 
 
@@ -517,6 +518,12 @@ class Controller(object):
         self.gui.tab.globals.clicked.connect(self._print_globals)
         self.gui.positionUnits.clicked.connect(self._change_units)
 
+        # Load and save configuration functionality.
+        self.gui.savePos.clicked.connect(self._save_position)
+        self.gui.loadPos.clicked.connect(self._load_position)
+        self.gui.deletePos.clicked.connect(self._delete_position)
+        self.gui.clearPos.clicked.connect(self._clear_position)
+
         # Configuration functionality.
         self.gui.loadConfig.clicked.connect(self._load_config)
         self.gui.saveConfig.clicked.connect(self._save_config)
@@ -629,12 +636,12 @@ class Controller(object):
 
         try:
             home(self.modeMotor)
-            self.tab.group.setExclusive(False)
+            self.gui.tab.group.setExclusive(False)
             self.gui.tab.RDM1.setChecked(False)
-            self.tab.gui.RDM2.setChecked(False)
-            self.tab.gui.RDM3.setChecked(False)
-            self.tab.gui.RDM4.setChecked(False)
-            self.tab.group.setExclusive(True)
+            self.gui.tab.RDM2.setChecked(False)
+            self.gui.tab.RDM3.setChecked(False)
+            self.gui.tab.RDM4.setChecked(False)
+            self.gui.tab.group.setExclusive(True)
 
             self._append_text("THORLABS motor homing.")
         except:
@@ -1432,3 +1439,48 @@ class Controller(object):
                     stepText = f"<b>{round(value - offset, 1)} STEPS</b>"
 
                 currentStep[(object, axis)].setText(stepText)
+        
+    def _save_position(self):
+        """Save the current position to the program."""
+        posLabel = self.posLabel.text()
+        position = {}
+        for object in ["S", "O"]:
+            for axis in ["X", "Y", "Z"]:
+                position[(object, axis)] = caget(self.gui.macros[f"{axis}{object}POS"])
+        self.savedPos[posLabel] = position
+
+        if self.comboBox.findText(posLabel) == -1:
+            self.comboBox.insertItem(1, posLabel)
+            save_pos_config(path="saved_positions.json", data=self.savedPos)
+        else:
+            self._append_text("ERROR: Position label already exists, change the position label and try again.",
+                              QColor(255, 0, 0))
+
+    def _load_position(self):
+        """Load the selected position to the program."""
+        posLabel = self.comboBox.currentText()
+        position = self.savePos[posLabel]
+
+        for object in ["S", "O"]:
+            for axis in ["X", "Y", "Z"]:
+                caput(self.gui.macros[f"{axis}{object}ABSPOS"], position[(object, axis)])
+                caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
+                caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
+
+    def _delete_position(self):
+        """Delete the selected position from the program."""
+        label = self.comboBox.currentText()
+        index = self.comboBox.currentIndex()
+        if index != 0:
+            self.comboBox.removeItem(index)
+            del self.savedPos[label]
+        save_pos_config(path="saved_positions.json", data=self.savedPos)
+
+    def _clear_position(self):
+        """Clear all saved positions from the program."""
+        for key in self.savedPos.keys():
+            index = self.comboBox.findText(key)
+            self.comboBox.removeItem(index)
+        self.comboBox = {}
+        save_pos_config(path="saved_positions.json", data=self.savedPos)
+        

@@ -18,7 +18,6 @@ MicroGUI's documentation
    modules/thorlabs_motor_control
 
 
-
 Indices and tables
 ==================
 
