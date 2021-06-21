@@ -7,6 +7,7 @@ Microscope.
 
 # Import package dependencies.
 import numpy as np
+import matplotlib.pyplot as plt
 import pyqtgraph as pg
 import pyqtgraph.ptime as ptime
 from typing import (
@@ -38,7 +39,9 @@ from PyQt5.QtWidgets import (
     QTabWidget,
     QScrollBar,
     QWidget,
-    QComboBox
+    QComboBox,
+    QDockWidget,
+    QFileDialog
 )
 
 # Import file dependencies.
@@ -291,7 +294,7 @@ class GUI(QMainWindow):
         # Add sub-windows to main window layout.
         self.layout = QGridLayout()
         self.layout.addWidget(self._diagram_window(), 0, 0, 2, 5)
-        self.layout.addWidget(self._camera_window(), 0, 5, 2, 5)
+        self.layout.addWidget(CameraWindow(), 0, 5, 2, 5)
         self.layout.addWidget(self._tabular_window(), 0, 10, 2, 5)
         self.layout.addWidget(self._sample_window(), 2, 0, 1, 15)
         self.layout.addWidget(self._objective_window(), 3, 0, 1, 15)
@@ -318,80 +321,6 @@ class GUI(QMainWindow):
         window.setPixmap(QPixmap(image))
 
         return window
-
-    def _camera_window(self) -> QWidget:
-        """Create live feed window.
-
-        Returns
-        -------
-        QWidget
-            Window representing the live feed and interactive widgets.
-        """
-        def updateData() -> None:
-            """Update live feed display.
-
-            Notes
-            -----
-            The red cross hair is added by changing the central three rows and
-            columns of pixels in the image to red (RGB=[225, 0, 0]).
-            """
-            # Get new image.
-            self.image = np.copy(np.rot90(get_image()))
-            height = self.image.shape[0]
-            width = self.image.shape[1]
-
-            # Generate cross hairs
-            if self.SCH.isChecked():
-                length = int(0.1 * min(height, width))
-                xLine = np.full((5, 2 * length, 3), [225, 0, 0])
-                yLine = np.full((length * 2, 5, 3), [225, 0, 0])
-                self.image[height // 2 - 2:height // 2 + 3,
-                           width // 2 - length:width // 2 + length] = xLine
-                self.image[height // 2 - length:height // 2 +
-                           length:, width // 2 - 2:width // 2 + 3] = yLine
-
-            # Update image.
-            self.img.setImage(np.fliplr(np.rot90(self.image, 2)))
-            QTimer.singleShot(1, updateData)
-
-            # Initialize timer.
-            now = ptime.time()
-            fps2 = 1.0 / (now - self.updateTime)
-            self.updateTime = now
-            self.fps = self.fps * 0.9 + fps2 * 0.1
-
-        # Configure camera window.
-        self.cameraWindow = QWidget()
-        pg.setConfigOptions(antialias=True)
-        win = pg.GraphicsLayoutWidget()
-        self.img = pg.ImageItem(border='w')
-
-        # Create viewing box.
-        view = win.addViewBox()
-        view.setAspectLocked(True)
-        view.addItem(self.img)
-        view.setRange(QRectF(300, 0, 700, 1000))
-
-        self.updateTime = ptime.time()
-        self.fps = 0
-
-        layout = QGridLayout()
-
-        # Create, modify, and place image buttons.
-        self.WCB = QPushButton("Image Capture")
-        self.SCH = QPushButton("Show Cross Hairs")
-        self.WCB.setStyleSheet("background-color: lightgrey")
-        self.SCH.setStyleSheet("background-color: lightgrey")
-        self.SCH.setCheckable(True)
-        layout.addWidget(win, 0, 0, 1, 2)
-        layout.addWidget(self.WCB, 1, 0, 1, 1)
-        layout.addWidget(self.SCH, 1, 1, 1, 1)
-
-        self.cameraWindow.setLayout(layout)
-
-        updateData()
-
-        return self.cameraWindow
 
     def _tabular_window(self) -> QWidget:
         """Create tabular window.
@@ -899,6 +828,115 @@ class GUI(QMainWindow):
         self.baseWindow.setLayout(layout)
 
         return self.baseWindow
+
+
+class CameraWindow(QMainWindow):
+    """
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        dock = QDockWidget("Live Stream", self)
+        dock.setAllowedAreas(Qt.AllDockWidgetAreas)
+        dock.setFeatures(dock.DockWidgetFloatable)
+        dock.setWidget(self._camera_window())
+        self.addDockWidget(Qt.TopDockWidgetArea, dock)
+
+        # Save image functionality.
+        self.WCB.clicked.connect(self._save_image)
+    
+    def _camera_window(self) -> QWidget:
+        """Create live feed window.
+
+        Returns
+        -------
+        QWidget
+            Window representing the live feed and interactive widgets.
+        """
+        def updateData() -> None:
+            """Update live feed display.
+
+            Notes
+            -----
+            The red cross hair is added by changing the central three rows and
+            columns of pixels in the image to red (RGB=[225, 0, 0]).
+            """
+            # Get new image.
+            self.image = np.copy(np.rot90(get_image()))
+            height = self.image.shape[0]
+            width = self.image.shape[1]
+
+            # Generate cross hairs
+            if self.SCH.isChecked():
+                length = int(0.1 * min(height, width))
+                xLine = np.full((5, 2 * length, 3), [225, 0, 0])
+                yLine = np.full((length * 2, 5, 3), [225, 0, 0])
+                self.image[height // 2 - 2:height // 2 + 3,
+                           width // 2 - length:width // 2 + length] = xLine
+                self.image[height // 2 - length:height // 2 +
+                           length:, width // 2 - 2:width // 2 + 3] = yLine
+
+            # Update image.
+            self.img.setImage(np.fliplr(np.rot90(self.image, 2)))
+            QTimer.singleShot(1, updateData)
+
+            # Initialize timer.
+            now = ptime.time()
+            fps2 = 1.0 / (now - self.updateTime)
+            self.updateTime = now
+            self.fps = self.fps * 0.9 + fps2 * 0.1
+
+        # Configure camera window.
+        self.cameraWindow = QWidget()
+        pg.setConfigOptions(antialias=True)
+        win = pg.GraphicsLayoutWidget()
+        self.img = pg.ImageItem(border='w')
+
+        # Create viewing box.
+        view = win.addViewBox()
+        view.setAspectLocked(True)
+        view.addItem(self.img)
+        view.setRange(QRectF(300, 0, 700, 1000))
+
+        self.updateTime = ptime.time()
+        self.fps = 0
+
+        layout = QGridLayout()
+
+        # Create, modify, and place image buttons.
+        self.WCB = QPushButton("Image Capture")
+        self.SCH = QPushButton("Show Cross Hairs")
+        self.WCB.setStyleSheet("background-color: lightgrey")
+        self.SCH.setStyleSheet("background-color: lightgrey")
+        self.SCH.setCheckable(True)
+        layout.addWidget(win, 0, 0, 1, 2)
+        layout.addWidget(self.WCB, 1, 0, 1, 1)
+        layout.addWidget(self.SCH, 1, 1, 1, 1)
+
+        self.cameraWindow.setLayout(layout)
+
+        updateData()
+
+        return self.cameraWindow
+    
+    def _save_image(self) -> None:
+        """Live stream image capture.
+
+        This method saves a capture of the current live stream to the chosen
+        directory.
+        """
+
+        path, _ = QFileDialog.getSaveFileName(parent=self, caption="Save File",
+            directory="../figures", filter="Image files (*.jpg *.jpeg *.png)")
+
+        plt.figure()
+        plt.imshow(np.rot90(self.gui.image, 3))
+        plt.axis("off")
+        plt.savefig(path, dpi=500, bbox_inches="tight")
+
+        self._append_text(f"Image capture saved to: {path}")
+
 
 
 class MyTableWidget(QWidget):

@@ -391,9 +391,6 @@ class Controller(object):
         sequence to update the display or interface with hardware.
         """
 
-        # Save image functionality.
-        self.gui.WCB.clicked.connect(self._save_image)
-
         # Mode select functionality.
         self.gui.tab.RDM1.pressed.connect(
             partial(self._mode_state, 1, self.modeMotor))
@@ -520,25 +517,6 @@ class Controller(object):
         self.gui.saveConfig.clicked.connect(self._save_config)
 
         self._append_text("Widgets connected to control sequences.")
-
-    def _save_image(self) -> None:
-        """Live stream image capture.
-
-        This method saves a capture of the current live stream to the chosen
-        directory.
-        """
-
-        path, _ = QFileDialog.getSaveFileName(parent=self.gui,
-                                              caption="Save File",
-                                              directory="../figures",
-                                              filter="Image files (*.jpg *.jpeg *.png)")
-
-        plt.figure()
-        plt.imshow(np.rot90(self.gui.image, 3))
-        plt.axis("off")
-        plt.savefig(path, dpi=500, bbox_inches="tight")
-
-        self._append_text(f"Image capture saved to: {path}")
 
     def _mode_state(self, mode: Literal[1, 2, 3, 4], modeMotor: Motor) -> None:
         """Change microscope mode.
