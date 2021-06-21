@@ -9,12 +9,37 @@ Microscope.
 import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.ptime as ptime
-from typing import Any, Dict
-from PyQt5.QtGui import QPixmap, QFont, QIcon
-from PyQt5.QtCore import QRectF, QTimer, Qt
-from PyQt5.QtWidgets import QButtonGroup, QMainWindow, QGridLayout,\
-    QScrollBar, QTextBrowser, QVBoxLayout, QWidget, QLabel, QPushButton,\
-    QLineEdit, QRadioButton, QTabWidget, QScrollBar, QDesktopWidget, QWidget
+from typing import (
+    Any,
+    Dict
+)
+from PyQt5.QtGui import (
+    QPixmap,
+    QFont,
+    QIcon
+)
+from PyQt5.QtCore import (
+    QRectF,
+    QTimer,
+    Qt
+)
+from PyQt5.QtWidgets import (
+    QButtonGroup,
+    QMainWindow,
+    QGridLayout,
+    QScrollBar,
+    QTextBrowser,
+    QVBoxLayout,
+    QWidget,
+    QLabel,
+    QPushButton,
+    QLineEdit,
+    QRadioButton,
+    QTabWidget,
+    QScrollBar,
+    QWidget,
+    QComboBox
+)
 
 # Import file dependencies.
 from flir_camera_control import get_image
@@ -32,9 +57,13 @@ class GUI(QMainWindow):
         Dictionary of raw variable data.
     macros : Dict
         Dictionary of macro variables.
+    savedPos : Dict
+        Dictionary of saved positions.
 
     Attributes
     ----------
+    data : Dict
+        Dictionary containing initialization data.
     macros : Dict
         Dictionary containing macro variables.
     cameraWindow : QWidget
@@ -219,6 +248,12 @@ class GUI(QMainWindow):
         Motor status label for the objective's z dimension.
     textWindow : QTextBrowser
         Text browser to display Terminal output.
+    loadConfig : QPushButton
+        Load a new configuration button.
+    saveConfig : QPushButton
+        Save current configuration button.
+    positionUnits : QPushButton
+        Control to shange the current position between steps and microns.
 
     Methods
     -------
@@ -232,17 +267,18 @@ class GUI(QMainWindow):
         Creates the sample window.
     _objective_window()
         Creates the objective window.
-    _text_window()
-        Creates the text browser window.
+    _base_window()
+        Creates the GUI's base window.
     """
 
-    def __init__(self, data: Dict, macros: Dict) -> None:
+    def __init__(self, data: Dict, macros: Dict, savedPos: Dict) -> None:
         """Initialize the GUI."""
 
         super().__init__()
 
         self.data = data
         self.macros = macros
+        self.savedPos = savedPos
 
         # Set CLS logo.
         self.setWindowIcon(QIcon('figures/CLS_logo.png'))
@@ -252,12 +288,6 @@ class GUI(QMainWindow):
         self.setFixedWidth(1500)
         self.setFixedHeight(750)
 
-        # Center frame.
-        #rect = self.findGeometry()
-        #centerPoint = QDesktopWidget().availableGeometry().center()
-        #rect.moveCenter(centerPoint)
-        #self.move(rect.topLeft())
-
         # Add sub-windows to main window layout.
         self.layout = QGridLayout()
         self.layout.addWidget(self._diagram_window(), 0, 0, 2, 5)
@@ -265,8 +295,7 @@ class GUI(QMainWindow):
         self.layout.addWidget(self._tabular_window(), 0, 10, 2, 5)
         self.layout.addWidget(self._sample_window(), 2, 0, 1, 15)
         self.layout.addWidget(self._objective_window(), 3, 0, 1, 15)
-        self.layout.addWidget(self._text_window(), 4, 0, 2, 14)
-        self.layout.addWidget(self._config_file(), 4, 14, 1, 1)
+        self.layout.addWidget(self._base_window(), 4, 0, 3, 15)
 
         # Set main window layout.
         self.centralWidget = QWidget(self)
@@ -317,12 +346,12 @@ class GUI(QMainWindow):
                 xLine = np.full((5, 2 * length, 3), [225, 0, 0])
                 yLine = np.full((length * 2, 5, 3), [225, 0, 0])
                 self.image[height // 2 - 2:height // 2 + 3,
-                        width // 2 - length:width // 2 + length] = xLine
+                           width // 2 - length:width // 2 + length] = xLine
                 self.image[height // 2 - length:height // 2 +
-                        length:, width // 2 - 2:width // 2 + 3] = yLine
+                           length:, width // 2 - 2:width // 2 + 3] = yLine
 
             # Update image.
-            self.img.setImage(np.rot90(self.image, 2))
+            self.img.setImage(np.fliplr(np.rot90(self.image, 2)))
             QTimer.singleShot(1, updateData)
 
             # Initialize timer.
@@ -432,11 +461,16 @@ class GUI(QMainWindow):
         self.xSCn.setStyleSheet("background-color: lightgrey")
         self.xSStop.setStyleSheet("background-color: red")
         self.xSCp.setStyleSheet("background-color: lightgrey")
-        self.xSSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xSSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xSHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xSHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xSSn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xSSp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xSHn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xSHp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xIdleS.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Horizontal:"), 2, 0, 1, 1)
@@ -486,11 +520,16 @@ class GUI(QMainWindow):
         self.ySCn.setStyleSheet("background-color: lightgrey")
         self.ySStop.setStyleSheet("background-color: red")
         self.ySCp.setStyleSheet("background-color: lightgrey")
-        self.ySSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.ySSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.ySHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.ySHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.yIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.ySSn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.ySSp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.ySHn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.ySHp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.yIdleS.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Vertical:"), 3, 0, 1, 1)
@@ -540,11 +579,16 @@ class GUI(QMainWindow):
         self.zSCn.setStyleSheet("background-color: lightgrey")
         self.zSStop.setStyleSheet("background-color: red")
         self.zSCp.setStyleSheet("background-color: lightgrey")
-        self.zSSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zSSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zSHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zSHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zIdleS.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zSSn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zSSp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zSHn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zSHp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zIdleS.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Focus:"), 4, 0, 1, 1)
@@ -624,11 +668,16 @@ class GUI(QMainWindow):
         self.xOCn.setStyleSheet("background-color: lightgrey")
         self.xOStop.setStyleSheet("background-color: red")
         self.xOCp.setStyleSheet("background-color: lightgrey")
-        self.xOSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xOSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xOHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.xIdleO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.xOSn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xOSp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xOHn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xOHp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.xIdleO.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Horizontal:"), 2, 0, 1, 1)
@@ -678,11 +727,16 @@ class GUI(QMainWindow):
         self.yOCn.setStyleSheet("background-color: lightgrey")
         self.yOStop.setStyleSheet("background-color: red")
         self.yOCp.setStyleSheet("background-color: lightgrey")
-        self.yOSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.yOSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.yOHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.yOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.yIdleO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.yOSn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.yOSp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.yOHn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.yOHp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.yIdleO.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Vertical:"), 3, 0, 1, 1)
@@ -732,11 +786,16 @@ class GUI(QMainWindow):
         self.zOCn.setStyleSheet("background-color: lightgrey")
         self.zOStop.setStyleSheet("background-color: red")
         self.zOCp.setStyleSheet("background-color: lightgrey")
-        self.zOSn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zOSp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zOHn.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zOHp.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
-        self.zIdleO.setStyleSheet("background-color: lightgrey; border: 1px solid black;")
+        self.zOSn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zOSp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zOHn.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zOHp.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
+        self.zIdleO.setStyleSheet(
+            "background-color: lightgrey; border: 1px solid black;")
 
         # Organize widgets on layout.
         layout.addWidget(QLabel("Focus:"), 4, 0, 1, 1)
@@ -758,47 +817,88 @@ class GUI(QMainWindow):
         # Set window layout.
         window.setLayout(layout)
         return window
-    
-    def _text_window(self) -> QTextBrowser:
-        """Create text/console window.
+
+    def _base_window(self) -> QTextBrowser:
+        """Create GUI's base window.
 
         Returns
         -------
         QWidget
             Window representing the objective interactive widgets.
         """
+        # Initialize the text browser window.
         self.textWindow = QTextBrowser()
         self.textWindow.setAcceptRichText(True)
         self.textWindow.setOpenExternalLinks(True)
         self.textWindow.setVerticalScrollBar(QScrollBar())
 
-        return self.textWindow
-    
-    def _config_file(self) -> QWidget:
-        """Create configuration window.
+        # Save and load position functionality.
+        self.savePos = QPushButton("Save Position")
+        self.loadPos = QPushButton("Load Position")
+        self.deletePos = QPushButton("Delete Position")
+        self.clearPos = QPushButton("Clear All Positions")
+        self.posSelect = QComboBox()
+        self.posLabel = QLineEdit("Position Label")
 
-        Returns
-        -------
-        QWidget
-            Window for file configuration access.
-        """
+        self.posSelect.addItem("--None--")
+        for key in self.savedPos.keys():
+            self.posSelect.addItem(key)
+
+        self.savePos.setStyleSheet("background-color: lightgrey")
+        self.loadPos.setStyleSheet("background-color: lightgrey")
+        self.deletePos.setStyleSheet("background-color: lightgrey")
+        self.clearPos.setStyleSheet("background-color: lightgrey")
+
+        self.posWindow = QWidget()
+        layout = QGridLayout()
+        layout.addWidget(QLabel("<b>Save and Load Position</b>"), 0, 0, 1, 5)
+        layout.addWidget(self.posSelect, 1, 0, 1, 2)
+        layout.addWidget(self.loadPos, 2, 0, 1, 1)
+        layout.addWidget(self.deletePos, 2, 1, 1, 1)
+        layout.addWidget(self.posLabel, 1, 2, 1, 1)
+        layout.addWidget(self.savePos, 1, 3, 1, 1)
+        layout.addWidget(self.clearPos, 2, 2, 1, 2)
+        self.posWindow.setLayout(layout)
+
+        # Progran-configuration functionality.
         self.configWindow = QWidget()
 
-        # Define configuration widgets.
         self.loadConfig = QPushButton("Load Config")
         self.saveConfig = QPushButton("Save Config")
 
-        # Style configuration widgets.
         self.loadConfig.setStyleSheet("background-color: lightgrey")
         self.saveConfig.setStyleSheet("background-color: lightgrey")
 
-        # Set configuration button layout.
+        self.configWindow = QWidget()
         layout = QGridLayout()
-        layout.addWidget(self.loadConfig)
-        layout.addWidget(self.saveConfig)
+        layout.addWidget(QLabel("<b>Program Configuration</b>"), 0, 0, 1, 2)
+        layout.addWidget(self.loadConfig, 1, 0, 1, 2)
+        layout.addWidget(self.saveConfig, 2, 0, 1, 2)
         self.configWindow.setLayout(layout)
 
-        return self.configWindow
+        # Unit conversion functionality.
+        self.positionUnits = QPushButton("Microns")
+
+        self.positionUnits.setStyleSheet("background-color: lightgrey")
+        self.positionUnits.setCheckable(True)
+
+        # Set units window layout.
+        self.unitsWindow = QWidget()
+        layout = QGridLayout()
+        layout.addWidget(QLabel("<b>Current Position Units</b>"), 0, 0, 1, 1)
+        layout.addWidget(self.positionUnits, 1, 0, 2, 1)
+        self.unitsWindow.setLayout(layout)
+
+        # Create base window.
+        self.baseWindow = QWidget()
+        layout = QGridLayout()
+        layout.addWidget(self.textWindow, 0, 0, 3, 5)
+        layout.addWidget(self.posWindow, 0, 5, 3, 5)
+        layout.addWidget(self.configWindow, 0, 10, 3, 2)
+        layout.addWidget(self.unitsWindow, 0, 12, 3, 2)
+        self.baseWindow.setLayout(layout)
+
+        return self.baseWindow
 
 
 class MyTableWidget(QWidget):
@@ -816,8 +916,6 @@ class MyTableWidget(QWidget):
     ----------
     tabs : QTabWidget
         Points to the object defining the table window.
-    tab1 : QWidget
-        Status tab of the table window.
     tab2 : QWidget
         Mode tab of the table window.
     tab3 : QWidget
@@ -928,10 +1026,6 @@ class MyTableWidget(QWidget):
         Toggles between actual and relative values.
     globals : QPushButton
         Display the programs global variables.
-
-    Methods
-    -------
-    None
     """
 
     def __init__(self, parent: Any) -> None:
@@ -956,7 +1050,6 @@ class MyTableWidget(QWidget):
         self.tabs.addTab(self.tab3, "Hard Limits")
         self.tabs.addTab(self.tab4, "Soft Limits")
         self.tabs.addTab(self.tab5, "Calibration")
-
 
         # ---------------------------------------------------------------------
         #   Tab 2
@@ -986,10 +1079,14 @@ class MyTableWidget(QWidget):
         self.tab2.layout.addWidget(self.RDM4, 4, 0, 1, 1)
 
         # Set position customization widgets
-        self.TMTM = QLineEdit(str(float(self.parent.macros["TRANSMISSION_POSITION"])))
-        self.TMRM = QLineEdit(str(float(self.parent.macros["REFLECTION_POSITION"])))
-        self.TMVM = QLineEdit(str(float(self.parent.macros["VISIBLE_IMAGE_POSITION"])))
-        self.TMBM = QLineEdit(str(float(self.parent.macros["BEAMSPLITTER_POSITION"])))
+        self.TMTM = QLineEdit(
+            str(float(self.parent.macros["TRANSMISSION_POSITION"])))
+        self.TMRM = QLineEdit(
+            str(float(self.parent.macros["REFLECTION_POSITION"])))
+        self.TMVM = QLineEdit(
+            str(float(self.parent.macros["VISIBLE_IMAGE_POSITION"])))
+        self.TMBM = QLineEdit(
+            str(float(self.parent.macros["BEAMSPLITTER_POSITION"])))
 
         self.tab2.layout.addWidget(self.TMTM, 1, 1, 1, 1)
         self.tab2.layout.addWidget(self.TMRM, 2, 1, 1, 1)
@@ -1008,7 +1105,7 @@ class MyTableWidget(QWidget):
 
         self.tab2.layout.addWidget(QLabel("<b>Motor Control</b>"), 5, 0, 1, 4)
         self.tab2.layout.addWidget(QLabel("<i>Enable or disable the THORLABS motor and move to home position.</i>"), 6, 0, 1, 4)
-        
+
         # THORLABS/mode motor controls.
         self.enableDisable = QPushButton("Disable")
         self.home = QPushButton("Home Motor")

@@ -16,7 +16,7 @@ def load_config(path: str) -> Dict:
     ----------
     path : str
         Path to configuration file to upload.
-    
+
     Returns
     -------
     Dict
@@ -29,7 +29,7 @@ def load_config(path: str) -> Dict:
         jsonfile.close()
     macros = {}
     init_macros(data, macros)
-    
+
     return data, macros
 
 
@@ -53,7 +53,7 @@ def save_config(path: str, data: Dict, macros: Dict) -> None:
 
 def init_macros(baseDict: Dict, macroDict: Dict) -> None:
     """Initialize macro variables.
-    
+
     This function transforms, in place, a nested dictionary into a planar
     dictionary.
 
@@ -63,10 +63,6 @@ def init_macros(baseDict: Dict, macroDict: Dict) -> None:
         Nested dictionary of values.
     macroDict : Dict
         New planar dictionary to add key/value pairs to from `baseDict`.
-    
-    Returns
-    -------
-    None
     """
     keys = baseDict.keys()
     for key in keys:
@@ -78,7 +74,7 @@ def init_macros(baseDict: Dict, macroDict: Dict) -> None:
 
 def condense_macros(baseDict: Dict, macroDict: Dict) -> None:
     """Save macro variables.
-    
+
     This function updates the values of a nested dictionary from the a planar
     dictionary with common keys.
 
@@ -88,10 +84,6 @@ def condense_macros(baseDict: Dict, macroDict: Dict) -> None:
         Nested dictionary of values.
     macroDict : Dict
         New planar dictionary to add key/value pairs to from `baseDict`.
-    
-    Returns
-    -------
-    None
     """
     keys = baseDict.keys()
     for key in keys:
@@ -99,3 +91,20 @@ def condense_macros(baseDict: Dict, macroDict: Dict) -> None:
             condense_macros(baseDict[key], macroDict)
         except:
             baseDict[key] = macroDict[key]
+
+
+def load_pos_config(path: str) -> Dict:
+    """
+    """
+    with open(path, "r") as jsonfile:
+        data = json.load(jsonfile)
+        jsonfile.close()
+    return data
+
+
+def save_pos_config(path: str, data: Dict) -> None:
+    """
+    """
+    with open(path, "w") as jsonfile:
+        myJSON = json.dumps(data, indent=4)
+        jsonfile.write(myJSON)

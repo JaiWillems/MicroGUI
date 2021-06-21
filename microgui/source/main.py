@@ -6,20 +6,21 @@ to run the FAR-IR horizontal microscope.
 
 # Import package dependencies.
 from PyQt5.QtWidgets import QApplication
-import sys
 from epics import PV
+import sys
 
 # Import file dependencies.
 from gui import GUI
 from controller import Controller
 from thorlabs_motor_control import initMotor
-from configuration import load_config
+from configuration import load_config, load_pos_config, load_pos_config
 
 # Define the THORLABS "mode" motor.
 modeMotor = initMotor()
 
 # Define macro variables.
 data, macros = load_config("config.json")
+savedPos = load_pos_config("saved_positions.json")
 
 
 def program_exit(gui: GUI) -> None:
@@ -41,10 +42,10 @@ def program_exit(gui: GUI) -> None:
             pv.put(0)
 
 
-# Run the GUI.
+# Start GUI execution.
 app = QApplication([])
 app.setStyle("Windows")
-gui = GUI(data=data, macros=macros)
+gui = GUI(data=data, macros=macros, savedPos=savedPos)
 gui.show()
 Controller(gui=gui, modeMotor=modeMotor)
 sys.exit(program_exit(gui))
