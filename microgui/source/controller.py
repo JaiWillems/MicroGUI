@@ -292,6 +292,15 @@ class Controller(object):
         self.PV_ZOPOS = PV(pvname=self.gui.macros["ZOPOS"], auto_monitor=True,
                            callback=self._set_current_position)
 
+        # Initialize move PV's.
+        self.PV_XSMOVE = PV(pvname=self.gui.macros["XSMOVE"])
+        self.PV_YSMOVE = PV(pvname=self.gui.macros["YSMOVE"])
+        self.PV_ZSMOVE = PV(pvname=self.gui.macros["ZSMOVE"])
+        self.PV_XOMOVE = PV(pvname=self.gui.macros["XOMOVE"])
+        self.PV_YOMOVE = PV(pvname=self.gui.macros["YOMOVE"])
+        self.PV_ZOMOVE = PV(pvname=self.gui.macros["ZOMOVE"])
+
+
         self._append_text("PVs configured and initialized.")
 
         # Set THORLABS motor position line edits.
@@ -354,39 +363,21 @@ class Controller(object):
         self.gui.yOStep.setText(str(caget(self.gui.macros["YOSTEP"])))
         self.gui.zOStep.setText(str(caget(self.gui.macros["ZOSTEP"])))
 
-        # Set PV's to uploaded motor position.
-        self.PV_XSABSPOS.put(self.gui.macros["XS_BASE_POSITION"] +
-                             self.gui.macros["XS_RELATIVE_POSITION"])
-        caput(self.gui.macros["XSMOVE"], 1)
-        caput(self.gui.macros["XSMOVE"], 0)
-        self.PV_YSABSPOS.put(self.gui.macros["YS_BASE_POSITION"] +
-                             self.gui.macros["YS_RELATIVE_POSITION"])
-        caput(self.gui.macros["YSMOVE"], 1)
-        caput(self.gui.macros["YSMOVE"], 0)
-        self.PV_ZSABSPOS.put(self.gui.macros["ZS_BASE_POSITION"] +
-                             self.gui.macros["ZS_RELATIVE_POSITION"])
-        caput(self.gui.macros["ZSMOVE"], 1)
-        caput(self.gui.macros["ZSMOVE"], 0)
-        self.PV_XOABSPOS.put(self.gui.macros["XO_BASE_POSITION"] +
-                             self.gui.macros["XO_RELATIVE_POSITION"])
-        caput(self.gui.macros["XOMOVE"], 1)
-        caput(self.gui.macros["XOMOVE"], 0)
-        self.PV_YOABSPOS.put(self.gui.macros["YO_BASE_POSITION"] +
-                             self.gui.macros["YO_RELATIVE_POSITION"])
-        caput(self.gui.macros["YOMOVE"], 1)
-        caput(self.gui.macros["YOMOVE"], 0)
-        self.PV_ZOABSPOS.put(self.gui.macros["ZO_BASE_POSITION"] +
-                             self.gui.macros["ZO_RELATIVE_POSITION"])
-        caput(self.gui.macros["ZOMOVE"], 1)
-        caput(self.gui.macros["ZOMOVE"], 0)
+        # Set relative positions macros.
+        self.gui.macros["XS_RELATIVE_POSITION"] = self.PV_XSABSPOS.get()
+        self.gui.macros["YS_RELATIVE_POSITION"] = self.PV_YSABSPOS.get()
+        self.gui.macros["ZS_RELATIVE_POSITION"] = self.PV_ZSABSPOS.get()
+        self.gui.macros["XO_RELATIVE_POSITION"] = self.PV_XOABSPOS.get()
+        self.gui.macros["YO_RELATIVE_POSITION"] = self.PV_YOABSPOS.get()
+        self.gui.macros["ZO_RELATIVE_POSITION"] = self.PV_ZOABSPOS.get()
     
         # Set absolute position line edits to current PV values.
-        self.gui.xSAbsPos.setText(str(caget(self.gui.macros["XSABSPOS"])))
-        self.gui.ySAbsPos.setText(str(caget(self.gui.macros["YSABSPOS"])))
-        self.gui.zSAbsPos.setText(str(caget(self.gui.macros["ZSABSPOS"])))
-        self.gui.xOAbsPos.setText(str(caget(self.gui.macros["XOABSPOS"])))
-        self.gui.yOAbsPos.setText(str(caget(self.gui.macros["YOABSPOS"])))
-        self.gui.zOAbsPos.setText(str(caget(self.gui.macros["ZOABSPOS"])))
+        self.gui.xSAbsPos.setText(str(self.gui.macros["XS_RELATIVE_POSITION"]))
+        self.gui.ySAbsPos.setText(str(self.gui.macros["YS_RELATIVE_POSITION"]))
+        self.gui.zSAbsPos.setText(str(self.gui.macros["ZS_RELATIVE_POSITION"]))
+        self.gui.xOAbsPos.setText(str(self.gui.macros["XO_RELATIVE_POSITION"]))
+        self.gui.yOAbsPos.setText(str(self.gui.macros["YO_RELATIVE_POSITION"]))
+        self.gui.zOAbsPos.setText(str(self.gui.macros["ZO_RELATIVE_POSITION"]))
 
         # Enable Thorlabs motor.
         enable(self.modeMotor)
@@ -1442,16 +1433,16 @@ class Controller(object):
         
     def _save_position(self):
         """Save the current position to the program."""
-        label = self.posLabel.text()
+        label = self.gui.posLabel.text()
         position = {}
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
-                position[(object, axis)] = caget(self.gui.macros[f"{axis}{object}POS"])
-        self.savedPos[label] = position
+                position[f"{axis}{object}"] = caget(self.gui.macros[f"{axis}{object}POS"])
+        self.gui.savedPos[label] = position
 
-        if self.comboBox.findText(label) == -1:
-            self.comboBox.insertItem(1, label)
-            save_pos_config(path="saved_positions.json", data=self.savedPos)
+        if self.gui.posSelect.findText(label) == -1:
+            self.gui.posSelect.insertItem(1, label)
+            save_pos_config(path="saved_positions.json", data=self.gui.savedPos)
             self._append_text(f"Position, \"{label}\", saved.")
         else:
             self._append_text("ERROR: Position label already exists, change the position label and try again.",
@@ -1459,13 +1450,13 @@ class Controller(object):
 
     def _load_position(self):
         """Load the selected position to the program."""
-        label = self.comboBox.currentText()
+        label = self.gui.posSelect.currentText()
 
         if label != "--None--":
-            position = self.savePos[label]
+            position = self.gui.savedPos[label]
             for object in ["S", "O"]:
                 for axis in ["X", "Y", "Z"]:
-                    caput(self.gui.macros[f"{axis}{object}ABSPOS"], position[(object, axis)])
+                    caput(self.gui.macros[f"{axis}{object}ABSPOS"], position[f"{axis}{object}"])
                     caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
                     caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
             
@@ -1473,20 +1464,19 @@ class Controller(object):
 
     def _delete_position(self):
         """Delete the selected position from the program."""
-        label = self.comboBox.currentText()
-        index = self.comboBox.currentIndex()
+        label = self.gui.posSelect.currentText()
+        index = self.gui.posSelect.currentIndex()
         if index != 0:
-            self.comboBox.removeItem(index)
-            del self.savedPos[label]
-            save_pos_config(path="saved_positions.json", data=self.savedPos)
+            self.gui.posSelect.removeItem(index)
+            del self.gui.savedPos[label]
+            save_pos_config(path="saved_positions.json", data=self.gui.savedPos)
             self._append_text(f"Position, \"{label}\", deleted.")
 
     def _clear_position(self):
         """Clear all saved positions from the program."""
-        for key in self.savedPos.keys():
-            index = self.comboBox.findText(key)
-            self.comboBox.removeItem(index)
-        self.comboBox = {}
-        save_pos_config(path="saved_positions.json", data=self.savedPos)
+        for key in self.gui.savedPos.keys():
+            index = self.gui.posSelect.findText(key)
+            self.gui.posSelect.removeItem(index)
+        save_pos_config(path="saved_positions.json", data=self.gui.savedPos)
         self._append_text("All positions cleared.")
         

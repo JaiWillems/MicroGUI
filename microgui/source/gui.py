@@ -882,23 +882,23 @@ class GUI(QMainWindow):
         self.positionUnits.setStyleSheet("background-color: lightgrey")
         self.positionUnits.setCheckable(True)
 
-        # Set configuration button layout.
+        # Set units window layout.
         self.unitsWindow = QWidget()
         layout = QGridLayout()
         layout.addWidget(QLabel("<b>Current Position Units</b>"), 0, 0, 1, 1)
         layout.addWidget(self.positionUnits, 1, 0, 2, 1)
-        self.configWindow.setLayout(layout)
+        self.unitsWindow.setLayout(layout)
 
         # Create base window.
         self.baseWindow = QWidget()
         layout = QGridLayout()
-        layout.addWidget(self.textbrowser, 0, 0, 3, 5)
+        layout.addWidget(self.textWindow, 0, 0, 3, 5)
         layout.addWidget(self.posWindow, 0, 5, 3, 5)
         layout.addWidget(self.configWindow, 0, 10, 3, 2)
         layout.addWidget(self.unitsWindow, 0, 12, 3, 2)
         self.baseWindow.setLayout(layout)
 
-        return self.configWindow
+        return self.baseWindow
 
 
 class MyTableWidget(QWidget):
