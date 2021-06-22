@@ -5,15 +5,13 @@ responsible for creating the main user interface with the FAR-IR Horizontal
 Microscope.
 """
 
-# Import package dependencies.
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pyqtgraph as pg
 import pyqtgraph.ptime as ptime
-from typing import (
-    Any,
-    Dict
-)
+from typing import Any
+from flir_camera_control import get_image
 from PyQt5.QtGui import (
     QPixmap,
     QFont,
@@ -44,9 +42,6 @@ from PyQt5.QtWidgets import (
     QFileDialog
 )
 
-# Import file dependencies.
-from flir_camera_control import get_image
-
 
 class GUI(QMainWindow):
     """Main GUI window.
@@ -56,29 +51,19 @@ class GUI(QMainWindow):
 
     Parameters
     ----------
-    data : Dict
+    data : dict
         Dictionary of raw variable data.
-    macros : Dict
+    macros : dict
         Dictionary of macro variables.
-    savedPos : Dict
+    savedPos : dict
         Dictionary of saved positions.
 
     Attributes
     ----------
-    data : Dict
+    data : dict
         Dictionary containing initialization data.
-    macros : Dict
+    macros : dict
         Dictionary containing macro variables.
-    cameraWindow : QWidget
-        QWidget window containing camera feed and interface.
-    img : pg.ImageItem
-        Live feed image from Blackfly camera.
-    image : nd.array
-        Current image displayed in an array representation.
-    WCB : QPushButton
-        Image capture push button.
-    SHC : QPushButton
-        Show Cross Hairs toggle push button.
     tab : MyTableWidget object
         The tabular display located on the main GUI window.
     xSN : QPushButton
@@ -251,6 +236,18 @@ class GUI(QMainWindow):
         Motor status label for the objective's z dimension.
     textWindow : QTextBrowser
         Text browser to display Terminal output.
+    savePos : QPushButton
+        Save current position push button.
+    loadPos : QPushButton
+        Load selected position push button.
+    deletePos : QPushButton
+        Delete selected position push button.
+    clearPos : QPushButton
+        Clear all saved positions push button.
+    posSelect : QComboBox
+        Combo box to select a saved position.
+    posLabel : QLineEdit
+        Text box to insert the label for a position to save.
     loadConfig : QPushButton
         Load a new configuration button.
     saveConfig : QPushButton
@@ -262,8 +259,6 @@ class GUI(QMainWindow):
     -------
     _diagram_window()
         Creates the diagram window.
-    _camera_window()
-        Creates the camera window.
     _tabular_window()
         Creates the table window.
     _sample_window()
@@ -274,7 +269,7 @@ class GUI(QMainWindow):
         Creates the GUI's base window.
     """
 
-    def __init__(self, data: Dict, macros: Dict, savedPos: Dict) -> None:
+    def __init__(self, data: dict, macros: dict, savedPos: dict) -> None:
         """Initialize the GUI."""
 
         super().__init__()
@@ -831,7 +826,27 @@ class GUI(QMainWindow):
 
 
 class CameraWindow(QMainWindow):
-    """
+    """Generate detachable camera window.
+
+    Attributes
+    ----------
+    cameraWindow : QWidget
+        QWidget window containing camera feed and interface.
+    img : pg.ImageItem
+        Live feed image from Blackfly camera.
+    image : nd.array
+        Current image displayed in an array representation.
+    WCB : QPushButton
+        Image capture push button.
+    SHC : QPushButton
+        Show Cross Hairs toggle push button.
+    
+    Methods
+    -------
+    _camera_window()
+        Generate the detachable camera window.
+    _save_image()
+        Control sequence to save an image capture.
     """
 
     def __init__(self):
@@ -931,7 +946,7 @@ class CameraWindow(QMainWindow):
             directory="../figures", filter="Image files (*.jpg *.jpeg *.png)")
 
         plt.figure()
-        plt.imshow(np.rot90(self.gui.image, 3))
+        plt.imshow(np.rot90(self.image, 3))
         plt.axis("off")
         plt.savefig(path, dpi=500, bbox_inches="tight")
 
