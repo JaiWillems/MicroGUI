@@ -1373,7 +1373,7 @@ class Controller(object):
         path, _ = QFileDialog.getOpenFileName(parent=self.gui,
                                               caption="Open File",
                                               directory="../configuration files",
-                                              filter="Configuration files (*.json)")
+                                              filter="configuration files (*.json)")
         data, macros = load_config(path)
         self.gui.data = data
         self.gui.macros = macros
@@ -1385,7 +1385,7 @@ class Controller(object):
         path, _ = QFileDialog.getSaveFileName(parent=self.gui,
                                               caption="Save File",
                                               directory="../configuration files",
-                                              filter="Configuration files (*.json)")
+                                              filter="configuration files (*.json)")
         save_config(path, self.gui.data, self.gui.macros)
 
         self._append_text(f"Configuration saved to {path}")
