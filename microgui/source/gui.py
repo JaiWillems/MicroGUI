@@ -5,14 +5,13 @@ responsible for creating the main user interface with the FAR-IR Horizontal
 Microscope.
 """
 
-# Import package dependencies.
+
 import numpy as np
+import matplotlib.pyplot as plt
 import pyqtgraph as pg
 import pyqtgraph.ptime as ptime
-from typing import (
-    Any,
-    Dict
-)
+from typing import Any
+from flir_camera_control import get_image
 from PyQt5.QtGui import (
     QPixmap,
     QFont,
@@ -38,11 +37,10 @@ from PyQt5.QtWidgets import (
     QTabWidget,
     QScrollBar,
     QWidget,
-    QComboBox
+    QComboBox,
+    QDockWidget,
+    QFileDialog
 )
-
-# Import file dependencies.
-from flir_camera_control import get_image
 
 
 class GUI(QMainWindow):
@@ -53,29 +51,19 @@ class GUI(QMainWindow):
 
     Parameters
     ----------
-    data : Dict
+    data : dict
         Dictionary of raw variable data.
-    macros : Dict
+    macros : dict
         Dictionary of macro variables.
-    savedPos : Dict
+    savedPos : dict
         Dictionary of saved positions.
 
     Attributes
     ----------
-    data : Dict
+    data : dict
         Dictionary containing initialization data.
-    macros : Dict
+    macros : dict
         Dictionary containing macro variables.
-    cameraWindow : QWidget
-        QWidget window containing camera feed and interface.
-    img : pg.ImageItem
-        Live feed image from Blackfly camera.
-    image : nd.array
-        Current image displayed in an array representation.
-    WCB : QPushButton
-        Image capture push button.
-    SHC : QPushButton
-        Show Cross Hairs toggle push button.
     tab : MyTableWidget object
         The tabular display located on the main GUI window.
     xSN : QPushButton
@@ -248,6 +236,18 @@ class GUI(QMainWindow):
         Motor status label for the objective's z dimension.
     textWindow : QTextBrowser
         Text browser to display Terminal output.
+    savePos : QPushButton
+        Save current position push button.
+    loadPos : QPushButton
+        Load selected position push button.
+    deletePos : QPushButton
+        Delete selected position push button.
+    clearPos : QPushButton
+        Clear all saved positions push button.
+    posSelect : QComboBox
+        Combo box to select a saved position.
+    posLabel : QLineEdit
+        Text box to insert the label for a position to save.
     loadConfig : QPushButton
         Load a new configuration button.
     saveConfig : QPushButton
@@ -259,8 +259,6 @@ class GUI(QMainWindow):
     -------
     _diagram_window()
         Creates the diagram window.
-    _camera_window()
-        Creates the camera window.
     _tabular_window()
         Creates the table window.
     _sample_window()
@@ -271,7 +269,7 @@ class GUI(QMainWindow):
         Creates the GUI's base window.
     """
 
-    def __init__(self, data: Dict, macros: Dict, savedPos: Dict) -> None:
+    def __init__(self, data: dict, macros: dict, savedPos: dict) -> None:
         """Initialize the GUI."""
 
         super().__init__()
@@ -281,7 +279,7 @@ class GUI(QMainWindow):
         self.savedPos = savedPos
 
         # Set CLS logo.
-        self.setWindowIcon(QIcon('figures/CLS_logo.png'))
+        self.setWindowIcon(QIcon("figures/MicroGUI_logo.png"))
 
         # Define main GUI window.
         self.setWindowTitle("Horizontal Microscope Control")
@@ -291,7 +289,7 @@ class GUI(QMainWindow):
         # Add sub-windows to main window layout.
         self.layout = QGridLayout()
         self.layout.addWidget(self._diagram_window(), 0, 0, 2, 5)
-        self.layout.addWidget(self._camera_window(), 0, 5, 2, 5)
+        self.layout.addWidget(CameraWindow(), 0, 5, 2, 5)
         self.layout.addWidget(self._tabular_window(), 0, 10, 2, 5)
         self.layout.addWidget(self._sample_window(), 2, 0, 1, 15)
         self.layout.addWidget(self._objective_window(), 3, 0, 1, 15)
@@ -318,80 +316,6 @@ class GUI(QMainWindow):
         window.setPixmap(QPixmap(image))
 
         return window
-
-    def _camera_window(self) -> QWidget:
-        """Create live feed window.
-
-        Returns
-        -------
-        QWidget
-            Window representing the live feed and interactive widgets.
-        """
-        def updateData() -> None:
-            """Update live feed display.
-
-            Notes
-            -----
-            The red cross hair is added by changing the central three rows and
-            columns of pixels in the image to red (RGB=[225, 0, 0]).
-            """
-            # Get new image.
-            self.image = np.copy(np.rot90(get_image()))
-            height = self.image.shape[0]
-            width = self.image.shape[1]
-
-            # Generate cross hairs
-            if self.SCH.isChecked():
-                length = int(0.1 * min(height, width))
-                xLine = np.full((5, 2 * length, 3), [225, 0, 0])
-                yLine = np.full((length * 2, 5, 3), [225, 0, 0])
-                self.image[height // 2 - 2:height // 2 + 3,
-                           width // 2 - length:width // 2 + length] = xLine
-                self.image[height // 2 - length:height // 2 +
-                           length:, width // 2 - 2:width // 2 + 3] = yLine
-
-            # Update image.
-            self.img.setImage(np.fliplr(np.rot90(self.image, 2)))
-            QTimer.singleShot(1, updateData)
-
-            # Initialize timer.
-            now = ptime.time()
-            fps2 = 1.0 / (now - self.updateTime)
-            self.updateTime = now
-            self.fps = self.fps * 0.9 + fps2 * 0.1
-
-        # Configure camera window.
-        self.cameraWindow = QWidget()
-        pg.setConfigOptions(antialias=True)
-        win = pg.GraphicsLayoutWidget()
-        self.img = pg.ImageItem(border='w')
-
-        # Create viewing box.
-        view = win.addViewBox()
-        view.setAspectLocked(True)
-        view.addItem(self.img)
-        view.setRange(QRectF(300, 0, 700, 1000))
-
-        self.updateTime = ptime.time()
-        self.fps = 0
-
-        layout = QGridLayout()
-
-        # Create, modify, and place image buttons.
-        self.WCB = QPushButton("Image Capture")
-        self.SCH = QPushButton("Show Cross Hairs")
-        self.WCB.setStyleSheet("background-color: lightgrey")
-        self.SCH.setStyleSheet("background-color: lightgrey")
-        self.SCH.setCheckable(True)
-        layout.addWidget(win, 0, 0, 1, 2)
-        layout.addWidget(self.WCB, 1, 0, 1, 1)
-        layout.addWidget(self.SCH, 1, 1, 1, 1)
-
-        self.cameraWindow.setLayout(layout)
-
-        updateData()
-
-        return self.cameraWindow
 
     def _tabular_window(self) -> QWidget:
         """Create tabular window.
@@ -899,6 +823,135 @@ class GUI(QMainWindow):
         self.baseWindow.setLayout(layout)
 
         return self.baseWindow
+
+
+class CameraWindow(QMainWindow):
+    """Generate detachable camera window.
+
+    Attributes
+    ----------
+    cameraWindow : QWidget
+        QWidget window containing camera feed and interface.
+    img : pg.ImageItem
+        Live feed image from Blackfly camera.
+    image : nd.array
+        Current image displayed in an array representation.
+    WCB : QPushButton
+        Image capture push button.
+    SHC : QPushButton
+        Show Cross Hairs toggle push button.
+    
+    Methods
+    -------
+    _camera_window()
+        Generate the detachable camera window.
+    _save_image()
+        Control sequence to save an image capture.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        dock = QDockWidget("Live Stream", self)
+        dock.setAllowedAreas(Qt.AllDockWidgetAreas)
+        dock.setFeatures(dock.DockWidgetFloatable)
+        dock.setWidget(self._camera_window())
+        self.addDockWidget(Qt.TopDockWidgetArea, dock)
+
+        # Save image functionality.
+        self.WCB.clicked.connect(self._save_image)
+    
+    def _camera_window(self) -> QWidget:
+        """Create live feed window.
+
+        Returns
+        -------
+        QWidget
+            Window representing the live feed and interactive widgets.
+        """
+        def updateData() -> None:
+            """Update live feed display.
+
+            Notes
+            -----
+            The red cross hair is added by changing the central three rows and
+            columns of pixels in the image to red (RGB=[225, 0, 0]).
+            """
+            # Get new image.
+            self.image = np.copy(np.rot90(get_image()))
+            height = self.image.shape[0]
+            width = self.image.shape[1]
+
+            # Generate cross hairs
+            if self.SCH.isChecked():
+                length = int(0.1 * min(height, width))
+                xLine = np.full((5, 2 * length, 3), [225, 0, 0])
+                yLine = np.full((length * 2, 5, 3), [225, 0, 0])
+                self.image[height // 2 - 2:height // 2 + 3,
+                           width // 2 - length:width // 2 + length] = xLine
+                self.image[height // 2 - length:height // 2 +
+                           length:, width // 2 - 2:width // 2 + 3] = yLine
+
+            # Update image.
+            self.img.setImage(np.fliplr(np.rot90(self.image, 2)))
+            QTimer.singleShot(1, updateData)
+
+            # Initialize timer.
+            now = ptime.time()
+            fps2 = 1.0 / (now - self.updateTime)
+            self.updateTime = now
+            self.fps = self.fps * 0.9 + fps2 * 0.1
+
+        # Configure camera window.
+        self.cameraWindow = QWidget()
+        pg.setConfigOptions(antialias=True)
+        win = pg.GraphicsLayoutWidget()
+        self.img = pg.ImageItem(border='w')
+
+        # Create viewing box.
+        view = win.addViewBox()
+        view.setAspectLocked(True)
+        view.addItem(self.img)
+        view.setRange(QRectF(300, 0, 700, 1000))
+
+        self.updateTime = ptime.time()
+        self.fps = 0
+
+        layout = QGridLayout()
+
+        # Create, modify, and place image buttons.
+        self.WCB = QPushButton("Image Capture")
+        self.SCH = QPushButton("Show Cross Hairs")
+        self.WCB.setStyleSheet("background-color: lightgrey")
+        self.SCH.setStyleSheet("background-color: lightgrey")
+        self.SCH.setCheckable(True)
+        layout.addWidget(win, 0, 0, 1, 2)
+        layout.addWidget(self.WCB, 1, 0, 1, 1)
+        layout.addWidget(self.SCH, 1, 1, 1, 1)
+
+        self.cameraWindow.setLayout(layout)
+
+        updateData()
+
+        return self.cameraWindow
+    
+    def _save_image(self) -> None:
+        """Live stream image capture.
+
+        This method saves a capture of the current live stream to the chosen
+        directory.
+        """
+
+        path, _ = QFileDialog.getSaveFileName(parent=self, caption="Save File",
+            directory="../figures", filter="Image files (*.jpg *.jpeg *.png)")
+
+        plt.figure()
+        plt.imshow(np.rot90(self.image, 3))
+        plt.axis("off")
+        plt.savefig(path, dpi=500, bbox_inches="tight")
+
+        self._append_text(f"Image capture saved to: {path}")
+
 
 
 class MyTableWidget(QWidget):

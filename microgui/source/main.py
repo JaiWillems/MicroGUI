@@ -4,19 +4,23 @@ The main module is responsible for calling the required files and dependencies
 to run the FAR-IR horizontal microscope.
 """
 
-# Import package dependencies.
+
+import sys
 from PyQt5.QtWidgets import QApplication
 from epics import PV
-import sys
-
-# Import file dependencies.
 from gui import GUI
 from controller import Controller
 from thorlabs_motor_control import initMotor
-from configuration import load_config, load_pos_config, load_pos_config
+from configuration import (
+    load_config,
+    load_pos_config,
+    load_pos_config
+)
+
 
 # Define the THORLABS "mode" motor.
 modeMotor = initMotor()
+
 
 # Define macro variables.
 data, macros = load_config("config.json")
@@ -37,9 +41,9 @@ def program_exit(gui: GUI) -> None:
     app.exec_()
     for object in ["S", "O"]:
         for axis in ["X", "Y", "Z"]:
-            pv = PV(gui.macros[f"{axis}{object}STOP"])
-            pv.put(1)
-            pv.put(0)
+            pvStop = PV(gui.macros[f"{axis}{object}STOP"])
+            pvStop.put(1)
+            pvStop.put(0)
 
 
 # Start GUI execution.

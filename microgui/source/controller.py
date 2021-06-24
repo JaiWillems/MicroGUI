@@ -6,8 +6,6 @@ connecting widgets up to control sequences that bring about change.
 
 
 # Import package dependencies.
-import matplotlib.pyplot as plt
-import numpy as np
 from functools import partial
 from PyQt5.QtGui import QColor
 from thorlabs_apt import Motor
@@ -197,6 +195,14 @@ class Controller(object):
         Control sequence to save the current configuration.
     _change_units()
         Control sequence to change the `current position` display's units.
+    _save_position()
+        Control sequence to save the current motor positions.
+    _load_position()
+        Control sequence to load the selected motor position.
+    _delete_position()
+        Control sequence to delete the selected motor position.
+    _clear_position()
+        Control sequence to clear all saved motor positions.
     """
 
     def __init__(self, gui: GUI, modeMotor: Motor) -> None:
@@ -391,9 +397,6 @@ class Controller(object):
         sequence to update the display or interface with hardware.
         """
 
-        # Save image functionality.
-        self.gui.WCB.clicked.connect(self._save_image)
-
         # Mode select functionality.
         self.gui.tab.RDM1.pressed.connect(
             partial(self._mode_state, 1, self.modeMotor))
@@ -521,25 +524,6 @@ class Controller(object):
 
         self._append_text("Widgets connected to control sequences.")
 
-    def _save_image(self) -> None:
-        """Live stream image capture.
-
-        This method saves a capture of the current live stream to the chosen
-        directory.
-        """
-
-        path, _ = QFileDialog.getSaveFileName(parent=self.gui,
-                                              caption="Save File",
-                                              directory="../figures",
-                                              filter="Image files (*.jpg *.jpeg *.png)")
-
-        plt.figure()
-        plt.imshow(np.rot90(self.gui.image, 3))
-        plt.axis("off")
-        plt.savefig(path, dpi=500, bbox_inches="tight")
-
-        self._append_text(f"Image capture saved to: {path}")
-
     def _mode_state(self, mode: Literal[1, 2, 3, 4], modeMotor: Motor) -> None:
         """Change microscope mode.
 
@@ -555,12 +539,13 @@ class Controller(object):
         """
 
         # Set move_to position based on mode.
-        modeDict = {1: "TRANSMISSION_POSITION", 2: "REFLECTION_POSITION",
-                    3: "VISIBLE_IMAGE_POSITION", 4: "BEAMSPLITTER_POSITION"}
-        pos = self.gui.macros[modeDict[mode]]
-        changeMode(pos=pos, modeMotor=modeMotor)
+        modeDict = {1: "TRANSMISSION_POSITION",
+                    2: "REFLECTION_POSITION",
+                    3: "VISIBLE_IMAGE_POSITION",
+                    4: "BEAMSPLITTER_POSITION"}
+        position = self.gui.macros[modeDict[mode]]
+        status = changeMode(pos=position, modeMotor=modeMotor)
 
-        status = changeMode(pos=pos, modeMotor=modeMotor)
         if status == -1:
             self._append_text("ERROR: Can not change THORLABS motor position.",
                               QColor(255, 0, 0))
@@ -605,7 +590,7 @@ class Controller(object):
             if self.gui.tab.RDM4.isChecked():
                 self._mode_state(4, self.modeMotor)
 
-        self._append_text("Setting new mode positions.")
+        self._append_text("Setting new mode position.")
 
     def _enable_thorlabs(self) -> None:
         """Enable or disable the THORLABS motor."""
@@ -614,12 +599,10 @@ class Controller(object):
         if label == "Enable":
             enable(self.modeMotor)
             self.gui.tab.enableDisable.setText("Disable")
-
             self._append_text("THORLABS motor enabled.")
         else:
             disable(self.modeMotor)
             self.gui.tab.enableDisable.setText("Enable")
-
             self._append_text("THORLABS motor disabled.")
 
     def _home_thorlabs(self) -> None:
@@ -1390,7 +1373,7 @@ class Controller(object):
         path, _ = QFileDialog.getOpenFileName(parent=self.gui,
                                               caption="Open File",
                                               directory="../configuration files",
-                                              filter="Configuration files (*.json)")
+                                              filter="configuration files (*.json)")
         data, macros = load_config(path)
         self.gui.data = data
         self.gui.macros = macros
@@ -1402,7 +1385,7 @@ class Controller(object):
         path, _ = QFileDialog.getSaveFileName(parent=self.gui,
                                               caption="Save File",
                                               directory="../configuration files",
-                                              filter="Configuration files (*.json)")
+                                              filter="configuration files (*.json)")
         save_config(path, self.gui.data, self.gui.macros)
 
         self._append_text(f"Configuration saved to {path}")
@@ -1479,4 +1462,3 @@ class Controller(object):
             self.gui.posSelect.removeItem(index)
         save_pos_config(path="saved_positions.json", data=self.gui.savedPos)
         self._append_text("All positions cleared.")
-        
