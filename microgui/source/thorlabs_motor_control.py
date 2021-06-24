@@ -31,6 +31,7 @@ def initMotor() -> apt.Motor:
 
     # Initialize motor if detected.
     modeMotor = apt.Motor(motorSerialNumber)
+    
     return modeMotor
 
 

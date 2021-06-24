@@ -110,6 +110,7 @@ def load_pos_config(path: str) -> dict:
     with open(path, "r") as jsonfile:
         data = json.load(jsonfile)
         jsonfile.close()
+
     return data
 
 

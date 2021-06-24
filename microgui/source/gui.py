@@ -279,7 +279,7 @@ class GUI(QMainWindow):
         self.savedPos = savedPos
 
         # Set CLS logo.
-        self.setWindowIcon(QIcon('figures/CLS_logo.png'))
+        self.setWindowIcon(QIcon("figures/MicroGUI_logo.png"))
 
         # Define main GUI window.
         self.setWindowTitle("Horizontal Microscope Control")
