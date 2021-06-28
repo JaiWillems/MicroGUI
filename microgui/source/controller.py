@@ -17,8 +17,6 @@ from epics import (
 )
 from typing import (
     Literal,
-    Dict,
-    Any,
     Union
 )
 from PyQt5.QtWidgets import (
@@ -761,7 +759,7 @@ class Controller(object):
 
         Parameters
         ----------
-        **kwargs : Dict
+        **kwargs : dict
             Extra arguments to `_update_abs_pos`: refer to PyEpics
             documentation for a list of all possible arguments for PV callback
             functions.
@@ -1033,7 +1031,7 @@ class Controller(object):
 
         Parameters
         ----------
-        **kwargs : Dict
+        **kwargs : dict
             Extra arguments to `_motor_status`: refer to PyEpics documentation
             for a list of all possible arguments for PV callback functions.
         """
@@ -1137,7 +1135,7 @@ class Controller(object):
 
         Parameters
         ----------
-        **kwargs : Dict
+        **kwargs : dict
             Extra arguments to `_hard_lim_indicators`: refer to PyEpics
             documentation for a list of all possible arguments for PV callback
             functions.
@@ -1180,7 +1178,7 @@ class Controller(object):
 
         Parameters
         ----------
-        **kwargs : Dict
+        **kwargs : dict
             Extra arguments to `_hard_lim_indicators`: refer to PyEpics
             documentation for a list of all possible arguments for PV callback
             functions.
@@ -1303,7 +1301,7 @@ class Controller(object):
 
         Parameters
         ----------
-        **kwargs : Dict
+        **kwargs : dict
             Extra arguments to `_hard_lim_indicators`: refer to PyEpics
             documentation for a list of all possible arguments for PV callback
             functions.
