@@ -1381,7 +1381,6 @@ class MyTableWidget(QWidget):
         self.tab5.layout.addWidget(zeroLabel, 7, 0, 1, 4)
 
         self.valueType = QPushButton("Display Actual Values")
-        self.valueType.setCheckable(True)
         self.valueType.setStyleSheet("background-color: lightgrey")
         self.tab5.layout.addWidget(self.valueType, 5, 3, 1, 3)
 
