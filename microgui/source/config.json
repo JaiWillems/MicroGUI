@@ -5,24 +5,6 @@
         "VISIBLE_IMAGE_POSITION": 0,
         "BEAMSPLITTER_POSITION": 18
     },
-    "positions": {
-        "base_positions": {
-            "XS_BASE_POSITION": 0,
-            "YS_BASE_POSITION": 0,
-            "ZS_BASE_POSITION": 0,
-            "XO_BASE_POSITION": 0,
-            "YO_BASE_POSITION": 0,
-            "ZO_BASE_POSITION": 0
-        },
-        "relative_positions": {
-            "XS_RELATIVE_POSITION": 0,
-            "YS_RELATIVE_POSITION": 0,
-            "ZS_RELATIVE_POSITION": 0,
-            "XO_RELATIVE_POSITION": 0,
-            "YO_RELATIVE_POSITION": 0,
-            "ZO_RELATIVE_POSITION": 0
-        }
-    },
     "conversions": {
         "XS_STEP2MICRON": 0.98935,
         "YS_STEP2MICRON": 0.23618,

@@ -304,6 +304,14 @@ class Controller(object):
         self.PV_YOMOVE = PV(pvname=self.gui.macros["YOMOVE"])
         self.PV_ZOMOVE = PV(pvname=self.gui.macros["ZOMOVE"])
 
+        # Initialize offset PV's.
+        self.PV_XSOFFSET = PV(pvname=self.gui.macros["XSOFFSET"])
+        self.PV_YSOFFSET = PV(pvname=self.gui.macros["YSOFFSET"])
+        self.PV_ZSOFFSET = PV(pvname=self.gui.macros["ZSOFFSET"])
+        self.PV_XOOFFSET = PV(pvname=self.gui.macros["XOOFFSET"])
+        self.PV_YOOFFSET = PV(pvname=self.gui.macros["YOOFFSET"])
+        self.PV_ZOOFFSET = PV(pvname=self.gui.macros["ZOOFFSET"])
+
 
         self._append_text("PVs configured and initialized.")
 
@@ -344,12 +352,12 @@ class Controller(object):
             str(float(self.gui.macros["ZOMAX_SOFT_LIMIT"])))
         
         # Set all offset PV's to zero.
-        caput(self.gui.macros["XSOFFSET"], 0)
-        caput(self.gui.macros["YSOFFSET"], 0)
-        caput(self.gui.macros["ZSOFFSET"], 0)
-        caput(self.gui.macros["XOOFFSET"], 0)
-        caput(self.gui.macros["YOOFFSET"], 0)
-        caput(self.gui.macros["ZOOFFSET"], 0)
+        self.PV_XSOFFSET.put(0)
+        self.PV_YSOFFSET.put(0)
+        self.PV_ZSOFFSET.put(0)
+        self.PV_XOOFFSET.put(0)
+        self.PV_YOOFFSET.put(0)
+        self.PV_ZOOFFSET.put(0)
 
         # Set backlash PV values.
         caput(self.gui.macros["XSB"], self.gui.macros["XS_BACKLASH"])
@@ -687,7 +695,14 @@ class Controller(object):
                     ("O", "Y"): self.gui.yOAbsPos,
                     ("O", "Z"): self.gui.zOAbsPos}
 
-        offset = caget(self.gui.macros[f"{object}{axis}OFFSET"])
+        offsets = {("S", "X"): self.PV_XSOFFSET,
+                   ("S", "Y"): self.PV_YSOFFSET,
+                   ("S", "Z"): self.PV_ZSOFFSET,
+                   ("O", "X"): self.PV_XOOFFSET,
+                   ("O", "Y"): self.PV_YOOFFSET,
+                   ("O", "Z"): self.PV_ZOOFFSET}
+
+        offset = offsets[(object, axis)].get()
         absPos = float(lineEdit[(object, axis)].text()) - offset
 
         PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
@@ -698,7 +713,6 @@ class Controller(object):
         elif absPos < NSL:
             absPos = NSL
 
-        # self.gui.macros[f"{axis}{object}_RELATIVE_POSITION"] = relPos
         caput(self.gui.macros[f"{axis}{object}ABSPOS"], absPos)
         caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
         caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
@@ -754,6 +768,13 @@ class Controller(object):
                     ("O", "X"): self.gui.xOAbsPos,
                     ("O", "Y"): self.gui.yOAbsPos,
                     ("O", "Z"): self.gui.zOAbsPos}
+        
+        offsets = {("S", "X"): self.PV_XSOFFSET,
+                   ("S", "Y"): self.PV_YSOFFSET,
+                   ("S", "Z"): self.PV_ZSOFFSET,
+                   ("O", "X"): self.PV_XOOFFSET,
+                   ("O", "Y"): self.PV_YOOFFSET,
+                   ("O", "Z"): self.PV_ZOOFFSET}
 
         pvname = kwargs["pvname"]
         value = kwargs["value"]
@@ -765,7 +786,7 @@ class Controller(object):
         axis = pvKey[0]
         object = pvKey[1]
 
-        offset = caget(self.gui.macros[f"{axis}{object}OFFSET"])
+        offset = offsets[(object, axis)].get()
         lineEdit[(object, axis)].setText(str(value + offset))
 
     def _update_soft_lim(self, buttonID: Literal[0, 1]) -> None:
@@ -793,6 +814,13 @@ class Controller(object):
                       ("O", "Y", 1): self.gui.tab.yOMax,
                       ("O", "Z", 0): self.gui.tab.zOMin,
                       ("O", "Z", 1): self.gui.tab.zOMax}
+        
+        offsets = {("S", "X"): self.PV_XSOFFSET,
+                   ("S", "Y"): self.PV_YSOFFSET,
+                   ("S", "Z"): self.PV_ZSOFFSET,
+                   ("O", "X"): self.PV_XOOFFSET,
+                   ("O", "Y"): self.PV_YOOFFSET,
+                   ("O", "Z"): self.PV_ZOOFFSET}
 
         if buttonID == 2:
             # Set soft limits to hard limits.
@@ -841,7 +869,7 @@ class Controller(object):
             for object in ["S", "O"]:
                 for axis in ["X", "Y", "Z"]:
 
-                    offset = caget(self.gui.macros[f"{axis}{object}OFFSET"])
+                    offset = offsets[(object, axis)].get()
 
                     min = float(softLimits[(object, axis, 0)].text()) - offset
                     max = float(softLimits[(object, axis, 1)].text()) - offset
@@ -863,38 +891,19 @@ class Controller(object):
                             self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] = max
 
         # Update soft limit line edits.
-        self.gui.tab.xSMin.setText(str(self.gui.macros["XSMIN_SOFT_LIMIT"] +
-                                       caget(self.gui.macros[f"XSOFFSET"])))
-        self.gui.tab.xSMax.setText(str(self.gui.macros["XSMAX_SOFT_LIMIT"] +
-                                       caget(self.gui.macros[f"XSOFFSET"])))
-        self.gui.tab.ySMin.setText(str(self.gui.macros["YSMIN_SOFT_LIMIT"] +
-                                       caget(self.gui.macros[f"YSOFFSET"])))
-        self.gui.tab.ySMax.setText(str(self.gui.macros["YSMAX_SOFT_LIMIT"] +
-                                       caget(self.gui.macros[f"YSOFFSET"])))
-        self.gui.tab.zSMin.setText(str(self.gui.macros["ZSMIN_SOFT_LIMIT"] +
-                                       caget(self.gui.macros[f"ZSOFFSET"])))
-        self.gui.tab.zSMax.setText(str(self.gui.macros["ZSMAX_SOFT_LIMIT"] +
-                                       caget(self.gui.macros[f"ZSOFFSET"])))
-        self.gui.tab.xOMin.setText(str(self.gui.macros["XOMIN_SOFT_LIMIT"] +
-                                       caget(self.gui.macros[f"XOOFFSET"])))
-        self.gui.tab.xOMax.setText(str(self.gui.macros["XOMAX_SOFT_LIMIT"] +
-                                       caget(self.gui.macros[f"XOOFFSET"])))
-        self.gui.tab.yOMin.setText(str(self.gui.macros["YOMIN_SOFT_LIMIT"] +
-                                       caget(self.gui.macros[f"YOOFFSET"])))
-        self.gui.tab.yOMax.setText(str(self.gui.macros["YOMAX_SOFT_LIMIT"] +
-                                       caget(self.gui.macros[f"YOOFFSET"])))
-        self.gui.tab.zOMin.setText(str(self.gui.macros["ZOMIN_SOFT_LIMIT"] +
-                                       caget(self.gui.macros[f"ZOOFFSET"])))
-        self.gui.tab.zOMax.setText(str(self.gui.macros["ZOMAX_SOFT_LIMIT"] +
-                                       caget(self.gui.macros[f"ZOOFFSET"])))
+        self.gui.tab.xSMin.setText(str(self.gui.macros["XSMIN_SOFT_LIMIT"] + self.PV_XSOFFSET.get()))
+        self.gui.tab.xSMax.setText(str(self.gui.macros["XSMAX_SOFT_LIMIT"] + self.PV_XSOFFSET.get()))
+        self.gui.tab.ySMin.setText(str(self.gui.macros["YSMIN_SOFT_LIMIT"] + self.PV_YSOFFSET.get()))
+        self.gui.tab.ySMax.setText(str(self.gui.macros["YSMAX_SOFT_LIMIT"] + self.PV_YSOFFSET.get()))
+        self.gui.tab.zSMin.setText(str(self.gui.macros["ZSMIN_SOFT_LIMIT"] + self.PV_ZSOFFSET.get()))
+        self.gui.tab.zSMax.setText(str(self.gui.macros["ZSMAX_SOFT_LIMIT"] + self.PV_ZSOFFSET.get()))
+        self.gui.tab.xOMin.setText(str(self.gui.macros["XOMIN_SOFT_LIMIT"] + self.PV_XOOFFSET.get()))
+        self.gui.tab.xOMax.setText(str(self.gui.macros["XOMAX_SOFT_LIMIT"] + self.PV_XOOFFSET.get()))
+        self.gui.tab.yOMin.setText(str(self.gui.macros["YOMIN_SOFT_LIMIT"] + self.PV_YOOFFSET.get()))
+        self.gui.tab.yOMax.setText(str(self.gui.macros["YOMAX_SOFT_LIMIT"] + self.PV_YOOFFSET.get()))
+        self.gui.tab.zOMin.setText(str(self.gui.macros["ZOMIN_SOFT_LIMIT"] + self.PV_ZOOFFSET.get()))
+        self.gui.tab.zOMax.setText(str(self.gui.macros["ZOMAX_SOFT_LIMIT"] + self.PV_ZOOFFSET.get()))
 
-        # Update soft limit indicators.
-        self._soft_lim_indicators("S", "X")
-        self._soft_lim_indicators("S", "Y")
-        self._soft_lim_indicators("S", "Z")
-        self._soft_lim_indicators("O", "X")
-        self._soft_lim_indicators("O", "Y")
-        self._soft_lim_indicators("O", "Z")
 
         # Move motors to within soft limits.
         self._check_motor_position()
@@ -954,15 +963,13 @@ class Controller(object):
 
         Notes
         -----
-        The base position deifnes the actual motor position whereas the
-        relative position defines the position displayed. Internal workings use
-        base position but external workings use relative position.
+        Inputed values are relative if `offset!=0` and are absolute if
+        `offset==0`. A relative value can be attained by adding the offset
+        value to the corresponding absolute value.
         """
 
-        for axis in ["X", "Y", "Z"]:
-            for object in ["S", "O"]:
-                caput(self.gui.macros[f"{axis}{object}ZERO"], 1)
-                caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
+        caput(self.gui.macros[f"{axis}{object}ZERO"], 1)
+        caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
         
         self._change_display_vals()
 
@@ -984,6 +991,13 @@ class Controller(object):
                         ("O", "X"): self.gui.xIdleO,
                         ("O", "Y"): self.gui.yIdleO,
                         ("O", "Z"): self.gui.zIdleO}
+        
+        absPos = {("S", "X"): self.gui.xSAbsPos,
+                  ("S", "Y"): self.gui.ySAbsPos,
+                  ("S", "Z"): self.gui.zSAbsPos,
+                  ("O", "X"): self.gui.xOAbsPos,
+                  ("O", "Y"): self.gui.yOAbsPos,
+                  ("O", "Z"): self.gui.zOAbsPos}
 
         pvname = kwargs["pvname"]
         value = kwargs["value"]
@@ -1028,6 +1042,9 @@ class Controller(object):
             motionLabels[(object, axis)].setText("UNPOWERING")
             motionLabels[(object, axis)].setStyleSheet(
                 "background-color: #ff4747; border: 1px solid black;")
+            self._soft_lim_indicators(object, axis)
+        
+        absPos[(object, axis)].setText(str(caget(self.gui.macros[f"{axis}{object}POS"])))
 
     def _check_motor_position(self) -> None:
         """Moves motors within soft limits.
@@ -1038,19 +1055,22 @@ class Controller(object):
 
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
+
                 PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
                 NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
 
                 currPos = caget(self.gui.macros[f"{axis}{object}POS_ABS"])
 
-                if currPos > PSL:
+                if currPos >= PSL:
                     caput(self.gui.macros[f"{axis}{object}ABSPOS"], PSL)
                     caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
                     caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
-                elif currPos < NSL:
+                    self._soft_lim_indicators(object, axis)
+                elif currPos <= NSL:
                     caput(self.gui.macros[f"{axis}{object}ABSPOS"], NSL)
                     caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
                     caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
+                    self._soft_lim_indicators(object, axis)
 
     def _hard_lim_indicators(self, **kwargs: Union[str, int, float]) -> None:
         """Set hard limit indicators.
@@ -1154,13 +1174,6 @@ class Controller(object):
         reference to the zeroed position.
         """
 
-        absPos = {("S", "X"): self.gui.xSAbsPos,
-                  ("S", "Y"): self.gui.ySAbsPos,
-                  ("S", "Z"): self.gui.zSAbsPos,
-                  ("O", "X"): self.gui.xOAbsPos,
-                  ("O", "Y"): self.gui.yOAbsPos,
-                  ("O", "Z"): self.gui.zOAbsPos}
-
         hardLimits = {("S", "X"): self.gui.tab.xSMM,
                       ("S", "Y"): self.gui.tab.ySMM,
                       ("S", "Z"): self.gui.tab.zSMM,
@@ -1180,14 +1193,21 @@ class Controller(object):
                       ("O", "Y", 1): self.gui.tab.yOMax,
                       ("O", "Z", 0): self.gui.tab.zOMin,
                       ("O", "Z", 1): self.gui.tab.zOMax}
+        
+        offsets = {("S", "X"): self.PV_XSOFFSET,
+                   ("S", "Y"): self.PV_YSOFFSET,
+                   ("S", "Z"): self.PV_ZSOFFSET,
+                   ("O", "X"): self.PV_XOOFFSET,
+                   ("O", "Y"): self.PV_YOOFFSET,
+                   ("O", "Z"): self.PV_ZOOFFSET}
 
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
 
-                offset = caget(f"{axis}{object}OFFSET")
+                offset = offsets[(object, axis)].get()
 
                 currAbsPos = caget(self.gui.macros[f"{axis}{object}POS_ABS"])
-                absPos[("object", "axis")].setText(str(float(currAbsPos) + offset))
+                caput(self.gui.macros[f"{axis}{object}ABSPOS"], currAbsPos)
 
                 minLim = self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"] + offset
                 maxLim = self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"] + offset
@@ -1205,9 +1225,16 @@ class Controller(object):
         `_change_display_values` to update displays.
         """
 
+        offsets = {("S", "X"): self.PV_XSOFFSET,
+                   ("S", "Y"): self.PV_YSOFFSET,
+                   ("S", "Z"): self.PV_ZSOFFSET,
+                   ("O", "X"): self.PV_XOOFFSET,
+                   ("O", "Y"): self.PV_YOOFFSET,
+                   ("O", "Z"): self.PV_ZOOFFSET}
+
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
-                caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
+                offsets[(object, axis)].put(0)
         
         self._change_display_vals()
 
