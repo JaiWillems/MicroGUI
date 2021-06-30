@@ -9,34 +9,14 @@ connecting widgets up to control sequences that bring about change.
 from functools import partial
 from PyQt5.QtGui import QColor
 from thorlabs_apt import Motor
-from epics import (
-    ca,
-    caput,
-    caget,
-    PV
-)
-from typing import (
-    Literal,
-    Union
-)
-from PyQt5.QtWidgets import (
-    QLineEdit,
-    QFileDialog
-)
+from epics import ca, caput, caget, PV
+from typing import Literal, Union
+from PyQt5.QtWidgets import QLineEdit, QFileDialog
 
 # Import file dependencies.
 from gui import GUI
-from thorlabs_motor_control import (
-    enable,
-    disable,
-    home,
-    changeMode
-)
-from configuration import (
-    load_config,
-    save_config,
-    save_pos_config
-)
+from thorlabs_motor_control import enable, disable, home, changeMode
+from configuration import load_config, save_config, save_pos_config
 
 
 # Set up epics environment.
@@ -1242,16 +1222,12 @@ class Controller(object):
         This method sets all offsets to zero.
         """
 
-        offsets = {("S", "X"): self.PV_XSOFFSET,
-                   ("S", "Y"): self.PV_YSOFFSET,
-                   ("S", "Z"): self.PV_ZSOFFSET,
-                   ("O", "X"): self.PV_XOOFFSET,
-                   ("O", "Y"): self.PV_YOOFFSET,
-                   ("O", "Z"): self.PV_ZOOFFSET}
-
-        for object in ["S", "O"]:
-            for axis in ["X", "Y", "Z"]:
-                offsets[(object, axis)].put(0)
+        self.PV_XSOFFSET.put(0)
+        self.PV_YSOFFSET.put(0)
+        self.PV_ZSOFFSET.put(0)
+        self.PV_XOOFFSET.put(0)
+        self.PV_YOOFFSET.put(0)
+        self.PV_ZOOFFSET.put(0)
 
     def _set_current_position(self, **kwargs: Union[str, int, float]) -> None:
         """Update current position label.

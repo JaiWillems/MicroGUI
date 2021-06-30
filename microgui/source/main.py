@@ -11,11 +11,7 @@ from epics import PV
 from gui import GUI
 from controller import Controller
 from thorlabs_motor_control import initMotor
-from configuration import (
-    load_config,
-    load_pos_config,
-    load_pos_config
-)
+from configuration import load_config, load_pos_config, load_pos_config
 
 
 # Define the THORLABS "mode" motor.

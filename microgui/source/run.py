@@ -1,4 +1,7 @@
-"""
+"""MicroGUI launcher executable base file.
+
+This script is converted into an executable file to server as the MicroGUI
+program launcher.
 """
 
 

@@ -12,34 +12,12 @@ import pyqtgraph as pg
 import pyqtgraph.ptime as ptime
 from typing import Any
 from flir_camera_control import get_image
-from PyQt5.QtGui import (
-    QPixmap,
-    QFont,
-    QIcon
-)
-from PyQt5.QtCore import (
-    QRectF,
-    QTimer,
-    Qt
-)
+from PyQt5.QtGui import QPixmap, QFont, QIcon
+from PyQt5.QtCore import QRectF, QTimer, Qt
 from PyQt5.QtWidgets import (
-    QButtonGroup,
-    QMainWindow,
-    QGridLayout,
-    QScrollBar,
-    QTextBrowser,
-    QVBoxLayout,
-    QWidget,
-    QLabel,
-    QPushButton,
-    QLineEdit,
-    QRadioButton,
-    QTabWidget,
-    QScrollBar,
-    QWidget,
-    QComboBox,
-    QDockWidget,
-    QFileDialog
+    QButtonGroup, QMainWindow, QGridLayout, QScrollBar, QTextBrowser,
+    QVBoxLayout, QWidget, QLabel, QPushButton, QLineEdit, QRadioButton,
+    QTabWidget, QScrollBar, QWidget, QComboBox, QDockWidget, QFileDialog
 )
 
 
@@ -894,7 +872,7 @@ class CameraWindow(QMainWindow):
 
             # Update image.
             self.img.setImage(np.fliplr(np.rot90(self.image, 2)))
-            QTimer.singleShot(1, updateData)
+            QTimer.singleShot(75, updateData)
 
             # Initialize timer.
             now = ptime.time()
