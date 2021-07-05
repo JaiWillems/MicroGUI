@@ -42,6 +42,18 @@ class Controller(object):
         The GUi object with which the Controller class controls.
     modeMotor : Motor
         The initialized THORLABS motor unit controlling the microscope mode.
+    PV_XSSTEP : PV
+        Step PV for the sample's x dimension.
+    PV_YSSTEP : PV
+        Step PV for the sample's y dimension.
+    PV_ZSSTEP : PV
+        Step PV for the sample's z dimension.
+    PV_XOSTEP : PV
+        Step PV for the objective's x dimension.
+    PV_YOSTEP : PV
+        Step PV for the objective's y dimension.
+    PV_ZOSTEP : PV
+        Step PV for the objective's z dimension.
     PV_XSABSPOS : PV
         Absolute position PV for the sample's x dimension.
     PV_YSABSPOS : PV
@@ -54,6 +66,54 @@ class Controller(object):
         Absolute position PV for the objective's y dimension.
     PV_ZOABSPOS : PV
         Absolute position PV for the objective's z dimension.
+    PV_XSPOS : PV
+        Current position PV for the sample's x dimension.
+    PV_YSPOS : PV
+        Current position PV for the sample's y dimension.
+    PV_ZSPOS : PV
+        Current position PV for the sample's z dimension.
+    PV_XOPOS : PV
+        Current position PV for the objective's x dimension.
+    PV_YOPOS : PV
+        Current position PV for the objective's y dimension.
+    PV_ZOPOS : PV
+        Current position PV for the objective's z dimension.
+    PV_XSPOS_ABS : PV
+        Absolute current position PV for the sample's x dimension.
+    PV_YSPOS_ABS : PV
+        Absolute current position PV for the sample's y dimension.
+    PV_ZSPOS_ABS : PV
+        Absolute current position PV for the sample's z dimension.
+    PV_XOPOS_ABS : PV
+        Absolute current position PV for the objective's x dimension.
+    PV_YOPOS_ABS : PV
+        Absolute current position PV for the objective's y dimension.
+    PV_ZOPOS_ABS : PV
+        Absolute current position PV for the objective's z dimension.
+    PV_XSPOS_ENG : PV
+        Current engineering position PV for the sample's x dimension.
+    PV_YSPOS_ENG : PV
+        Current engineering position PV for the sample's y dimension.
+    PV_ZSPOS_ENG : PV
+        Current engineering position PV for the sample's z dimension.
+    PV_XOPOS_ENG : PV
+        Current engineering position PV for the objective's x dimension.
+    PV_YOPOS_ENG : PV
+        Current engineering position PV for the objective's y dimension.
+    PV_ZOPOS_ENG : PV
+        Current engineering position PV for the objective's z dimension.
+    PV_XSMOVE : PV
+        Move PV of the sample's x dimension.
+    PV_YSMOVE : PV
+        Move PV of the sample's y dimension.
+    PV_ZSMOVE : PV
+        Move PV of the sample's z dimension.
+    PV_XOMOVE : PV
+        Move PV of the objective's x dimension.
+    PV_YOMOVE : PV
+        Move PV of the objective's y dimension.
+    PV_ZOMOVE : PV
+        Move PV of the objective's z dimension.
     PV_XSSTOP : PV
         Stop PV for the sample's x dimension.
     PV_YSSTOP : PV
@@ -102,19 +162,18 @@ class Controller(object):
         State PV of the objective's y dimension.
     PV_ZOSTATE : PV
         State PV of the objective's z dimension.
-    PV_XSPOS : PV
-        Feedback PV for the sample's x dimension
-    PV_YSPOS : PV
-        Feedback PV for the sample's y dimension
-    PV_ZSPOS : PV
-        Feedback PV for the sample's z dimension
-    PV_XOPOS : PV
-        Feedback PV for the objective's x dimension
-    PV_YOPOS : PV
-        Feedback PV for the objective's y dimension
-    PV_ZOPOS : PV
-        Feedback PV for the objective's z dimension
-
+    PV_XSOFFSET : PV
+        Offset PV for the sample's x dimension
+    PV_YSOFFSET : PV
+        Offset PV for the sample's y dimension
+    PV_ZSOFFSET : PV
+        Offset PV for the sample's z dimension
+    PV_XOOFFSET : PV
+        Offset PV for the objective's x dimension
+    PV_YOOFFSET : PV
+        Offset PV for the objective's y dimension
+    PV_ZOOFFSET : PV
+        Offset PV for the objective's z dimension
 
     Methods
     -------
@@ -124,8 +183,6 @@ class Controller(object):
         Initialize GUI displays.
     _connect_signals()
         Connect the widgets to a control sequence.
-    _save_image()
-        Control sequence to capture an image of the live feed.
     _mode_state(mode, modeMotor)
         Control sequence to change the microscope mode.
     _mode_position(mode)
@@ -148,21 +205,25 @@ class Controller(object):
         Control sequence to set soft limits to the inputted soft limits.
     _update_BL()
         Control sequence to update backlash values.
-    _zero(object, axis)
-        Control sequence to zero the current motor positions.
     _motor_status(**kwargs)
         Control sequence to check and set mode status indicators.
     _check_motor_position()
         Control sequence to move motors within soft limits.
-    _hard_lim_indicators(**kwargs)
-        Control sequence to set hard limit indicators.
     _soft_lim_indicators(object, axis)
         Control sequence to set doft limit indicators.
+    _hard_lim_indicators(**kwargs)
+        Control sequence to set hard limit indicators.
     _change_display_vals()
         Callback function to switch displayed values between actual and
         relative values.
     _change_to_actual()
         Control sequence to change display values to actual.
+    _change_to_relative()
+        Control sequence to change display values to relative.
+    _zero(object, axis)
+        Control sequence to zero the current motor positions.
+    _actual(object, axis)
+        Control sequence to zero the current motor offset.
     _set_current_position(**kwargs)
         Control sequence to update current position labels.
     _append_text(text, color)
@@ -373,6 +434,14 @@ class Controller(object):
         self.PV_YOOFFSET.put(self.gui.macros["YO_OFFSET"])
         self.PV_ZOOFFSET.put(self.gui.macros["ZO_OFFSET"])
 
+        # Set offset line edits to current PV values.
+        self.gui.tab.xSZero.setText(self.PV_XSOFFSET.get())
+        self.gui.tab.ySZero.setText(self.PV_YSOFFSET.get())
+        self.gui.tab.zSZero.setText(self.PV_ZSOFFSET.get())
+        self.gui.tab.xOZero.setText(self.PV_XOOFFSET.get())
+        self.gui.tab.yOZero.setText(self.PV_YOOFFSET.get())
+        self.gui.tab.zOZero.setText(self.PV_ZOOFFSET.get())
+
         # Set slope PV's.
         caput(self.gui.macros["XSSLOPE"], self.gui.macros["XS_STEP2MICRON"])
         caput(self.gui.macros["YSSLOPE"], self.gui.macros["YS_STEP2MICRON"])
@@ -391,12 +460,12 @@ class Controller(object):
         caput(self.gui.macros["ZOB"], self.gui.macros["ZO_BACKLASH"])
 
         # Set backlash line edits to current PV values.
-        self.gui.tab.xSB.setText(str(self.gui.macros["XS_BACKLASH"]))
-        self.gui.tab.ySB.setText(str(self.gui.macros["YS_BACKLASH"]))
-        self.gui.tab.zSB.setText(str(self.gui.macros["ZS_BACKLASH"]))
-        self.gui.tab.xOB.setText(str(self.gui.macros["XO_BACKLASH"]))
-        self.gui.tab.yOB.setText(str(self.gui.macros["YO_BACKLASH"]))
-        self.gui.tab.zOB.setText(str(self.gui.macros["ZO_BACKLASH"]))
+        self.gui.tab.xSB.setText(str(float(self.gui.macros["XS_BACKLASH"])))
+        self.gui.tab.ySB.setText(str(float(self.gui.macros["YS_BACKLASH"])))
+        self.gui.tab.zSB.setText(str(float(self.gui.macros["ZS_BACKLASH"])))
+        self.gui.tab.xOB.setText(str(float(self.gui.macros["XO_BACKLASH"])))
+        self.gui.tab.yOB.setText(str(float(self.gui.macros["YO_BACKLASH"])))
+        self.gui.tab.zOB.setText(str(float(self.gui.macros["ZO_BACKLASH"])))
 
         # Set step line edits to current PV values.
         self.gui.xSStep.setText(str(caget(self.gui.macros["XSSTEP"])))
@@ -546,7 +615,7 @@ class Controller(object):
         # Other functionality.
         self.gui.tab.SBL.clicked.connect(self._update_BL)
         self.gui.tab.allActual.clicked.connect(self._change_to_actual)
-        self.gui.tab.allZero.clicked.connect(self._change_to_relative)
+        self.gui.tab.zeroAll.clicked.connect(self._change_to_relative)
         self.gui.positionUnits.clicked.connect(self._change_units)
 
         # Load and save configuration functionality.
@@ -947,61 +1016,14 @@ class Controller(object):
         caput(self.gui.macros["ZOB"], self.gui.macros["ZO_BACKLASH"])
 
         # Reset backlash line edits for consistent formatting.
-        self.gui.tab.xSB.setText(str(self.gui.macros["XS_BACKLASH"]))
-        self.gui.tab.ySB.setText(str(self.gui.macros["YS_BACKLASH"]))
-        self.gui.tab.zSB.setText(str(self.gui.macros["ZS_BACKLASH"]))
-        self.gui.tab.xOB.setText(str(self.gui.macros["XO_BACKLASH"]))
-        self.gui.tab.yOB.setText(str(self.gui.macros["YO_BACKLASH"]))
-        self.gui.tab.zOB.setText(str(self.gui.macros["ZO_BACKLASH"]))
+        self.gui.tab.xSB.setText(str(float(self.gui.macros["XS_BACKLASH"])))
+        self.gui.tab.ySB.setText(str(float(self.gui.macros["YS_BACKLASH"])))
+        self.gui.tab.zSB.setText(str(float(self.gui.macros["ZS_BACKLASH"])))
+        self.gui.tab.xOB.setText(str(float(self.gui.macros["XO_BACKLASH"])))
+        self.gui.tab.yOB.setText(str(float(self.gui.macros["YO_BACKLASH"])))
+        self.gui.tab.zOB.setText(str(float(self.gui.macros["ZO_BACKLASH"])))
 
         self._append_text("Updating backlash values.")
-
-    def _zero(self, object: Literal["S", "O"], axis:
-              Literal["X", "Y", "Z"]) -> None:
-        """Zero sample or objective axis position.
-
-        This method zeros the absolute position line edit of the motor defined
-        by 'object' and 'axis'.
-
-        Parameters
-        ----------
-        object : {"S", "O"}
-            Defines the stage as either sample or orbjective using "S" and "O",
-            respectively.
-        axis : {"X", "Y", "Z"}
-            Defines the motor axis as x, y, or z using "X", "Y", "Z",
-            respectively.
-
-        Notes
-        -----
-        Inputed values are relative if `offset!=0` and are absolute if
-        `offset==0`. A relative value can be attained by adding the offset
-        value to the corresponding absolute value.
-        """
-
-        caput(self.gui.macros[f"{axis}{object}ZERO"], 1)
-        caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
-
-        self._append_text(f"Zero'ing the {axis}{object}ABSPOS line edit.")
-    
-    def _actual(self, object: Literal["S", "O"], axis:
-              Literal["X", "Y", "Z"]) -> None:
-        """Convert to relative the sample or objective axis position.
-
-        This method converts motor's position defined by 'object' and 'axis' to
-        relative positions.
-
-        Parameters
-        ----------
-        object : {"S", "O"}
-            Defines the stage as either sample or orbjective using "S" and "O",
-            respectively.
-        axis : {"X", "Y", "Z"}
-            Defines the motor axis as x, y, or z using "X", "Y", "Z",
-            respectively.
-        """
-
-        caput(self.gui.macros[f"{axis}{object}OFFSET"], 0)
 
     def _motor_status(self, **kwargs: Union[str, int, float]) -> None:
         """Check and set motor status indicators.
@@ -1090,49 +1112,7 @@ class Controller(object):
                     caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
                     caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
                     self._soft_lim_indicators(object, axis)
-
-    def _hard_lim_indicators(self, **kwargs: Union[str, int, float]) -> None:
-        """Set hard limit indicators.
-
-        Parameters
-        ----------
-        **kwargs : dict
-            Extra arguments to `_hard_lim_indicators`: refer to PyEpics
-            documentation for a list of all possible arguments for PV callback
-            functions.
-        """
-
-        hardLimits = {("S", "X", "N"): self.gui.xSHn,
-                      ("S", "X", "P"): self.gui.xSHp,
-                      ("S", "Y", "N"): self.gui.ySHn,
-                      ("S", "Y", "P"): self.gui.ySHp,
-                      ("S", "Z", "N"): self.gui.zSHn,
-                      ("S", "Z", "P"): self.gui.zSHp,
-                      ("O", "X", "N"): self.gui.xOHn,
-                      ("O", "X", "P"): self.gui.xOHp,
-                      ("O", "Y", "N"): self.gui.yOHn,
-                      ("O", "Y", "P"): self.gui.yOHp,
-                      ("O", "Z", "N"): self.gui.zOHn,
-                      ("O", "Z", "P"): self.gui.zOHp}
-
-        pvname = kwargs["pvname"]
-        value = kwargs["value"]
-
-        keys = list(self.gui.macros.keys())
-        vals = list(self.gui.macros.values())
-        pvKey = keys[vals.index(pvname)]
-
-        axis = pvKey[0]
-        object = pvKey[1]
-        direction = pvKey[3]
-
-        if value > 0:
-            hardLimits[(object, axis, direction)].setStyleSheet(
-                "background-color: #3ac200; border: 1px solid black;")
-        else:
-            hardLimits[(object, axis, direction)].setStyleSheet(
-                "background-color: lightgrey; border: 1px solid black;")
-
+    
     def _soft_lim_indicators(self, object: Literal["S", "O"], axis:
                              Literal["X", "Y", "Z"]) -> None:
         """Set soft limit indicators.
@@ -1183,6 +1163,48 @@ class Controller(object):
                 "background-color: #3ac200; border: 1px solid black;")
         else:
             softLimits[(object, axis, 0)].setStyleSheet(
+                "background-color: lightgrey; border: 1px solid black;")
+
+    def _hard_lim_indicators(self, **kwargs: Union[str, int, float]) -> None:
+        """Set hard limit indicators.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Extra arguments to `_hard_lim_indicators`: refer to PyEpics
+            documentation for a list of all possible arguments for PV callback
+            functions.
+        """
+
+        hardLimits = {("S", "X", "N"): self.gui.xSHn,
+                      ("S", "X", "P"): self.gui.xSHp,
+                      ("S", "Y", "N"): self.gui.ySHn,
+                      ("S", "Y", "P"): self.gui.ySHp,
+                      ("S", "Z", "N"): self.gui.zSHn,
+                      ("S", "Z", "P"): self.gui.zSHp,
+                      ("O", "X", "N"): self.gui.xOHn,
+                      ("O", "X", "P"): self.gui.xOHp,
+                      ("O", "Y", "N"): self.gui.yOHn,
+                      ("O", "Y", "P"): self.gui.yOHp,
+                      ("O", "Z", "N"): self.gui.zOHn,
+                      ("O", "Z", "P"): self.gui.zOHp}
+
+        pvname = kwargs["pvname"]
+        value = kwargs["value"]
+
+        keys = list(self.gui.macros.keys())
+        vals = list(self.gui.macros.values())
+        pvKey = keys[vals.index(pvname)]
+
+        axis = pvKey[0]
+        object = pvKey[1]
+        direction = pvKey[3]
+
+        if value > 0:
+            hardLimits[(object, axis, direction)].setStyleSheet(
+                "background-color: #3ac200; border: 1px solid black;")
+        else:
+            hardLimits[(object, axis, direction)].setStyleSheet(
                 "background-color: lightgrey; border: 1px solid black;")
 
     def _change_display_vals(self, **kwargs: Union[str, int, float]) -> None:
@@ -1241,12 +1263,12 @@ class Controller(object):
                    ("O", "Y"): self.PV_YOOFFSET,
                    ("O", "Z"): self.PV_ZOOFFSET}
         
-        offsetLabels = {("S", "X"): self.PV_xSOffset,
-                        ("S", "Y"): self.PV_ySOffset,
-                        ("S", "Z"): self.PV_zSOffset,
-                        ("O", "X"): self.PV_xOOffset,
-                        ("O", "Y"): self.PV_yOOffset,
-                        ("O", "Z"): self.PV_zOOffset}
+        offsetLabels = {("S", "X"): self.gui.tab.xSOffset,
+                        ("S", "Y"): self.gui.tab.ySOffset,
+                        ("S", "Z"): self.gui.tab.zSOffset,
+                        ("O", "X"): self.gui.tab.xOOffset,
+                        ("O", "Y"): self.gui.tab.yOOffset,
+                        ("O", "Z"): self.gui.tab.zOOffset}
 
         offset = offsets[(object, axis)].get()
 
@@ -1288,6 +1310,53 @@ class Controller(object):
             for axis in ["X", "Y", "Z"]:
                 caput(self.gui.macros[f"{axis}{object}ZERO"], 1)
                 caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
+    
+    def _zero(self, object: Literal["S", "O"], axis:
+              Literal["X", "Y", "Z"]) -> None:
+        """Zero sample or objective axis position.
+
+        This method zeros the absolute position line edit of the motor defined
+        by 'object' and 'axis'.
+
+        Parameters
+        ----------
+        object : {"S", "O"}
+            Defines the stage as either sample or orbjective using "S" and "O",
+            respectively.
+        axis : {"X", "Y", "Z"}
+            Defines the motor axis as x, y, or z using "X", "Y", "Z",
+            respectively.
+
+        Notes
+        -----
+        Inputed values are relative if `offset!=0` and are absolute if
+        `offset==0`. A relative value can be attained by adding the offset
+        value to the corresponding absolute value.
+        """
+
+        caput(self.gui.macros[f"{axis}{object}ZERO"], 1)
+        caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
+
+        self._append_text(f"Zero'ing the {axis}{object}ABSPOS line edit.")
+    
+    def _actual(self, object: Literal["S", "O"], axis:
+              Literal["X", "Y", "Z"]) -> None:
+        """Convert to relative the sample or objective axis position.
+
+        This method converts motor's position defined by 'object' and 'axis' to
+        relative positions.
+
+        Parameters
+        ----------
+        object : {"S", "O"}
+            Defines the stage as either sample or orbjective using "S" and "O",
+            respectively.
+        axis : {"X", "Y", "Z"}
+            Defines the motor axis as x, y, or z using "X", "Y", "Z",
+            respectively.
+        """
+
+        caput(self.gui.macros[f"{axis}{object}OFFSET"], 0)
 
     def _set_current_position(self, **kwargs: Union[str, int, float]) -> None:
         """Update current position label.

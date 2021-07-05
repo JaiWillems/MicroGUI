@@ -54,10 +54,10 @@
     "offsets": {
         "XS_OFFSET": 0,
         "YS_OFFSET": 0,
-        "zS_OFFSET": 0,
+        "ZS_OFFSET": 0,
         "XO_OFFSET": 0,
         "YO_OFFSET": 0,
-        "zO_OFFSET": 0
+        "ZO_OFFSET": 0
     },
     "PVs": {
         "XS": {

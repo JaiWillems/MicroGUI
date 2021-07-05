@@ -954,7 +954,9 @@ class MyTableWidget(QWidget):
     tab4 : QWidget
         Soft Limits tab of the table window.
     tab5 : QWidget
-        Calibration tab of the table window.
+        Zero tab of the table window.
+    tab6 : QWidget
+        Backlash tab of the table window.
     RDM1 : QRadioButton
         Transmission mode radio button.
     RDM2 : QRadioButton
@@ -1027,24 +1029,53 @@ class MyTableWidget(QWidget):
         Set minimal soft limits button.
     SESL : QPushButton
         Set maximal soft limits button.
+
+    xSOffset : QLabel
+        Current offset label for the sample's x dimension.
+    ySOffset : QLabel
+        Current offset label for the sample's y dimension.
+    zSOffset : QLabel
+        Current offset label for the sample's z dimension.
     xSZero : QPushButton
         Button to zero the sample's x dimension.
     ySZero : QPushButton
         Button to zero the sample's y dimension.
     zSZero : QPushButton
         Button to zero the sample's z dimension.
-    xSB : QLineEdit
-        Backlash input for the sample's x dimension.
-    ySB : QLineEdit
-        Backlash input for the sample's y dimension.
-    zSB : QLineEdit
-        Backlash input for the sample's z dimension.
+    xSActual : QPushButton
+        Button to display actual values for the sample's x dimension.
+    ySActual : QPushButton
+        Button to display actual values for the sample's y dimension.
+    zSActual : QPushButton
+        Button to display actual values for the sample's z dimension.
+    xOOffset : QLabel
+        Current offset label for the objective's x dimension.
+    yOOffset : QLabel
+        Current offset label for the objective's y dimension.
+    zOOffset : QLabel
+        Current offset label for the objective's z dimension.
     xOZero : QPushButton
         Button to zero the objective's x dimension.
     yOZero : QPushButton
         Button to zero the objective's y dimension.
     zOZero : QPushButton
         Button to zero the objective's z dimension.
+    xOActual : QPushButton
+        Button to display actual values for the sample's x dimension.
+    yOActual : QPushButton
+        Button to display actual values for the sample's y dimension.
+    zOActual : QPushButton
+        Button to display actual values for the objective's z dimension.
+    zeroAll : QPushButton
+        Button to zero all stages.
+    allActual : QPushButton
+        Button to change all displays to actual values.
+    xSB : QLineEdit
+        Backlash input for the sample's x dimension.
+    ySB : QLineEdit
+        Backlash input for the sample's y dimension.
+    zSB : QLineEdit
+        Backlash input for the sample's z dimension.
     xOB : QLineEdit
         Backlash input for the objective's x dimension.
     yOB : QLineEdit
@@ -1053,8 +1084,6 @@ class MyTableWidget(QWidget):
         Backlash input for the objective's z dimension.
     SBL : QPushButton
         Update all backlash values button.
-    valueType : QPushButton
-        Toggles between actual and relative values.
     """
 
     def __init__(self, parent: Any) -> None:
@@ -1406,11 +1435,6 @@ class MyTableWidget(QWidget):
         self.xOB = QLineEdit(str(xB))
         self.yOB = QLineEdit(str(yB))
         self.zOB = QLineEdit(str(zB))
-
-        # Style interactive objective widgets.
-        self.xOZero.setStyleSheet("background-color: lightgrey")
-        self.yOZero.setStyleSheet("background-color: lightgrey")
-        self.zOZero.setStyleSheet("background-color: lightgrey")
 
         # Organize objective widgets in the tab layout.
         self.tab6.layout.addWidget(QLabel("<b>Objective</b>"), 0, 2, 1, 3)
