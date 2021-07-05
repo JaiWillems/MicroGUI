@@ -1055,8 +1055,6 @@ class MyTableWidget(QWidget):
         Update all backlash values button.
     valueType : QPushButton
         Toggles between actual and relative values.
-    globals : QPushButton
-        Display the programs global variables.
     """
 
     def __init__(self, parent: Any) -> None:
@@ -1361,10 +1359,6 @@ class MyTableWidget(QWidget):
         self.valueType = QPushButton("Display Actual Values")
         self.valueType.setStyleSheet("background-color: lightgrey")
         self.tab5.layout.addWidget(self.valueType, 5, 3, 1, 3)
-
-        self.globals = QPushButton("GLOBALS")
-        self.globals.setStyleSheet("background-color: lightgrey")
-        self.tab5.layout.addWidget(self.globals, 7, 5, 1, 1)
 
         # Set tab layout.
         self.tab5.setLayout(self.tab5.layout)

@@ -118,8 +118,10 @@ class Controller(object):
 
     Methods
     -------
+    _initialize_PVs()
+        Initialize GUI PVs.
     _initialize_GUI()
-        Configure and initiallize PVs.
+        Initialize GUI displays.
     _connect_signals()
         Connect the widgets to a control sequence.
     _save_image()
@@ -165,8 +167,6 @@ class Controller(object):
         Control sequence to update current position labels.
     _append_text(text, color)
         Control sequence to append text to the user information display.
-    _print_globals()
-        Control sequence to display all global variables.
     _load_config()
         Control sequence to upload a new configuration.
     _save_config()
@@ -189,16 +189,20 @@ class Controller(object):
         self.gui = gui
         self.modeMotor = modeMotor
 
+        self._initialize_PVs()
         self._initialize_GUI()
         self._connect_signals()
+    
+    def _initialize_PVs(self) -> None:
+        """Conigure GUI PV's."""
 
-    def _initialize_GUI(self) -> None:
-        """Configure and initiallize PVs.
-
-        This method initializes the line-edits to the PV values on program
-        startup. Additionally, it connects PVs that need monitoring to
-        callback functions.
-        """
+        # Conigure step PV.
+        self.PV_XSSTEP = PV(pvname=self.gui.macros["XSSTEP"])
+        self.PV_YSSTEP = PV(pvname=self.gui.macros["YSSTEP"])
+        self.PV_ZSSTEP = PV(pvname=self.gui.macros["ZSSTEP"])
+        self.PV_XOSTEP = PV(pvname=self.gui.macros["XOSTEP"])
+        self.PV_YOSTEP = PV(pvname=self.gui.macros["YOSTEP"])
+        self.PV_ZOSTEP = PV(pvname=self.gui.macros["XOSTEP"])
 
         # Set absolute position PV monitoring and callback.
         self.PV_XSABSPOS = PV(pvname=self.gui.macros["XSABSPOS"],
@@ -213,6 +217,36 @@ class Controller(object):
                               auto_monitor=True, callback=self._update_abs_pos)
         self.PV_ZOABSPOS = PV(pvname=self.gui.macros["ZOABSPOS"],
                               auto_monitor=True, callback=self._update_abs_pos)
+
+        # Set current position PV monitoring and callback.
+        self.PV_XSPOS = PV(pvname=self.gui.macros["XSPOS"], auto_monitor=True,
+                           callback=self._set_current_position)
+        self.PV_YSPOS = PV(pvname=self.gui.macros["YSPOS"], auto_monitor=True,
+                           callback=self._set_current_position)
+        self.PV_ZSPOS = PV(pvname=self.gui.macros["ZSPOS"], auto_monitor=True,
+                           callback=self._set_current_position)
+        self.PV_XOPOS = PV(pvname=self.gui.macros["XOPOS"], auto_monitor=True,
+                           callback=self._set_current_position)
+        self.PV_YOPOS = PV(pvname=self.gui.macros["YOPOS"], auto_monitor=True,
+                           callback=self._set_current_position)
+        self.PV_ZOPOS = PV(pvname=self.gui.macros["ZOPOS"], auto_monitor=True,
+                           callback=self._set_current_position)
+
+        # Initialize current absolute position PV's.
+        self.PV_XSPOS_ABS = PV(pvname=self.gui.macros["XSPOS_ABS"])
+        self.PV_YSPOS_ABS = PV(pvname=self.gui.macros["YSPOS_ABS"])
+        self.PV_ZSPOS_ABS = PV(pvname=self.gui.macros["ZSPOS_ABS"])
+        self.PV_XOPOS_ABS = PV(pvname=self.gui.macros["XOPOS_ABS"])
+        self.PV_YOPOS_ABS = PV(pvname=self.gui.macros["YOPOS_ABS"])
+        self.PV_ZOPOS_ABS = PV(pvname=self.gui.macros["ZOPOS_ABS"])
+
+        # Initialize move PV's.
+        self.PV_XSMOVE = PV(pvname=self.gui.macros["XSMOVE"])
+        self.PV_YSMOVE = PV(pvname=self.gui.macros["YSMOVE"])
+        self.PV_ZSMOVE = PV(pvname=self.gui.macros["ZSMOVE"])
+        self.PV_XOMOVE = PV(pvname=self.gui.macros["XOMOVE"])
+        self.PV_YOMOVE = PV(pvname=self.gui.macros["YOMOVE"])
+        self.PV_ZOMOVE = PV(pvname=self.gui.macros["ZOMOVE"])
 
         # Configure emergency stop PVs.
         self.PV_XSSTOP = PV(pvname=self.gui.macros["XSSTOP"])
@@ -262,36 +296,6 @@ class Controller(object):
         self.PV_ZOSTATE = PV(pvname=self.gui.macros["ZOSTATE"],
                              auto_monitor=True, callback=self._motor_status)
 
-        # Set current position PV monitoring and callback.
-        self.PV_XSPOS = PV(pvname=self.gui.macros["XSPOS"], auto_monitor=True,
-                           callback=self._set_current_position)
-        self.PV_YSPOS = PV(pvname=self.gui.macros["YSPOS"], auto_monitor=True,
-                           callback=self._set_current_position)
-        self.PV_ZSPOS = PV(pvname=self.gui.macros["ZSPOS"], auto_monitor=True,
-                           callback=self._set_current_position)
-        self.PV_XOPOS = PV(pvname=self.gui.macros["XOPOS"], auto_monitor=True,
-                           callback=self._set_current_position)
-        self.PV_YOPOS = PV(pvname=self.gui.macros["YOPOS"], auto_monitor=True,
-                           callback=self._set_current_position)
-        self.PV_ZOPOS = PV(pvname=self.gui.macros["ZOPOS"], auto_monitor=True,
-                           callback=self._set_current_position)
-
-        # Initialize current absolute position PV's.
-        self.PV_XSPOS_ABS = PV(pvname=self.gui.macros["XSPOS_ABS"])
-        self.PV_YSPOS_ABS = PV(pvname=self.gui.macros["YSPOS_ABS"])
-        self.PV_ZSPOS_ABS = PV(pvname=self.gui.macros["ZSPOS_ABS"])
-        self.PV_XOPOS_ABS = PV(pvname=self.gui.macros["XOPOS_ABS"])
-        self.PV_YOPOS_ABS = PV(pvname=self.gui.macros["YOPOS_ABS"])
-        self.PV_ZOPOS_ABS = PV(pvname=self.gui.macros["ZOPOS_ABS"])
-
-        # Initialize move PV's.
-        self.PV_XSMOVE = PV(pvname=self.gui.macros["XSMOVE"])
-        self.PV_YSMOVE = PV(pvname=self.gui.macros["YSMOVE"])
-        self.PV_ZSMOVE = PV(pvname=self.gui.macros["ZSMOVE"])
-        self.PV_XOMOVE = PV(pvname=self.gui.macros["XOMOVE"])
-        self.PV_YOMOVE = PV(pvname=self.gui.macros["YOMOVE"])
-        self.PV_ZOMOVE = PV(pvname=self.gui.macros["ZOMOVE"])
-
         # Initialize offset PV monitoring and callback.
         self.PV_XSOFFSET = PV(pvname=self.gui.macros["XSOFFSET"],
                               auto_monitor=True,
@@ -313,6 +317,9 @@ class Controller(object):
                               callback=self._change_display_vals)
 
         self._append_text("PVs configured and initialized.")
+
+    def _initialize_GUI(self) -> None:
+        """Configure GUI displays."""
 
         # Set THORLABS motor position line edits.
         self.gui.tab.TMTM.setText(
@@ -404,13 +411,13 @@ class Controller(object):
 
         # Mode select functionality.
         self.gui.tab.RDM1.pressed.connect(
-            partial(self._mode_state, 1, self.modeMotor))
+            partial(self._mode_state, "TRANSMISSION_POSITION", self.modeMotor))
         self.gui.tab.RDM2.pressed.connect(
-            partial(self._mode_state, 2, self.modeMotor))
+            partial(self._mode_state, "REFLECTION_POSITION", self.modeMotor))
         self.gui.tab.RDM3.pressed.connect(
-            partial(self._mode_state, 3, self.modeMotor))
+            partial(self._mode_state, "VISIBLE_IMAGE_POSITION", self.modeMotor))
         self.gui.tab.RDM4.pressed.connect(
-            partial(self._mode_state, 4, self.modeMotor))
+            partial(self._mode_state, "BEAMSPLITTER_POSITION", self.modeMotor))
 
         # THORLABS/mode motor functionality.
         self.gui.tab.enableDisable.clicked.connect(self._enable_thorlabs)
@@ -418,13 +425,13 @@ class Controller(object):
 
         # Mode position customizarion functionality.
         self.gui.tab.TMTMbutton.clicked.connect(
-            partial(self._mode_position, 1))
+            partial(self._mode_position, "TRANSMISSION_POSITION"))
         self.gui.tab.TMRMbutton.clicked.connect(
-            partial(self._mode_position, 2))
+            partial(self._mode_position, "REFLECTION_POSITION"))
         self.gui.tab.TMVMbutton.clicked.connect(
-            partial(self._mode_position, 3))
+            partial(self._mode_position, "VISIBLE_IMAGE_POSITION"))
         self.gui.tab.TMBMbutton.clicked.connect(
-            partial(self._mode_position, 4))
+            partial(self._mode_position, "BEAMSPLITTER_POSITION"))
 
         # Increment sample and objective stage functionality.
         self.gui.xSN.clicked.connect(
@@ -514,7 +521,6 @@ class Controller(object):
         # Other functionality.
         self.gui.tab.SBL.clicked.connect(self._update_BL)
         self.gui.tab.valueType.clicked.connect(self._change_to_actual)
-        self.gui.tab.globals.clicked.connect(self._print_globals)
         self.gui.positionUnits.clicked.connect(self._change_units)
 
         # Load and save configuration functionality.
@@ -529,7 +535,7 @@ class Controller(object):
 
         self._append_text("Widgets connected to control sequences.")
 
-    def _mode_state(self, mode: Literal[1, 2, 3, 4], modeMotor: Motor) -> None:
+    def _mode_state(self, mode: str, modeMotor: Motor) -> None:
         """Change microscope mode.
 
         This method is called when selecting a mode radio button to change
@@ -537,61 +543,49 @@ class Controller(object):
 
         Parameters
         ----------
-        mode : {1, 2, 3, 4}
-            Encoded mode to move the THORLABS motor to.
+        mode : str
+            Mode to move the THORLABS motor to.
         modeMotor : Motor Type
             Motor controlling the mode stage.
         """
 
         # Set move_to position based on mode.
-        modeDict = {1: "TRANSMISSION_POSITION",
-                    2: "REFLECTION_POSITION",
-                    3: "VISIBLE_IMAGE_POSITION",
-                    4: "BEAMSPLITTER_POSITION"}
-        position = self.gui.macros[modeDict[mode]]
+        position = self.gui.macros[mode]
         status = changeMode(pos=position, modeMotor=modeMotor)
 
         if status == -1:
             self._append_text("ERROR: Can not change THORLABS motor position.",
                               QColor(255, 0, 0))
         else:
-            self._append_text(f"Changing mode to {modeDict[mode]}.")
+            self._append_text(f"Changing mode to {mode}.")
 
-    def _mode_position(self, mode: Literal[1, 2, 3, 4]) -> None:
+    def _mode_position(self, mode: str) -> None:
         """Change mode position settings.
 
         Parameters
         ----------
-        mode : {1, 2, 3, 4}
+        mode : str
             The mode's position to be updated.
         """
 
-        if mode == 1:
-            self.gui.macros["TRANSMISSION_POSITION"] = float(
-                self.gui.tab.TMTM.text())
-            self.gui.tab.TMTM.setText(
-                str(self.gui.macros["TRANSMISSION_POSITION"]))
+        if mode == "TRANSMISSION_POSITION":
+            self.gui.macros[mode] = float(self.gui.tab.TMTM.text())
+            self.gui.tab.TMTM.setText(str(self.gui.macros[mode]))
             if self.gui.tab.RDM1.isChecked():
                 self._mode_state(1, self.modeMotor)
-        elif mode == 2:
-            self.gui.macros["REFLECTION_POSITION"] = float(
-                self.gui.tab.TMRM.text())
-            self.gui.tab.TMRM.setText(
-                str(self.gui.macros["REFLECTION_POSITION"]))
+        elif mode == "REFLECTION_POSITION":
+            self.gui.macros[mode] = float(self.gui.tab.TMRM.text())
+            self.gui.tab.TMRM.setText(str(self.gui.macros[mode]))
             if self.gui.tab.RDM2.isChecked():
                 self._mode_state(2, self.modeMotor)
-        elif mode == 3:
-            self.gui.macros["VISIBLE_IMAGE_POSITION"] = float(
-                self.gui.tab.TMVM.text())
-            self.gui.tab.TMVM.setText(
-                str(self.gui.macros["VISIBLE_IMAGE_POSITION"]))
+        elif mode == "VISIBLE_IMAGE_POSITION":
+            self.gui.macros[mode] = float(self.gui.tab.TMVM.text())
+            self.gui.tab.TMVM.setText(str(self.gui.macros[mode]))
             if self.gui.tab.RDM3.isChecked():
                 self._mode_state(3, self.modeMotor)
-        else:
-            self.gui.macros["BEAMSPLITTER_POSITION"] = float(
-                self.gui.tab.TMBM.text())
-            self.gui.tab.TMBM.setText(
-                str(self.gui.macros["BEAMSPLITTER_POSITION"]))
+        elif mode == "BEAMSPLITTER_POSITION":
+            self.gui.macros[mode] = float(self.gui.tab.TMBM.text())
+            self.gui.tab.TMBM.setText(str(self.gui.macros[mode]))
             if self.gui.tab.RDM4.isChecked():
                 self._mode_state(4, self.modeMotor)
 
@@ -654,8 +648,7 @@ class Controller(object):
         incPos = float(step.text())
 
         if incPos < 0:
-            incPos = -incPos
-            step.setText(str(incPos))
+            step.setText(str(-incPos))
             self._append_text("WARNING: Step must be positive. Step sign has been changed to positive.",
                               QColor(250, 215, 0))
 
@@ -798,12 +791,9 @@ class Controller(object):
                       ("O", "Z", 0): self.gui.tab.zOMin,
                       ("O", "Z", 1): self.gui.tab.zOMax}
         
-        offsets = {("S", "X"): self.PV_XSOFFSET,
-                   ("S", "Y"): self.PV_YSOFFSET,
-                   ("S", "Z"): self.PV_ZSOFFSET,
-                   ("O", "X"): self.PV_XOOFFSET,
-                   ("O", "Y"): self.PV_YOOFFSET,
-                   ("O", "Z"): self.PV_ZOOFFSET}
+        offsets = {("S", "X"): self.PV_XSOFFSET, ("S", "Y"): self.PV_YSOFFSET,
+                   ("S", "Z"): self.PV_ZSOFFSET, ("O", "X"): self.PV_XOOFFSET,
+                   ("O", "Y"): self.PV_YOOFFSET, ("O", "Z"): self.PV_ZOOFFSET}
 
         if buttonID == 2:
             # Set soft limits to hard limits.
@@ -874,18 +864,30 @@ class Controller(object):
                             self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] = max
 
         # Update soft limit line edits.
-        self.gui.tab.xSMin.setText(str(self.gui.macros["XSMIN_SOFT_LIMIT"] + self.PV_XSOFFSET.get()))
-        self.gui.tab.xSMax.setText(str(self.gui.macros["XSMAX_SOFT_LIMIT"] + self.PV_XSOFFSET.get()))
-        self.gui.tab.ySMin.setText(str(self.gui.macros["YSMIN_SOFT_LIMIT"] + self.PV_YSOFFSET.get()))
-        self.gui.tab.ySMax.setText(str(self.gui.macros["YSMAX_SOFT_LIMIT"] + self.PV_YSOFFSET.get()))
-        self.gui.tab.zSMin.setText(str(self.gui.macros["ZSMIN_SOFT_LIMIT"] + self.PV_ZSOFFSET.get()))
-        self.gui.tab.zSMax.setText(str(self.gui.macros["ZSMAX_SOFT_LIMIT"] + self.PV_ZSOFFSET.get()))
-        self.gui.tab.xOMin.setText(str(self.gui.macros["XOMIN_SOFT_LIMIT"] + self.PV_XOOFFSET.get()))
-        self.gui.tab.xOMax.setText(str(self.gui.macros["XOMAX_SOFT_LIMIT"] + self.PV_XOOFFSET.get()))
-        self.gui.tab.yOMin.setText(str(self.gui.macros["YOMIN_SOFT_LIMIT"] + self.PV_YOOFFSET.get()))
-        self.gui.tab.yOMax.setText(str(self.gui.macros["YOMAX_SOFT_LIMIT"] + self.PV_YOOFFSET.get()))
-        self.gui.tab.zOMin.setText(str(self.gui.macros["ZOMIN_SOFT_LIMIT"] + self.PV_ZOOFFSET.get()))
-        self.gui.tab.zOMax.setText(str(self.gui.macros["ZOMAX_SOFT_LIMIT"] + self.PV_ZOOFFSET.get()))
+        self.gui.tab.xSMin.setText(str(self.gui.macros["XSMIN_SOFT_LIMIT"] +
+                                       self.PV_XSOFFSET.get()))
+        self.gui.tab.xSMax.setText(str(self.gui.macros["XSMAX_SOFT_LIMIT"] +
+                                       self.PV_XSOFFSET.get()))
+        self.gui.tab.ySMin.setText(str(self.gui.macros["YSMIN_SOFT_LIMIT"] +
+                                       self.PV_YSOFFSET.get()))
+        self.gui.tab.ySMax.setText(str(self.gui.macros["YSMAX_SOFT_LIMIT"] +
+                                       self.PV_YSOFFSET.get()))
+        self.gui.tab.zSMin.setText(str(self.gui.macros["ZSMIN_SOFT_LIMIT"] +
+                                       self.PV_ZSOFFSET.get()))
+        self.gui.tab.zSMax.setText(str(self.gui.macros["ZSMAX_SOFT_LIMIT"] +
+                                       self.PV_ZSOFFSET.get()))
+        self.gui.tab.xOMin.setText(str(self.gui.macros["XOMIN_SOFT_LIMIT"] +
+                                       self.PV_XOOFFSET.get()))
+        self.gui.tab.xOMax.setText(str(self.gui.macros["XOMAX_SOFT_LIMIT"] +
+                                       self.PV_XOOFFSET.get()))
+        self.gui.tab.yOMin.setText(str(self.gui.macros["YOMIN_SOFT_LIMIT"] +
+                                       self.PV_YOOFFSET.get()))
+        self.gui.tab.yOMax.setText(str(self.gui.macros["YOMAX_SOFT_LIMIT"] +
+                                       self.PV_YOOFFSET.get()))
+        self.gui.tab.zOMin.setText(str(self.gui.macros["ZOMIN_SOFT_LIMIT"] +
+                                       self.PV_ZOOFFSET.get()))
+        self.gui.tab.zOMax.setText(str(self.gui.macros["ZOMAX_SOFT_LIMIT"] +
+                                       self.PV_ZOOFFSET.get()))
 
 
         # Move motors to within soft limits.
@@ -898,7 +900,7 @@ class Controller(object):
 
         # Set global backlash variables.
         self.gui.macros["XS_BACKLASH"] = abs(
-            int(float(self.gui.tab.xSB.text())))
+           int(float(self.gui.tab.xSB.text())))
         self.gui.macros["YS_BACKLASH"] = abs(
             int(float(self.gui.tab.ySB.text())))
         self.gui.macros["ZS_BACKLASH"] = abs(
@@ -972,13 +974,6 @@ class Controller(object):
                         ("O", "X"): self.gui.xIdleO,
                         ("O", "Y"): self.gui.yIdleO,
                         ("O", "Z"): self.gui.zIdleO}
-        
-        absPos = {("S", "X"): self.gui.xSAbsPos,
-                  ("S", "Y"): self.gui.ySAbsPos,
-                  ("S", "Z"): self.gui.zSAbsPos,
-                  ("O", "X"): self.gui.xOAbsPos,
-                  ("O", "Y"): self.gui.yOAbsPos,
-                  ("O", "Z"): self.gui.zOAbsPos}
 
         pvname = kwargs["pvname"]
         value = kwargs["value"]
@@ -1283,17 +1278,6 @@ class Controller(object):
         self.gui.textWindow.append(text)
         maxVal = self.gui.textWindow.verticalScrollBar().maximum()
         self.gui.textWindow.verticalScrollBar().setValue(maxVal)
-
-    def _print_globals(self) -> None:
-        """Display all global variables."""
-
-        self._append_text("-*- GLOBAL VARIABLES - START -*-")
-
-        keys = list(self.gui.macros.keys())
-        for key in keys:
-            self._append_text(f"{key} -> {self.gui.macros[key]}")
-
-        self._append_text("-*- GLOBAL VARIABLES - END -*-")
 
     def _load_config(self) -> None:
         """Load new configuration"""
