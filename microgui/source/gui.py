@@ -1071,6 +1071,7 @@ class MyTableWidget(QWidget):
         self.tab3 = QWidget()
         self.tab4 = QWidget()
         self.tab5 = QWidget()
+        self.tab6 = QWidget()
 
         self.tabs.resize(3000, 1000)
 
@@ -1078,7 +1079,8 @@ class MyTableWidget(QWidget):
         self.tabs.addTab(self.tab2, "Mode")
         self.tabs.addTab(self.tab3, "Hard Limits")
         self.tabs.addTab(self.tab4, "Soft Limits")
-        self.tabs.addTab(self.tab5, "Calibration")
+        self.tabs.addTab(self.tab5, "Zero")
+        self.tabs.addTab(self.tab6, "Backlash")
 
         # ---------------------------------------------------------------------
         #   Tab 2
@@ -1286,9 +1288,100 @@ class MyTableWidget(QWidget):
         self.tab5.layout = QGridLayout()
 
         # Define interactive sample widgets.
+        self.xSOffset = QLabel("Offset")
+        self.ySOffset = QLabel("Offset")
+        self.zSOffset = QLabel("Offset")
         self.xSZero = QPushButton("ZERO")
         self.ySZero = QPushButton("ZERO")
         self.zSZero = QPushButton("ZERO")
+        self.xSActual = QPushButton("Actual")
+        self.ySActual = QPushButton("Actual")
+        self.zSActual = QPushButton("Actual")
+
+        # Style interactive sample widgets.
+        self.xSZero.setStyleSheet("background-color: lightgrey")
+        self.ySZero.setStyleSheet("background-color: lightgrey")
+        self.zSZero.setStyleSheet("background-color: lightgrey")
+        self.xSActual.setStyleSheet("background-color: lightgrey")
+        self.ySActual.setStyleSheet("background-color: lightgrey")
+        self.zSActual.setStyleSheet("background-color: lightgrey")
+
+        # Organize sample widgets in the tab layout.
+        self.tab5.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 3)
+        self.tab5.layout.addWidget(QLabel("<i>Offset<i>"), 1, 1, 1, 1)
+        self.tab5.layout.addWidget(QLabel("Horizontal:"), 2, 0, 1, 1)
+        self.tab5.layout.addWidget(QLabel("Vertical:"), 3, 0, 1, 1)
+        self.tab5.layout.addWidget(QLabel("Focus:"), 4, 0, 1, 1)
+        self.tab5.layout.addWidget(self.xSOffset, 2, 1, 1, 1)
+        self.tab5.layout.addWidget(self.ySOffset, 3, 1, 1, 1)
+        self.tab5.layout.addWidget(self.zSOffset, 4, 1, 1, 1)
+        self.tab5.layout.addWidget(self.xSZero, 2, 2, 1, 1)
+        self.tab5.layout.addWidget(self.ySZero, 3, 2, 1, 1)
+        self.tab5.layout.addWidget(self.zSZero, 4, 2, 1, 1)
+        self.tab5.layout.addWidget(self.xSActual, 2, 3, 1, 1)
+        self.tab5.layout.addWidget(self.ySActual, 3, 3, 1, 1)
+        self.tab5.layout.addWidget(self.zSActual, 4, 3, 1, 1)
+
+        # Define interactive objective widgets.
+        self.xOOffset = QLabel("Offset")
+        self.yOOffset = QLabel("Offset")
+        self.zOOffset = QLabel("Offset")
+        self.xOZero = QPushButton("ZERO")
+        self.yOZero = QPushButton("ZERO")
+        self.zOZero = QPushButton("ZERO")
+        self.xOActual = QPushButton("Actual")
+        self.yOActual = QPushButton("Actual")
+        self.zOActual = QPushButton("Actual")
+
+        # Style interactive sample widgets.
+        self.xOZero.setStyleSheet("background-color: lightgrey")
+        self.yOZero.setStyleSheet("background-color: lightgrey")
+        self.zOZero.setStyleSheet("background-color: lightgrey")
+        self.xOActual.setStyleSheet("background-color: lightgrey")
+        self.yOActual.setStyleSheet("background-color: lightgrey")
+        self.zOActual.setStyleSheet("background-color: lightgrey")
+
+        # Organize sample widgets in the tab layout.
+        self.tab5.layout.addWidget(QLabel("<b>Objective</b>"), 0, 4, 1, 3)
+        self.tab5.layout.addWidget(QLabel("<i>Offset<i>"), 1, 5, 1, 1)
+        self.tab5.layout.addWidget(QLabel("Horizontal:"), 2, 4, 1, 1)
+        self.tab5.layout.addWidget(QLabel("Vertical:"), 3, 4, 1, 1)
+        self.tab5.layout.addWidget(QLabel("Focus:"), 4, 4, 1, 1)
+        self.tab5.layout.addWidget(self.xOOffset, 2, 5, 1, 1)
+        self.tab5.layout.addWidget(self.yOOffset, 3, 5, 1, 1)
+        self.tab5.layout.addWidget(self.zOOffset, 4, 5, 1, 1)
+        self.tab5.layout.addWidget(self.xOZero, 2, 6, 1, 1)
+        self.tab5.layout.addWidget(self.yOZero, 3, 6, 1, 1)
+        self.tab5.layout.addWidget(self.zOZero, 4, 6, 1, 1)
+        self.tab5.layout.addWidget(self.xOActual, 2, 7, 1, 1)
+        self.tab5.layout.addWidget(self.yOActual, 3, 7, 1, 1)
+        self.tab5.layout.addWidget(self.zOActual, 4, 7, 1, 1)
+
+        self.zeroAll = QPushButton("Zero All Stages")
+        self.zeroAll.setStyleSheet("background-color: lightgrey")
+        self.tab5.layout.addWidget(self.zeroAll, 5, 0, 1, 4)
+
+        self.allActual = QPushButton("Display All Actual Values")
+        self.allActual.setStyleSheet("background-color: lightgrey")
+        self.tab5.layout.addWidget(self.allActual, 5, 4, 1, 4)
+
+        # Add information labels.
+        zeroLabel = QLabel("<i>Cannot zero when displaying actual values.</i>")
+        zeroLabel.setWordWrap(True)
+        self.tab5.layout.addWidget(zeroLabel, 7, 0, 1, 4)
+
+        # Set tab layout.
+        self.tab5.setLayout(self.tab5.layout)
+
+
+        # ---------------------------------------------------------------------
+        #   Tab 6
+        # ---------------------------------------------------------------------
+
+        
+        self.tab6.layout = QGridLayout()
+
+        # Define interactive sample widgets.
         xB = self.parent.macros["XS_BACKLASH"]
         yB = self.parent.macros["YS_BACKLASH"]
         zB = self.parent.macros["ZS_BACKLASH"]
@@ -1296,28 +1389,17 @@ class MyTableWidget(QWidget):
         self.ySB = QLineEdit(str(yB))
         self.zSB = QLineEdit(str(zB))
 
-        # Style interactive sample widgets.
-        self.xSZero.setStyleSheet("background-color: lightgrey")
-        self.ySZero.setStyleSheet("background-color: lightgrey")
-        self.zSZero.setStyleSheet("background-color: lightgrey")
-
         # Organize sample widgets in the tab layout.
-        self.tab5.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 3)
-        self.tab5.layout.addWidget(QLabel("<i>Backlash</i>"), 1, 2, 1, 1)
-        self.tab5.layout.addWidget(QLabel("Horizontal:"), 2, 0, 1, 1)
-        self.tab5.layout.addWidget(QLabel("Vertical:"), 3, 0, 1, 1)
-        self.tab5.layout.addWidget(QLabel("Focus:"), 4, 0, 1, 1)
-        self.tab5.layout.addWidget(self.xSZero, 2, 1, 1, 1)
-        self.tab5.layout.addWidget(self.ySZero, 3, 1, 1, 1)
-        self.tab5.layout.addWidget(self.zSZero, 4, 1, 1, 1)
-        self.tab5.layout.addWidget(self.xSB, 2, 2, 1, 1)
-        self.tab5.layout.addWidget(self.ySB, 3, 2, 1, 1)
-        self.tab5.layout.addWidget(self.zSB, 4, 2, 1, 1)
+        self.tab6.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 3)
+        self.tab6.layout.addWidget(QLabel("<i>Backlash</i>"), 1, 1, 1, 1)
+        self.tab6.layout.addWidget(QLabel("Horizontal:"), 2, 0, 1, 1)
+        self.tab6.layout.addWidget(QLabel("Vertical:"), 3, 0, 1, 1)
+        self.tab6.layout.addWidget(QLabel("Focus:"), 4, 0, 1, 1)
+        self.tab6.layout.addWidget(self.xSB, 2, 1, 1, 1)
+        self.tab6.layout.addWidget(self.ySB, 3, 1, 1, 1)
+        self.tab6.layout.addWidget(self.zSB, 4, 1, 1, 1)
 
         # Define interactive objective widgets.
-        self.xOZero = QPushButton("ZERO")
-        self.yOZero = QPushButton("ZERO")
-        self.zOZero = QPushButton("ZERO")
         xB = self.parent.macros["XO_BACKLASH"]
         yB = self.parent.macros["YO_BACKLASH"]
         zB = self.parent.macros["ZO_BACKLASH"]
@@ -1331,37 +1413,26 @@ class MyTableWidget(QWidget):
         self.zOZero.setStyleSheet("background-color: lightgrey")
 
         # Organize objective widgets in the tab layout.
-        self.tab5.layout.addWidget(QLabel("<b>Objective</b>"), 0, 3, 1, 3)
-        self.tab5.layout.addWidget(QLabel("<i>Backlash</i>"), 1, 5, 1, 1)
-        self.tab5.layout.addWidget(QLabel("Horizontal:"), 2, 3, 1, 1)
-        self.tab5.layout.addWidget(QLabel("Vertical:"), 3, 3, 1, 1)
-        self.tab5.layout.addWidget(QLabel("Focus:"), 4, 3, 1, 1)
-        self.tab5.layout.addWidget(self.xOZero, 2, 4, 1, 1)
-        self.tab5.layout.addWidget(self.yOZero, 3, 4, 1, 1)
-        self.tab5.layout.addWidget(self.zOZero, 4, 4, 1, 1)
-        self.tab5.layout.addWidget(self.xOB, 2, 5, 1, 1)
-        self.tab5.layout.addWidget(self.yOB, 3, 5, 1, 1)
-        self.tab5.layout.addWidget(self.zOB, 4, 5, 1, 1)
+        self.tab6.layout.addWidget(QLabel("<b>Objective</b>"), 0, 2, 1, 3)
+        self.tab6.layout.addWidget(QLabel("<i>Backlash</i>"), 1, 3, 1, 1)
+        self.tab6.layout.addWidget(QLabel("Horizontal:"), 2, 2, 1, 1)
+        self.tab6.layout.addWidget(QLabel("Vertical:"), 3, 2, 1, 1)
+        self.tab6.layout.addWidget(QLabel("Focus:"), 4, 2, 1, 1)
+        self.tab6.layout.addWidget(self.xOB, 2, 3, 1, 1)
+        self.tab6.layout.addWidget(self.yOB, 3, 3, 1, 1)
+        self.tab6.layout.addWidget(self.zOB, 4, 3, 1, 1)
 
         # Define, style, and organize additional interactive widgets.
         self.SBL = QPushButton("Update Backlash Values")
         self.SBL.setStyleSheet("background-color: lightgrey")
-        self.tab5.layout.addWidget(self.SBL, 5, 0, 1, 3)
+        self.tab6.layout.addWidget(self.SBL, 5, 0, 1, 4)
 
         # Add information labels.
         backlashLabel = QLabel("<i>Backlash is applied when moving negitively. The motor will move 'backlash' steps past the target position before returning to the target position</i>")
-        zeroLabel = QLabel("<i>Cannot zero when displaying actual values.</i>")
         backlashLabel.setWordWrap(True)
-        zeroLabel.setWordWrap(True)
-        self.tab5.layout.addWidget(backlashLabel, 6, 0, 1, 6)
-        self.tab5.layout.addWidget(zeroLabel, 7, 0, 1, 4)
+        self.tab6.layout.addWidget(backlashLabel, 6, 0, 1, 4)
 
-        self.valueType = QPushButton("Display Actual Values")
-        self.valueType.setStyleSheet("background-color: lightgrey")
-        self.tab5.layout.addWidget(self.valueType, 5, 3, 1, 3)
-
-        # Set tab layout.
-        self.tab5.setLayout(self.tab5.layout)
+        self.tab6.setLayout(self.tab6.layout)
 
         # Set window layout.
         self.layout.addWidget(self.tabs)

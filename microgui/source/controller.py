@@ -366,12 +366,12 @@ class Controller(object):
             str(float(self.gui.macros["ZOMAX_SOFT_LIMIT"])))
         
         # Set all offset PV's to zero.
-        self.PV_XSOFFSET.put(0)
-        self.PV_YSOFFSET.put(0)
-        self.PV_ZSOFFSET.put(0)
-        self.PV_XOOFFSET.put(0)
-        self.PV_YOOFFSET.put(0)
-        self.PV_ZOOFFSET.put(0)
+        self.PV_XSOFFSET.put(self.gui.macros["XS_OFFSET"])
+        self.PV_YSOFFSET.put(self.gui.macros["YS_OFFSET"])
+        self.PV_ZSOFFSET.put(self.gui.macros["ZS_OFFSET"])
+        self.PV_XOOFFSET.put(self.gui.macros["XO_OFFSET"])
+        self.PV_YOOFFSET.put(self.gui.macros["YO_OFFSET"])
+        self.PV_ZOOFFSET.put(self.gui.macros["ZO_OFFSET"])
 
         # Set slope PV's.
         caput(self.gui.macros["XSSLOPE"], self.gui.macros["XS_STEP2MICRON"])
@@ -535,9 +535,18 @@ class Controller(object):
         self.gui.tab.yOZero.clicked.connect(partial(self._zero, "O", "Y"))
         self.gui.tab.zOZero.clicked.connect(partial(self._zero, "O", "Z"))
 
+        # Zero'ing absolute position functionality.
+        self.gui.tab.xSActual.clicked.connect(partial(self._actual, "S", "X"))
+        self.gui.tab.ySActual.clicked.connect(partial(self._actual, "S", "Y"))
+        self.gui.tab.zSActual.clicked.connect(partial(self._actual, "S", "Z"))
+        self.gui.tab.xOActual.clicked.connect(partial(self._actual, "O", "X"))
+        self.gui.tab.yOActual.clicked.connect(partial(self._actual, "O", "Y"))
+        self.gui.tab.zOActual.clicked.connect(partial(self._actual, "O", "Z"))
+
         # Other functionality.
         self.gui.tab.SBL.clicked.connect(self._update_BL)
-        self.gui.tab.valueType.clicked.connect(self._change_to_actual)
+        self.gui.tab.allActual.clicked.connect(self._change_to_actual)
+        self.gui.tab.allZero.clicked.connect(self._change_to_relative)
         self.gui.positionUnits.clicked.connect(self._change_units)
 
         # Load and save configuration functionality.
@@ -974,6 +983,25 @@ class Controller(object):
         caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
 
         self._append_text(f"Zero'ing the {axis}{object}ABSPOS line edit.")
+    
+    def _actual(self, object: Literal["S", "O"], axis:
+              Literal["X", "Y", "Z"]) -> None:
+        """Convert to relative the sample or objective axis position.
+
+        This method converts motor's position defined by 'object' and 'axis' to
+        relative positions.
+
+        Parameters
+        ----------
+        object : {"S", "O"}
+            Defines the stage as either sample or orbjective using "S" and "O",
+            respectively.
+        axis : {"X", "Y", "Z"}
+            Defines the motor axis as x, y, or z using "X", "Y", "Z",
+            respectively.
+        """
+
+        caput(self.gui.macros[f"{axis}{object}OFFSET"], 0)
 
     def _motor_status(self, **kwargs: Union[str, int, float]) -> None:
         """Check and set motor status indicators.
@@ -1212,6 +1240,13 @@ class Controller(object):
                    ("O", "X"): self.PV_XOOFFSET,
                    ("O", "Y"): self.PV_YOOFFSET,
                    ("O", "Z"): self.PV_ZOOFFSET}
+        
+        offsetLabels = {("S", "X"): self.PV_xSOffset,
+                        ("S", "Y"): self.PV_ySOffset,
+                        ("S", "Z"): self.PV_zSOffset,
+                        ("O", "X"): self.PV_xOOffset,
+                        ("O", "Y"): self.PV_yOOffset,
+                        ("O", "Z"): self.PV_zOOffset}
 
         offset = offsets[(object, axis)].get()
 
@@ -1227,6 +1262,8 @@ class Controller(object):
         maxLim = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] + offset
         softLimits[(object, axis, 0)].setText(str(minLim))
         softLimits[(object, axis, 1)].setText(str(maxLim))
+
+        offsetLabels[(object, axis)].setText(str(offset))
     
     def _change_to_actual(self) -> None:
         """Change display values to actual.
@@ -1240,6 +1277,17 @@ class Controller(object):
         self.PV_XOOFFSET.put(0)
         self.PV_YOOFFSET.put(0)
         self.PV_ZOOFFSET.put(0)
+
+    def _change_to_relative(self) -> None:
+        """Change display values to relative.
+
+        This method zeros all motor stages.
+        """
+
+        for object in ["S", "O"]:
+            for axis in ["X", "Y", "Z"]:
+                caput(self.gui.macros[f"{axis}{object}ZERO"], 1)
+                caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
 
     def _set_current_position(self, **kwargs: Union[str, int, float]) -> None:
         """Update current position label.
