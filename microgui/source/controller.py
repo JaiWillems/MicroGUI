@@ -1259,12 +1259,12 @@ class Controller(object):
                         ("O", "Y"): self.gui.yStepO,
                         ("O", "Z"): self.gui.zStepO}
         
-        engUnits = {("S", "X"): self.PV_XSABS_ENG,
-                    ("S", "Y"): self.PV_YSABS_ENG,
-                    ("S", "Z"): self.PV_ZSABS_ENG,
-                    ("O", "X"): self.PV_XOABS_ENG,
-                    ("O", "Y"): self.PV_YOABS_ENG,
-                    ("O", "Z"): self.PV_ZOABS_ENG}
+        engUnits = {("S", "X"): self.PV_XSPOS_ENG,
+                    ("S", "Y"): self.PV_YSPOS_ENG,
+                    ("S", "Z"): self.PV_ZSPOS_ENG,
+                    ("O", "X"): self.PV_XOPOS_ENG,
+                    ("O", "Y"): self.PV_YOPOS_ENG,
+                    ("O", "Z"): self.PV_ZOPOS_ENG}
 
         pvname = kwargs["pvname"]
         value = kwargs["value"]
