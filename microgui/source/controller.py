@@ -240,6 +240,14 @@ class Controller(object):
         self.PV_YOPOS_ABS = PV(pvname=self.gui.macros["YOPOS_ABS"])
         self.PV_ZOPOS_ABS = PV(pvname=self.gui.macros["ZOPOS_ABS"])
 
+        # Initialize current engineering position PV's.
+        self.PV_XSPOS_ENG = PV(pvname=self.gui.macros["XSPOS_ENG"])
+        self.PV_YSPOS_ENG = PV(pvname=self.gui.macros["YSPOS_ENG"])
+        self.PV_ZSPOS_ENG = PV(pvname=self.gui.macros["ZSPOS_ENG"])
+        self.PV_XOPOS_ENG = PV(pvname=self.gui.macros["XOPOS_ENG"])
+        self.PV_YOPOS_ENG = PV(pvname=self.gui.macros["YOPOS_ENG"])
+        self.PV_ZOPOS_ENG = PV(pvname=self.gui.macros["ZOPOS_ENG"])
+
         # Initialize move PV's.
         self.PV_XSMOVE = PV(pvname=self.gui.macros["XSMOVE"])
         self.PV_YSMOVE = PV(pvname=self.gui.macros["YSMOVE"])
@@ -364,6 +372,15 @@ class Controller(object):
         self.PV_XOOFFSET.put(0)
         self.PV_YOOFFSET.put(0)
         self.PV_ZOOFFSET.put(0)
+
+        # Set slope PV's.
+        caput(self.gui.macros["XSSLOPE"], self.gui.macros["XS_STEP2MICRON"])
+        caput(self.gui.macros["YSSLOPE"], self.gui.macros["YS_STEP2MICRON"])
+        caput(self.gui.macros["ZSSLOPE"], self.gui.macros["ZS_STEP2MICRON"])
+        caput(self.gui.macros["XOSLOPE"], self.gui.macros["XO_STEP2MICRON"])
+        caput(self.gui.macros["YOSLOPE"], self.gui.macros["YO_STEP2MICRON"])
+        caput(self.gui.macros["ZOSLOPE"], self.gui.macros["ZO_STEP2MICRON"])
+        
 
         # Set backlash PV values.
         caput(self.gui.macros["XSB"], self.gui.macros["XS_BACKLASH"])
@@ -1241,6 +1258,13 @@ class Controller(object):
                         ("O", "X"): self.gui.xStepO,
                         ("O", "Y"): self.gui.yStepO,
                         ("O", "Z"): self.gui.zStepO}
+        
+        engUnits = {("S", "X"): self.PV_XSABS_ENG,
+                    ("S", "Y"): self.PV_YSABS_ENG,
+                    ("S", "Z"): self.PV_ZSABS_ENG,
+                    ("O", "X"): self.PV_XOABS_ENG,
+                    ("O", "Y"): self.PV_YOABS_ENG,
+                    ("O", "Z"): self.PV_ZOABS_ENG}
 
         pvname = kwargs["pvname"]
         value = kwargs["value"]
@@ -1253,8 +1277,8 @@ class Controller(object):
         object = pvKey[1]
 
         if self.gui.positionUnits.isChecked():
-            factor = self.gui.macros[f"{axis}{object}_STEP2MICRON"]
-            stepText = f"<b>{round(factor * value, 1)} MICRONS</b>"
+            value = engUnits[(object, axis)].get()
+            stepText = f"<b>{round(value, 1)} MICRONS</b>"
         else:
             stepText = f"<b>{round(value, 1)} STEPS</b>"
 
