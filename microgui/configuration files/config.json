@@ -5,24 +5,6 @@
         "VISIBLE_IMAGE_POSITION": 0,
         "BEAMSPLITTER_POSITION": 18
     },
-    "positions": {
-        "base_positions": {
-            "XS_BASE_POSITION": 0,
-            "YS_BASE_POSITION": 0,
-            "ZS_BASE_POSITION": 0,
-            "XO_BASE_POSITION": 0,
-            "YO_BASE_POSITION": 0,
-            "ZO_BASE_POSITION": 0
-        },
-        "relative_positions": {
-            "XS_RELATIVE_POSITION": 0,
-            "YS_RELATIVE_POSITION": 0,
-            "ZS_RELATIVE_POSITION": 0,
-            "XO_RELATIVE_POSITION": 0,
-            "YO_RELATIVE_POSITION": 0,
-            "ZO_RELATIVE_POSITION": 0
-        }
-    },
     "conversions": {
         "XS_STEP2MICRON": 0.98935,
         "YS_STEP2MICRON": 0.23618,
@@ -69,6 +51,14 @@
         "YO_BACKLASH": 0,
         "ZO_BACKLASH": 0
     },
+    "offsets": {
+        "XS_OFFSET": 0,
+        "YS_OFFSET": 0,
+        "ZS_OFFSET": 0,
+        "XO_OFFSET": 0,
+        "YO_OFFSET": 0,
+        "ZO_OFFSET": 0
+    },
     "PVs": {
         "XS": {
             "XSN": "fihr:SMTR1601-1-R10-28:step:moveDeltaIn",
@@ -84,9 +74,11 @@
             "XSHN": "SMTR1601-1-R10-28:ccw",
             "XSHP": "SMTR1601-1-R10-28:cw",
             "XSZERO": "fihr:SMTR1601-1-R10-28:setAsZero",
+            "XSOFFSET": "SMTR1601-1-R10-28:step:ofst",
             "XSB": "fihr:SMTR1601-1-R10-28:step:backlash",
             "XSSTATE": "SMTR1601-1-R10-28:state",
-            "XSPOS": "SMTR1601-1-R10-28:step:fbk"
+            "XSPOS": "SMTR1601-1-R10-28:step:c:fbk",
+            "XSPOS_ABS": "SMTR1601-1-R10-28:step:fbk"
         },
         "YS": {
             "YSN": "fihr:SMTR1601-1-R10-29:step:moveDeltaIn",
@@ -102,9 +94,11 @@
             "YSHN": "SMTR1601-1-R10-29:ccw",
             "YSHP": "SMTR1601-1-R10-29:cw",
             "YSZERO": "fihr:SMTR1601-1-R10-29:setAsZero",
+            "YSOFFSET": "SMTR1601-1-R10-29:step:ofst",
             "YSB": "fihr:SMTR1601-1-R10-29:step:backlash",
             "YSSTATE": "SMTR1601-1-R10-29:state",
-            "YSPOS": "SMTR1601-1-R10-29:step:fbk"
+            "YSPOS": "SMTR1601-1-R10-29:step:c:fbk",
+            "YSPOS_ABS": "SMTR1601-1-R10-29:step:fbk"
         },
         "ZS": {
             "ZSN": "fihr:SMTR1601-1-R10-30:step:moveDeltaIn",
@@ -120,9 +114,11 @@
             "ZSHN": "SMTR1601-1-R10-30:ccw",
             "ZSHP": "SMTR1601-1-R10-30:cw",
             "ZSZERO": "fihr:SMTR1601-1-R10-30:setAsZero",
+            "ZSOFFSET": "SMTR1601-1-R10-30:step:ofst",
             "ZSB": "fihr:SMTR1601-1-R10-30:step:backlash",
             "ZSSTATE": "SMTR1601-1-R10-30:state",
-            "ZSPOS": "SMTR1601-1-R10-30:step:fbk"
+            "ZSPOS": "SMTR1601-1-R10-30:step:c:fbk",
+            "ZSPOS_ABS": "SMTR1601-1-R10-30:step:fbk"
         },
         "XO": {
             "XON": "obj:SMTR1601-1-R10-27:step:moveDeltaIn",
@@ -138,9 +134,11 @@
             "XOHN": "SMTR1601-1-R10-27:ccw",
             "XOHP": "SMTR1601-1-R10-27:cw",
             "XOZERO": "obj:SMTR1601-1-R10-27:setAsZero",
+            "XOOFFSET": "SMTR1601-1-R10-27:step:ofst",
             "XOB": "obj:SMTR1601-1-R10-27:step:backlash",
             "XOSTATE": "SMTR1601-1-R10-27:state",
-            "XOPOS": "SMTR1601-1-R10-27:step:fbk"
+            "XOPOS": "SMTR1601-1-R10-27:step:c:fbk",
+            "XOPOS_ABS": "SMTR1601-1-R10-27:step:fbk"
         },
         "YO": {
             "YON": "obj:SMTR1601-1-R10-31:step:moveDeltaIn",
@@ -156,9 +154,11 @@
             "YOHN": "SMTR1601-1-R10-31:ccw",
             "YOHP": "SMTR1601-1-R10-31:cw",
             "YOZERO": "obj:SMTR1601-1-R10-31:setAsZero",
+            "YOOFFSET": "SMTR1601-1-R10-31:step:ofst",
             "YOB": "obj:SMTR1601-1-R10-31:step:backlash",
             "YOSTATE": "SMTR1601-1-R10-31:state",
-            "YOPOS": "SMTR1601-1-R10-31:step:fbk"
+            "YOPOS": "SMTR1601-1-R10-31:step:c:fbk",
+            "YOPOS_ABS": "SMTR1601-1-R10-31:step:fbk"
         },
         "ZO": {
             "ZON": "obj:SMTR1601-1-R10-32:step:moveDeltaIn",
@@ -174,9 +174,11 @@
             "ZOHN": "SMTR1601-1-R10-32:ccw",
             "ZOHP": "SMTR1601-1-R10-32:cw",
             "ZOZERO": "obj:SMTR1601-1-R10-32:setAsZero",
+            "ZOOFFSET": "SMTR1601-1-R10-32:step:ofst",
             "ZOB": "obj:SMTR1601-1-R10-32:step:backlash",
             "ZOSTATE": "SMTR1601-1-R10-32:state",
-            "ZOPOS": "SMTR1601-1-R10-32:step:fbk"
+            "ZOPOS": "SMTR1601-1-R10-32:step:c:fbk",
+            "ZOPOS_ABS": "SMTR1601-1-R10-32:step:fbk"
         }
     }
 }

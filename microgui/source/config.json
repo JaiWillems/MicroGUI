@@ -78,9 +78,7 @@
             "XSB": "fihr:SMTR1601-1-R10-28:step:backlash",
             "XSSTATE": "SMTR1601-1-R10-28:state",
             "XSPOS": "SMTR1601-1-R10-28:step:c:fbk",
-            "XSPOS_ABS": "SMTR1601-1-R10-28:step:fbk",
-            "XSPOS_ENG": "SMTR1601-1-R10-28:mm:fbk",
-            "XSSLOPE": "SMTR1601-1-R10-28:step:slope"
+            "XSPOS_ABS": "SMTR1601-1-R10-28:step:fbk"
         },
         "YS": {
             "YSN": "fihr:SMTR1601-1-R10-29:step:moveDeltaIn",
@@ -100,9 +98,7 @@
             "YSB": "fihr:SMTR1601-1-R10-29:step:backlash",
             "YSSTATE": "SMTR1601-1-R10-29:state",
             "YSPOS": "SMTR1601-1-R10-29:step:c:fbk",
-            "YSPOS_ABS": "SMTR1601-1-R10-29:step:fbk",
-            "YSPOS_ENG": "SMTR1601-1-R10-29:mm:fbk",
-            "YSSLOPE": "SMTR1601-1-R10-29:step:slope"
+            "YSPOS_ABS": "SMTR1601-1-R10-29:step:fbk"
         },
         "ZS": {
             "ZSN": "fihr:SMTR1601-1-R10-30:step:moveDeltaIn",
@@ -122,9 +118,7 @@
             "ZSB": "fihr:SMTR1601-1-R10-30:step:backlash",
             "ZSSTATE": "SMTR1601-1-R10-30:state",
             "ZSPOS": "SMTR1601-1-R10-30:step:c:fbk",
-            "ZSPOS_ABS": "SMTR1601-1-R10-30:step:fbk",
-            "ZSPOS_ENG": "SMTR1601-1-R10-30:mm:fbk",
-            "ZSSLOPE": "SMTR1601-1-R10-30:step:slope"
+            "ZSPOS_ABS": "SMTR1601-1-R10-30:step:fbk"
         },
         "XO": {
             "XON": "obj:SMTR1601-1-R10-27:step:moveDeltaIn",
@@ -144,9 +138,7 @@
             "XOB": "obj:SMTR1601-1-R10-27:step:backlash",
             "XOSTATE": "SMTR1601-1-R10-27:state",
             "XOPOS": "SMTR1601-1-R10-27:step:c:fbk",
-            "XOPOS_ABS": "SMTR1601-1-R10-27:step:fbk",
-            "XOPOS_ENG": "SMTR1601-1-R10-27:mm:fbk",
-            "XOSLOPE": "SMTR1601-1-R10-27:step:slope"
+            "XOPOS_ABS": "SMTR1601-1-R10-27:step:fbk"
         },
         "YO": {
             "YON": "obj:SMTR1601-1-R10-31:step:moveDeltaIn",
@@ -166,9 +158,7 @@
             "YOB": "obj:SMTR1601-1-R10-31:step:backlash",
             "YOSTATE": "SMTR1601-1-R10-31:state",
             "YOPOS": "SMTR1601-1-R10-31:step:c:fbk",
-            "YOPOS_ABS": "SMTR1601-1-R10-31:step:fbk",
-            "YOPOS_ENG": "SMTR1601-1-R10-31:mm:fbk",
-            "YOSLOPE": "SMTR1601-1-R10-31:step:slope"
+            "YOPOS_ABS": "SMTR1601-1-R10-31:step:fbk"
         },
         "ZO": {
             "ZON": "obj:SMTR1601-1-R10-32:step:moveDeltaIn",
@@ -188,9 +178,7 @@
             "ZOB": "obj:SMTR1601-1-R10-32:step:backlash",
             "ZOSTATE": "SMTR1601-1-R10-32:state",
             "ZOPOS": "SMTR1601-1-R10-32:step:c:fbk",
-            "ZOPOS_ABS": "SMTR1601-1-R10-32:step:fbk",
-            "ZOPOS_ENG": "SMTR1601-1-R10-32:mm:fbk",
-            "ZOSLOPE": "SMTR1601-1-R10-32:step:slope"
+            "ZOPOS_ABS": "SMTR1601-1-R10-32:step:fbk"
         }
     }
 }

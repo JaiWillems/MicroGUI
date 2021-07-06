@@ -90,18 +90,6 @@ class Controller(object):
         Absolute current position PV for the objective's y dimension.
     PV_ZOPOS_ABS : PV
         Absolute current position PV for the objective's z dimension.
-    PV_XSPOS_ENG : PV
-        Current engineering position PV for the sample's x dimension.
-    PV_YSPOS_ENG : PV
-        Current engineering position PV for the sample's y dimension.
-    PV_ZSPOS_ENG : PV
-        Current engineering position PV for the sample's z dimension.
-    PV_XOPOS_ENG : PV
-        Current engineering position PV for the objective's x dimension.
-    PV_YOPOS_ENG : PV
-        Current engineering position PV for the objective's y dimension.
-    PV_ZOPOS_ENG : PV
-        Current engineering position PV for the objective's z dimension.
     PV_XSMOVE : PV
         Move PV of the sample's x dimension.
     PV_YSMOVE : PV
@@ -301,14 +289,6 @@ class Controller(object):
         self.PV_YOPOS_ABS = PV(pvname=self.gui.macros["YOPOS_ABS"])
         self.PV_ZOPOS_ABS = PV(pvname=self.gui.macros["ZOPOS_ABS"])
 
-        # Initialize current engineering position PV's.
-        self.PV_XSPOS_ENG = PV(pvname=self.gui.macros["XSPOS_ENG"])
-        self.PV_YSPOS_ENG = PV(pvname=self.gui.macros["YSPOS_ENG"])
-        self.PV_ZSPOS_ENG = PV(pvname=self.gui.macros["ZSPOS_ENG"])
-        self.PV_XOPOS_ENG = PV(pvname=self.gui.macros["XOPOS_ENG"])
-        self.PV_YOPOS_ENG = PV(pvname=self.gui.macros["YOPOS_ENG"])
-        self.PV_ZOPOS_ENG = PV(pvname=self.gui.macros["ZOPOS_ENG"])
-
         # Initialize move PV's.
         self.PV_XSMOVE = PV(pvname=self.gui.macros["XSMOVE"])
         self.PV_YSMOVE = PV(pvname=self.gui.macros["YSMOVE"])
@@ -426,7 +406,7 @@ class Controller(object):
         self.gui.tab.zOMax.setText(
             str(float(self.gui.macros["ZOMAX_SOFT_LIMIT"])))
         
-        # Set all offset PV's to zero.
+        # Set all offset PV's to the saved offsets.
         self.PV_XSOFFSET.put(self.gui.macros["XS_OFFSET"])
         self.PV_YSOFFSET.put(self.gui.macros["YS_OFFSET"])
         self.PV_ZSOFFSET.put(self.gui.macros["ZS_OFFSET"])
@@ -435,21 +415,12 @@ class Controller(object):
         self.PV_ZOOFFSET.put(self.gui.macros["ZO_OFFSET"])
 
         # Set offset line edits to current PV values.
-        self.gui.tab.xSZero.setText(self.PV_XSOFFSET.get())
-        self.gui.tab.ySZero.setText(self.PV_YSOFFSET.get())
-        self.gui.tab.zSZero.setText(self.PV_ZSOFFSET.get())
-        self.gui.tab.xOZero.setText(self.PV_XOOFFSET.get())
-        self.gui.tab.yOZero.setText(self.PV_YOOFFSET.get())
-        self.gui.tab.zOZero.setText(self.PV_ZOOFFSET.get())
-
-        # Set slope PV's.
-        caput(self.gui.macros["XSSLOPE"], self.gui.macros["XS_STEP2MICRON"])
-        caput(self.gui.macros["YSSLOPE"], self.gui.macros["YS_STEP2MICRON"])
-        caput(self.gui.macros["ZSSLOPE"], self.gui.macros["ZS_STEP2MICRON"])
-        caput(self.gui.macros["XOSLOPE"], self.gui.macros["XO_STEP2MICRON"])
-        caput(self.gui.macros["YOSLOPE"], self.gui.macros["YO_STEP2MICRON"])
-        caput(self.gui.macros["ZOSLOPE"], self.gui.macros["ZO_STEP2MICRON"])
-        
+        self.gui.tab.xSOffset.setText(str(float(self.gui.macros["XS_OFFSET"])))
+        self.gui.tab.ySOffset.setText(str(float(self.gui.macros["YS_OFFSET"])))
+        self.gui.tab.zSOffset.setText(str(float(self.gui.macros["ZS_OFFSET"])))
+        self.gui.tab.xOOffset.setText(str(float(self.gui.macros["XO_OFFSET"])))
+        self.gui.tab.yOOffset.setText(str(float(self.gui.macros["YO_OFFSET"])))
+        self.gui.tab.zOOffset.setText(str(float(self.gui.macros["ZO_OFFSET"])))
 
         # Set backlash PV values.
         caput(self.gui.macros["XSB"], self.gui.macros["XS_BACKLASH"])
@@ -468,12 +439,20 @@ class Controller(object):
         self.gui.tab.zOB.setText(str(float(self.gui.macros["ZO_BACKLASH"])))
 
         # Set step line edits to current PV values.
-        self.gui.xSStep.setText(str(caget(self.gui.macros["XSSTEP"])))
-        self.gui.ySStep.setText(str(caget(self.gui.macros["YSSTEP"])))
-        self.gui.zSStep.setText(str(caget(self.gui.macros["ZSSTEP"])))
-        self.gui.xOStep.setText(str(caget(self.gui.macros["XOSTEP"])))
-        self.gui.yOStep.setText(str(caget(self.gui.macros["YOSTEP"])))
-        self.gui.zOStep.setText(str(caget(self.gui.macros["ZOSTEP"])))
+        self.gui.xSStep.setText(str(float(self.PV_XSSTEP.get())))
+        self.gui.ySStep.setText(str(float(self.PV_YSSTEP.get())))
+        self.gui.zSStep.setText(str(float(self.PV_ZSSTEP.get())))
+        self.gui.xOStep.setText(str(float(self.PV_XOSTEP.get())))
+        self.gui.yOStep.setText(str(float(self.PV_YOSTEP.get())))
+        self.gui.zOStep.setText(str(float(self.PV_ZOSTEP.get())))
+
+        # Make the absolute display align with the current position display.
+        self.PV_XSABSPOS.put(self.PV_XSPOS.get())
+        self.PV_YSABSPOS.put(self.PV_YSPOS.get())
+        self.PV_ZSABSPOS.put(self.PV_ZSPOS.get())
+        self.PV_XOABSPOS.put(self.PV_XOPOS.get())
+        self.PV_YOABSPOS.put(self.PV_YOPOS.get())
+        self.PV_ZOABSPOS.put(self.PV_ZOPOS.get())
 
         # Set absolute position line edits to current PV values.
         self.gui.xSAbsPos.setText(str(self.PV_XSABSPOS.get()))
@@ -1300,6 +1279,13 @@ class Controller(object):
         self.PV_YOOFFSET.put(0)
         self.PV_ZOOFFSET.put(0)
 
+        self.gui.macros["XS_OFFSET"] = 0
+        self.gui.macros["YS_OFFSET"] = 0
+        self.gui.macros["ZS_OFFSET"] = 0
+        self.gui.macros["XO_OFFSET"] = 0
+        self.gui.macros["YO_OFFSET"] = 0
+        self.gui.macros["ZO_OFFSET"] = 0
+
     def _change_to_relative(self) -> None:
         """Change display values to relative.
 
@@ -1310,6 +1296,8 @@ class Controller(object):
             for axis in ["X", "Y", "Z"]:
                 caput(self.gui.macros[f"{axis}{object}ZERO"], 1)
                 caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
+
+                self.gui.macros[f"{axis}{object}_OFFSET"] = caget(self.gui.macros[f"{axis}{object}OFFSET"])
     
     def _zero(self, object: Literal["S", "O"], axis:
               Literal["X", "Y", "Z"]) -> None:
@@ -1337,6 +1325,8 @@ class Controller(object):
         caput(self.gui.macros[f"{axis}{object}ZERO"], 1)
         caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
 
+        self.gui.macros[f"{axis}{object}_OFFSET"] = caget(self.gui.macros[f"{axis}{object}OFFSET"])
+
         self._append_text(f"Zero'ing the {axis}{object}ABSPOS line edit.")
     
     def _actual(self, object: Literal["S", "O"], axis:
@@ -1357,6 +1347,7 @@ class Controller(object):
         """
 
         caput(self.gui.macros[f"{axis}{object}OFFSET"], 0)
+        self.gui.macros[f"{axis}{object}_OFFSET"] = 0
 
     def _set_current_position(self, **kwargs: Union[str, int, float]) -> None:
         """Update current position label.
@@ -1375,13 +1366,6 @@ class Controller(object):
                         ("O", "X"): self.gui.xStepO,
                         ("O", "Y"): self.gui.yStepO,
                         ("O", "Z"): self.gui.zStepO}
-        
-        engUnits = {("S", "X"): self.PV_XSPOS_ENG,
-                    ("S", "Y"): self.PV_YSPOS_ENG,
-                    ("S", "Z"): self.PV_ZSPOS_ENG,
-                    ("O", "X"): self.PV_XOPOS_ENG,
-                    ("O", "Y"): self.PV_YOPOS_ENG,
-                    ("O", "Z"): self.PV_ZOPOS_ENG}
 
         pvname = kwargs["pvname"]
         value = kwargs["value"]
@@ -1394,8 +1378,8 @@ class Controller(object):
         object = pvKey[1]
 
         if self.gui.positionUnits.isChecked():
-            value = engUnits[(object, axis)].get()
-            stepText = f"<b>{round(value, 1)} MICRONS</b>"
+            factor = self.gui.macros[f"{axis}{object}_STEP2MICRON"]
+            stepText = f"<b>{round(factor * value, 1)} MICRONS</b>"
         else:
             stepText = f"<b>{round(value, 1)} STEPS</b>"
 
