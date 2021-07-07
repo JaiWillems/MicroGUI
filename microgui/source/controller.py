@@ -364,6 +364,14 @@ class Controller(object):
         self.PV_ZOOFFSET = PV(pvname=self.gui.macros["ZOOFFSET"],
                               auto_monitor=True,
                               callback=self._change_display_vals)
+        
+        # Intialize backlash PV's.
+        self.PV_XSB = PV(self.gui.macros["XSB"])
+        self.PV_YSB = PV(self.gui.macros["YSB"])
+        self.PV_ZSB = PV(self.gui.macros["ZSB"])
+        self.PV_XOB = PV(self.gui.macros["XOB"])
+        self.PV_YOB = PV(self.gui.macros["YOB"])
+        self.PV_ZOB = PV(self.gui.macros["ZOB"])
 
         self._append_text("PVs configured and initialized.")
 
@@ -423,12 +431,12 @@ class Controller(object):
         self.gui.tab.zOOffset.setText(str(float(self.gui.macros["ZO_OFFSET"])))
 
         # Set backlash PV values.
-        caput(self.gui.macros["XSB"], self.gui.macros["XS_BACKLASH"])
-        caput(self.gui.macros["YSB"], self.gui.macros["YS_BACKLASH"])
-        caput(self.gui.macros["ZSB"], self.gui.macros["ZS_BACKLASH"])
-        caput(self.gui.macros["XOB"], self.gui.macros["XO_BACKLASH"])
-        caput(self.gui.macros["YOB"], self.gui.macros["YO_BACKLASH"])
-        caput(self.gui.macros["ZOB"], self.gui.macros["ZO_BACKLASH"])
+        self.PV_XSB.put(self.gui.macros["XS_BACKLASH"])
+        self.PV_YSB.put(self.gui.macros["YS_BACKLASH"])
+        self.PV_ZSB.put(self.gui.macros["ZS_BACKLASH"])
+        self.PV_XOB.put(self.gui.macros["XO_BACKLASH"])
+        self.PV_YOB.put(self.gui.macros["YO_BACKLASH"])
+        self.PV_ZOB.put(self.gui.macros["ZO_BACKLASH"])
 
         # Set backlash line edits to current PV values.
         self.gui.tab.xSB.setText(str(float(self.gui.macros["XS_BACKLASH"])))
@@ -717,8 +725,14 @@ class Controller(object):
         step : QLineEdit
             float(QLineEdit.text()) defines the stepsize to use.
         """
+        absolutePos = {("S", "X"): self.PV_XSPOS_ABS,
+                       ("S", "Y"): self.PV_YSPOS_ABS,
+                       ("S", "Z"): self.PV_ZSPOS_ABS,
+                       ("O", "X"): self.PV_XOPOS_ABS,
+                       ("O", "Y"): self.PV_YOPOS_ABS,
+                       ("O", "Z"): self.PV_ZOPOS_ABS}
 
-        absPos = caget(self.gui.macros[f"{axis}{object}POS_ABS"])
+        absPos = absolutePos[(object, axis)].get()
         incPos = float(step.text())
 
         if incPos < 0:
@@ -987,12 +1001,12 @@ class Controller(object):
             int(float(self.gui.tab.zOB.text())))
 
         # Set backlash PV's.
-        caput(self.gui.macros["XSB"], self.gui.macros["XS_BACKLASH"])
-        caput(self.gui.macros["YSB"], self.gui.macros["YS_BACKLASH"])
-        caput(self.gui.macros["ZSB"], self.gui.macros["ZS_BACKLASH"])
-        caput(self.gui.macros["XOB"], self.gui.macros["XO_BACKLASH"])
-        caput(self.gui.macros["YOB"], self.gui.macros["YO_BACKLASH"])
-        caput(self.gui.macros["ZOB"], self.gui.macros["ZO_BACKLASH"])
+        self.PV_XSB.put(self.gui.macros["XS_BACKLASH"])
+        self.PV_YSB.put(self.gui.macros["YS_BACKLASH"])
+        self.PV_ZSB.put(self.gui.macros["ZS_BACKLASH"])
+        self.PV_XOB.put(self.gui.macros["XO_BACKLASH"])
+        self.PV_YOB.put(self.gui.macros["YO_BACKLASH"])
+        self.PV_ZOB.put(self.gui.macros["ZO_BACKLASH"])
 
         # Reset backlash line edits for consistent formatting.
         self.gui.tab.xSB.setText(str(float(self.gui.macros["XS_BACKLASH"])))
@@ -1072,6 +1086,12 @@ class Controller(object):
         This method checkes each motors position. If a motor is out of the soft
         limits, it will be moved to the closes limit.
         """
+        absolutePos = {("S", "X"): self.PV_XSPOS_ABS,
+                       ("S", "Y"): self.PV_YSPOS_ABS,
+                       ("S", "Z"): self.PV_ZSPOS_ABS,
+                       ("O", "X"): self.PV_XOPOS_ABS,
+                       ("O", "Y"): self.PV_YOPOS_ABS,
+                       ("O", "Z"): self.PV_ZOPOS_ABS}
 
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
@@ -1079,7 +1099,7 @@ class Controller(object):
                 PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
                 NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
 
-                currPos = caget(self.gui.macros[f"{axis}{object}POS_ABS"])
+                currPos = absolutePos[(object, axis)].get()
 
                 if currPos >= PSL:
                     caput(self.gui.macros[f"{axis}{object}ABSPOS"], PSL)
@@ -1248,10 +1268,17 @@ class Controller(object):
                         ("O", "X"): self.gui.tab.xOOffset,
                         ("O", "Y"): self.gui.tab.yOOffset,
                         ("O", "Z"): self.gui.tab.zOOffset}
+        
+        absolutePos = {("S", "X"): self.PV_XSPOS_ABS,
+                       ("S", "Y"): self.PV_YSPOS_ABS,
+                       ("S", "Z"): self.PV_ZSPOS_ABS,
+                       ("O", "X"): self.PV_XOPOS_ABS,
+                       ("O", "Y"): self.PV_YOPOS_ABS,
+                       ("O", "Z"): self.PV_ZOPOS_ABS}
 
         offset = offsets[(object, axis)].get()
 
-        currAbsPos = caget(self.gui.macros[f"{axis}{object}POS_ABS"])
+        currAbsPos = absolutePos[(object, axis)].get()
         caput(self.gui.macros[f"{axis}{object}ABSPOS"], currAbsPos)
         absPos[(object, axis)].setText(str(currAbsPos + offset))
 
