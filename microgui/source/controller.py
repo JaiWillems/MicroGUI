@@ -10,7 +10,7 @@ from functools import partial
 from PyQt5.QtGui import QColor
 from thorlabs_apt import Motor
 from epics import ca, caput, PV
-from typing import Literal, Union, Any, Dict
+from typing import Literal, Any, Dict
 from PyQt5.QtWidgets import QLineEdit, QFileDialog
 
 # Import file dependencies.
@@ -1156,9 +1156,9 @@ class Controller(object):
         guiDict = self.__dict__["gui"].__dict__
 
         absPos = guiDict[f"{axis.lower()}{object}AbsPos"]
-        hardLims = guiDict[f"{axis.lower()}{object}MM"]
-        minSoftLim = guiDict[f"{axis.lower()}{object}Min"]
-        maxSoftLim = guiDict[f"{axis.lower()}{object}Max"]
+        hardLims = guiDict["tab"].__dict__[f"{axis.lower()}{object}MM"]
+        minSoftLim = guiDict["tab"].__dict__[f"{axis.lower()}{object}Min"]
+        maxSoftLim = guiDict["tab"].__dict__[f"{axis.lower()}{object}Max"]
         offsetLabel = guiDict["tab"].__dict__[f"{axis.lower()}{object}Offset"]
 
         offset = self.__dict__[f"PV_{axis}{object}OFFSET"].get()

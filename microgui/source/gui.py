@@ -1029,7 +1029,6 @@ class MyTableWidget(QWidget):
         Set minimal soft limits button.
     SESL : QPushButton
         Set maximal soft limits button.
-
     xSOffset : QLabel
         Current offset label for the sample's x dimension.
     ySOffset : QLabel
