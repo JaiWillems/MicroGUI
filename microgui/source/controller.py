@@ -9,15 +9,14 @@ connecting widgets up to control sequences that bring about change.
 from functools import partial
 from PyQt5.QtGui import QColor
 from thorlabs_apt import Motor
-from epics import ca, caput, caget, PV
-from typing import Literal, Union
+from epics import ca, caput, PV
+from typing import Literal, Union, Any, Dict
 from PyQt5.QtWidgets import QLineEdit, QFileDialog
 
 # Import file dependencies.
 from gui import GUI
 from thorlabs_motor_control import enable, disable, home, changeMode
 from configuration import load_config, save_config, save_pos_config
-
 
 # Set up epics environment.
 ca.find_libca()
@@ -725,18 +724,13 @@ class Controller(object):
         step : QLineEdit
             float(QLineEdit.text()) defines the stepsize to use.
         """
-        absolutePos = {("S", "X"): self.PV_XSPOS_ABS,
-                       ("S", "Y"): self.PV_YSPOS_ABS,
-                       ("S", "Z"): self.PV_ZSPOS_ABS,
-                       ("O", "X"): self.PV_XOPOS_ABS,
-                       ("O", "Y"): self.PV_YOPOS_ABS,
-                       ("O", "Z"): self.PV_ZOPOS_ABS}
 
-        absPos = absolutePos[(object, axis)].get()
+        absPos = self.__dict__[f"PV_{axis}{object}POS_ABS"].get()
         incPos = float(step.text())
 
         if incPos < 0:
-            step.setText(str(-incPos))
+            incPos = -incPos
+            step.setText(str(incPos))
             self._append_text("WARNING: Step must be positive. Step sign has been changed to positive.",
                               QColor(250, 215, 0))
 
@@ -748,7 +742,7 @@ class Controller(object):
         elif direction == "N" and absPos - incPos < NSL:
             incPos = absPos - NSL
 
-        caput(self.gui.macros[f"{axis}{object}STEP"], incPos)
+        self.__dict__[f"PV_{axis}{object}STEP"].put(incPos)
         caput(self.gui.macros[f"{axis}{object}{direction}"], 1)
 
     def _absolute(self, object: Literal["S", "O"], axis:
@@ -768,14 +762,8 @@ class Controller(object):
             respectively.
         """
 
-        lineEdit = {("S", "X"): self.gui.xSAbsPos,
-                    ("S", "Y"): self.gui.ySAbsPos,
-                    ("S", "Z"): self.gui.zSAbsPos,
-                    ("O", "X"): self.gui.xOAbsPos,
-                    ("O", "Y"): self.gui.yOAbsPos,
-                    ("O", "Z"): self.gui.zOAbsPos}
-
-        absPos = float(lineEdit[(object, axis)].text())
+        absPosLineEdit = self.__dict__["gui"].__dict__[f"{axis.lower()}{object}AbsPos"]
+        absPos = float(absPosLineEdit.text())
 
         PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
         NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
@@ -785,9 +773,9 @@ class Controller(object):
         elif absPos < NSL:
             absPos = NSL
 
-        caput(self.gui.macros[f"{axis}{object}ABSPOS"], absPos)
-        caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
-        caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
+        self.__dict__[f"PV_{axis}{object}ABSPOS"].put(absPos)
+        self.__dict__[f"PV_{axis}{object}MOVE"].put(1)
+        self.__dict__[f"PV_{axis}{object}MOVE"].put(0)
 
     def _continuous(self, object: Literal["S", "O"], axis:
                     Literal["X", "Y", "Z"], type:
@@ -820,10 +808,10 @@ class Controller(object):
             caput(self.gui.macros[f"{axis}{object}CP"],
                   self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"])
         else:
-            caput(self.gui.macros[f"{axis}{object}STOP"], 1)
-            caput(self.gui.macros[f"{axis}{object}STOP"], 0)
+            self.__dict__[f"PV_{axis}{object}STOP"].put(1)
+            self.__dict__[f"PV_{axis}{object}STOP"].put(0)
 
-    def _update_abs_pos(self, **kwargs: Union[str, int, float]) -> None:
+    def _update_abs_pos(self, **kwargs: Dict[str, Any]) -> None:
         """Update absolute value line edit.
 
         Parameters
@@ -833,13 +821,6 @@ class Controller(object):
             documentation for a list of all possible arguments for PV callback
             functions.
         """
-
-        lineEdit = {("S", "X"): self.gui.xSAbsPos,
-                    ("S", "Y"): self.gui.ySAbsPos,
-                    ("S", "Z"): self.gui.zSAbsPos,
-                    ("O", "X"): self.gui.xOAbsPos,
-                    ("O", "Y"): self.gui.yOAbsPos,
-                    ("O", "Z"): self.gui.zOAbsPos}
 
         pvname = kwargs["pvname"]
         value = kwargs["value"]
@@ -851,7 +832,7 @@ class Controller(object):
         axis = pvKey[0]
         object = pvKey[1]
 
-        lineEdit[(object, axis)].setText(str(value))
+        self.__dict__["gui"].__dict__[f"{axis.lower()}{object}AbsPos"].setText(str(value))
 
     def _update_soft_lim(self, buttonID: Literal[0, 1]) -> None:
         """Update sample and objective soft limits.
@@ -865,23 +846,6 @@ class Controller(object):
             Integer representing the button pressed as being either SSL or SESL
             using a 0 or 1, respectively.
         """
-
-        softLimits = {("S", "X", 0): self.gui.tab.xSMin,
-                      ("S", "X", 1): self.gui.tab.xSMax,
-                      ("S", "Y", 0): self.gui.tab.ySMin,
-                      ("S", "Y", 1): self.gui.tab.ySMax,
-                      ("S", "Z", 0): self.gui.tab.zSMin,
-                      ("S", "Z", 1): self.gui.tab.zSMax,
-                      ("O", "X", 0): self.gui.tab.xOMin,
-                      ("O", "X", 1): self.gui.tab.xOMax,
-                      ("O", "Y", 0): self.gui.tab.yOMin,
-                      ("O", "Y", 1): self.gui.tab.yOMax,
-                      ("O", "Z", 0): self.gui.tab.zOMin,
-                      ("O", "Z", 1): self.gui.tab.zOMax}
-        
-        offsets = {("S", "X"): self.PV_XSOFFSET, ("S", "Y"): self.PV_YSOFFSET,
-                   ("S", "Z"): self.PV_ZSOFFSET, ("O", "X"): self.PV_XOOFFSET,
-                   ("O", "Y"): self.PV_YOOFFSET, ("O", "Z"): self.PV_ZOOFFSET}
 
         if buttonID == 2:
             # Set soft limits to hard limits.
@@ -930,10 +894,11 @@ class Controller(object):
             for object in ["S", "O"]:
                 for axis in ["X", "Y", "Z"]:
 
-                    offset = offsets[(object, axis)].get()
+                    offset = self.__dict__[f"PV_{axis}{object}OFFSET"].get()
 
-                    min = float(softLimits[(object, axis, 0)].text()) - offset
-                    max = float(softLimits[(object, axis, 1)].text()) - offset
+                    tabDict = self.__dict__["gui"].__dict__["tab"].__dict__
+                    min = float(tabDict[f"{axis.lower()}{object}Min"].text()) - offset
+                    max = float(tabDict[f"{axis.lower()}{object}Max"].text()) - offset
 
                     if min > max:
                         self._append_text(f"WARNING: {axis}{object} soft limits are invalid. Minimum limits must be less then maximum limits.",
@@ -986,19 +951,15 @@ class Controller(object):
     def _update_BL(self) -> None:
         """Update backlash variables."""
 
+        tabDict = self.__dict__["gui"].__dict__["tab"].__dict__
+
         # Set global backlash variables.
-        self.gui.macros["XS_BACKLASH"] = abs(
-           int(float(self.gui.tab.xSB.text())))
-        self.gui.macros["YS_BACKLASH"] = abs(
-            int(float(self.gui.tab.ySB.text())))
-        self.gui.macros["ZS_BACKLASH"] = abs(
-            int(float(self.gui.tab.zSB.text())))
-        self.gui.macros["XO_BACKLASH"] = abs(
-            int(float(self.gui.tab.xOB.text())))
-        self.gui.macros["YO_BACKLASH"] = abs(
-            int(float(self.gui.tab.yOB.text())))
-        self.gui.macros["ZO_BACKLASH"] = abs(
-            int(float(self.gui.tab.zOB.text())))
+        self.gui.macros["XS_BACKLASH"] = abs(int(float(tabDict["xSB"].text())))
+        self.gui.macros["YS_BACKLASH"] = abs(int(float(tabDict["ySB"].text())))
+        self.gui.macros["ZS_BACKLASH"] = abs(int(float(tabDict["zSB"].text())))
+        self.gui.macros["XO_BACKLASH"] = abs(int(float(tabDict["xOB"].text())))
+        self.gui.macros["YO_BACKLASH"] = abs(int(float(tabDict["yOB"].text())))
+        self.gui.macros["ZO_BACKLASH"] = abs(int(float(tabDict["zOB"].text())))
 
         # Set backlash PV's.
         self.PV_XSB.put(self.gui.macros["XS_BACKLASH"])
@@ -1018,7 +979,7 @@ class Controller(object):
 
         self._append_text("Updating backlash values.")
 
-    def _motor_status(self, **kwargs: Union[str, int, float]) -> None:
+    def _motor_status(self, **kwargs: Dict[str, Any]) -> None:
         """Check and set motor status indicators.
 
         Parameters
@@ -1027,13 +988,6 @@ class Controller(object):
             Extra arguments to `_motor_status`: refer to PyEpics documentation
             for a list of all possible arguments for PV callback functions.
         """
-
-        motionLabels = {("S", "X"): self.gui.xIdleS,
-                        ("S", "Y"): self.gui.yIdleS,
-                        ("S", "Z"): self.gui.zIdleS,
-                        ("O", "X"): self.gui.xIdleO,
-                        ("O", "Y"): self.gui.yIdleO,
-                        ("O", "Z"): self.gui.zIdleO}
 
         pvname = kwargs["pvname"]
         value = kwargs["value"]
@@ -1045,38 +999,40 @@ class Controller(object):
         axis = pvKey[0]
         object = pvKey[1]
 
+        label = self.__dict__["gui"].__dict__[f"{axis.lower()}Idle{object}"]
+
         if value == 0:
-            motionLabels[(object, axis)].setText("IDLE")
-            motionLabels[(object, axis)].setStyleSheet(
+            label.setText("IDLE")
+            label.setStyleSheet(
                 "background-color: lightgrey; border: 1px solid black;")
             self._soft_lim_indicators(object, axis)
         elif value == 1:
-            motionLabels[(object, axis)].setText("POWERING")
-            motionLabels[(object, axis)].setStyleSheet(
+            label.setText("POWERING")
+            label.setStyleSheet(
                 "background-color: #ff4747; border: 1px solid black;")
             self._soft_lim_indicators(object, axis)
         elif value == 2:
-            motionLabels[(object, axis)].setText("POWERED")
-            motionLabels[(object, axis)].setStyleSheet(
+            label.setText("POWERED")
+            label.setStyleSheet(
                 "background-color: #ff4747; border: 1px solid black;")
             self._soft_lim_indicators(object, axis)
         elif value == 3:
-            motionLabels[(object, axis)].setText("RELEASING")
-            motionLabels[(object, axis)].setStyleSheet(
+            label.setText("RELEASING")
+            label.setStyleSheet(
                 "background-color: #edde07; border: 1px solid black;")
             self._soft_lim_indicators(object, axis)
         elif value == 4:
-            motionLabels[(object, axis)].setText("ACTIVE")
-            motionLabels[(object, axis)].setStyleSheet(
+            label.setText("ACTIVE")
+            label.setStyleSheet(
                 "background-color: #3ac200; border: 1px solid black;")
         elif value == 5:
-            motionLabels[(object, axis)].setText("APPLYING")
-            motionLabels[(object, axis)].setStyleSheet(
+            label.setText("APPLYING")
+            label.setStyleSheet(
                 "background-color: #edde07; border: 1px solid black;")
             self._soft_lim_indicators(object, axis)
         else:
-            motionLabels[(object, axis)].setText("UNPOWERING")
-            motionLabels[(object, axis)].setStyleSheet(
+            label.setText("UNPOWERING")
+            label.setStyleSheet(
                 "background-color: #ff4747; border: 1px solid black;")
             self._soft_lim_indicators(object, axis)
 
@@ -1086,12 +1042,6 @@ class Controller(object):
         This method checkes each motors position. If a motor is out of the soft
         limits, it will be moved to the closes limit.
         """
-        absolutePos = {("S", "X"): self.PV_XSPOS_ABS,
-                       ("S", "Y"): self.PV_YSPOS_ABS,
-                       ("S", "Z"): self.PV_ZSPOS_ABS,
-                       ("O", "X"): self.PV_XOPOS_ABS,
-                       ("O", "Y"): self.PV_YOPOS_ABS,
-                       ("O", "Z"): self.PV_ZOPOS_ABS}
 
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
@@ -1099,17 +1049,17 @@ class Controller(object):
                 PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
                 NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
 
-                currPos = absolutePos[(object, axis)].get()
+                currPos = self.__dict__[f"PV_{axis}{object}POS_ABS"].get()
 
                 if currPos >= PSL:
-                    caput(self.gui.macros[f"{axis}{object}ABSPOS"], PSL)
-                    caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
-                    caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
+                    self.__dict__[f"PV_{axis}{object}ABSPOS"].put(PSL)
+                    self.__dict__[f"PV_{axis}{object}MOVE"].put(1)
+                    self.__dict__[f"PV_{axis}{object}MOVE"].put(0)
                     self._soft_lim_indicators(object, axis)
                 elif currPos <= NSL:
-                    caput(self.gui.macros[f"{axis}{object}ABSPOS"], NSL)
-                    caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
-                    caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
+                    self.__dict__[f"PV_{axis}{object}ABSPOS"].put(NSL)
+                    self.__dict__[f"PV_{axis}{object}MOVE"].put(1)
+                    self.__dict__[f"PV_{axis}{object}MOVE"].put(0)
                     self._soft_lim_indicators(object, axis)
     
     def _soft_lim_indicators(self, object: Literal["S", "O"], axis:
@@ -1118,53 +1068,39 @@ class Controller(object):
 
         Parameters
         ----------
-        **kwargs : dict
-            Extra arguments to `_hard_lim_indicators`: refer to PyEpics
-            documentation for a list of all possible arguments for PV callback
-            functions.
+        object : {"S", "O"}
+            Defines the stage as either sample or orbjective using "S" and "O",
+            respectively.
+        axis : {"X", "Y", "Z"}
+            Defines the motor axis as x, y, or z using "X", "Y", "Z",
+            respectively.
         """
 
-        softLimits = {("S", "X", 0): self.gui.xSSn,
-                      ("S", "X", 1): self.gui.xSSp,
-                      ("S", "Y", 0): self.gui.ySSn,
-                      ("S", "Y", 1): self.gui.ySSp,
-                      ("S", "Z", 0): self.gui.zSSn,
-                      ("S", "Z", 1): self.gui.zSSp,
-                      ("O", "X", 0): self.gui.xOSn,
-                      ("O", "X", 1): self.gui.xOSp,
-                      ("O", "Y", 0): self.gui.yOSn,
-                      ("O", "Y", 1): self.gui.yOSp,
-                      ("O", "Z", 0): self.gui.zOSn,
-                      ("O", "Z", 1): self.gui.zOSp}
+        value = self.__dict__[f"PV_{axis}{object}POS"].get()
 
-        posPVs = {("S", "X"): self.PV_XSPOS,
-                  ("S", "Y"): self.PV_YSPOS,
-                  ("S", "Z"): self.PV_ZSPOS,
-                  ("O", "X"): self.PV_XOPOS,
-                  ("O", "Y"): self.PV_YOPOS,
-                  ("O", "Z"): self.PV_ZOPOS}
+        negLim = self.__dict__["gui"].__dict__[f"{axis.lower()}{object}Sn"]
+        posLim = self.__dict__["gui"].__dict__[f"{axis.lower()}{object}Sp"]
 
-        value = posPVs[(object, axis)].get()
         minSoftLim = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
         maxSoftLim = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
 
         # Set maximum soft limit indicator.
         if maxSoftLim <= value:
-            softLimits[(object, axis, 1)].setStyleSheet(
+            posLim.setStyleSheet(
                 "background-color: #3ac200; border: 1px solid black;")
         else:
-            softLimits[(object, axis, 1)].setStyleSheet(
+            posLim.setStyleSheet(
                 "background-color: lightgrey; border: 1px solid black;")
 
         # Set minimum soft limit indicator.
         if value <= minSoftLim:
-            softLimits[(object, axis, 0)].setStyleSheet(
+            negLim.setStyleSheet(
                 "background-color: #3ac200; border: 1px solid black;")
         else:
-            softLimits[(object, axis, 0)].setStyleSheet(
+            negLim.setStyleSheet(
                 "background-color: lightgrey; border: 1px solid black;")
 
-    def _hard_lim_indicators(self, **kwargs: Union[str, int, float]) -> None:
+    def _hard_lim_indicators(self, **kwargs: Dict[str, Any]) -> None:
         """Set hard limit indicators.
 
         Parameters
@@ -1174,19 +1110,6 @@ class Controller(object):
             documentation for a list of all possible arguments for PV callback
             functions.
         """
-
-        hardLimits = {("S", "X", "N"): self.gui.xSHn,
-                      ("S", "X", "P"): self.gui.xSHp,
-                      ("S", "Y", "N"): self.gui.ySHn,
-                      ("S", "Y", "P"): self.gui.ySHp,
-                      ("S", "Z", "N"): self.gui.zSHn,
-                      ("S", "Z", "P"): self.gui.zSHp,
-                      ("O", "X", "N"): self.gui.xOHn,
-                      ("O", "X", "P"): self.gui.xOHp,
-                      ("O", "Y", "N"): self.gui.yOHn,
-                      ("O", "Y", "P"): self.gui.yOHp,
-                      ("O", "Z", "N"): self.gui.zOHn,
-                      ("O", "Z", "P"): self.gui.zOHp}
 
         pvname = kwargs["pvname"]
         value = kwargs["value"]
@@ -1199,14 +1122,16 @@ class Controller(object):
         object = pvKey[1]
         direction = pvKey[3]
 
+        label = self.__dict__["gui"].__dict__[f"{axis.lower()}{object}H{direction.lower()}"]
+
         if value > 0:
-            hardLimits[(object, axis, direction)].setStyleSheet(
+            label.setStyleSheet(
                 "background-color: #3ac200; border: 1px solid black;")
         else:
-            hardLimits[(object, axis, direction)].setStyleSheet(
+            label.setStyleSheet(
                 "background-color: lightgrey; border: 1px solid black;")
 
-    def _change_display_vals(self, **kwargs: Union[str, int, float]) -> None:
+    def _change_display_vals(self, **kwargs: Dict[str, Any]) -> None:
         """Switch displayed values between actual and relative values.
 
         This method changes all position based line edits and labels between
@@ -1228,70 +1153,30 @@ class Controller(object):
         axis = pvKey[0]
         object = pvKey[1]
 
-        absPos = {("S", "X"): self.gui.xSAbsPos,
-                  ("S", "Y"): self.gui.ySAbsPos,
-                  ("S", "Z"): self.gui.zSAbsPos,
-                  ("O", "X"): self.gui.xOAbsPos,
-                  ("O", "Y"): self.gui.yOAbsPos,
-                  ("O", "Z"): self.gui.zOAbsPos}
+        guiDict = self.__dict__["gui"].__dict__
 
-        hardLimits = {("S", "X"): self.gui.tab.xSMM,
-                      ("S", "Y"): self.gui.tab.ySMM,
-                      ("S", "Z"): self.gui.tab.zSMM,
-                      ("O", "X"): self.gui.tab.xOMM,
-                      ("O", "Y"): self.gui.tab.yOMM,
-                      ("O", "Z"): self.gui.tab.zOMM}
+        absPos = guiDict[f"{axis.lower()}{object}AbsPos"]
+        hardLims = guiDict[f"{axis.lower()}{object}MM"]
+        minSoftLim = guiDict[f"{axis.lower()}{object}Min"]
+        maxSoftLim = guiDict[f"{axis.lower()}{object}Max"]
+        offsetLabel = guiDict["tab"].__dict__[f"{axis.lower()}{object}Offset"]
 
-        softLimits = {("S", "X", 0): self.gui.tab.xSMin,
-                      ("S", "X", 1): self.gui.tab.xSMax,
-                      ("S", "Y", 0): self.gui.tab.ySMin,
-                      ("S", "Y", 1): self.gui.tab.ySMax,
-                      ("S", "Z", 0): self.gui.tab.zSMin,
-                      ("S", "Z", 1): self.gui.tab.zSMax,
-                      ("O", "X", 0): self.gui.tab.xOMin,
-                      ("O", "X", 1): self.gui.tab.xOMax,
-                      ("O", "Y", 0): self.gui.tab.yOMin,
-                      ("O", "Y", 1): self.gui.tab.yOMax,
-                      ("O", "Z", 0): self.gui.tab.zOMin,
-                      ("O", "Z", 1): self.gui.tab.zOMax}
-        
-        offsets = {("S", "X"): self.PV_XSOFFSET,
-                   ("S", "Y"): self.PV_YSOFFSET,
-                   ("S", "Z"): self.PV_ZSOFFSET,
-                   ("O", "X"): self.PV_XOOFFSET,
-                   ("O", "Y"): self.PV_YOOFFSET,
-                   ("O", "Z"): self.PV_ZOOFFSET}
-        
-        offsetLabels = {("S", "X"): self.gui.tab.xSOffset,
-                        ("S", "Y"): self.gui.tab.ySOffset,
-                        ("S", "Z"): self.gui.tab.zSOffset,
-                        ("O", "X"): self.gui.tab.xOOffset,
-                        ("O", "Y"): self.gui.tab.yOOffset,
-                        ("O", "Z"): self.gui.tab.zOOffset}
-        
-        absolutePos = {("S", "X"): self.PV_XSPOS_ABS,
-                       ("S", "Y"): self.PV_YSPOS_ABS,
-                       ("S", "Z"): self.PV_ZSPOS_ABS,
-                       ("O", "X"): self.PV_XOPOS_ABS,
-                       ("O", "Y"): self.PV_YOPOS_ABS,
-                       ("O", "Z"): self.PV_ZOPOS_ABS}
+        offset = self.__dict__[f"PV_{axis}{object}OFFSET"].get()
+        currAbsPos = self.__dict__[f"PV_{axis}{object}POS_ABS"].get()
 
-        offset = offsets[(object, axis)].get()
-
-        currAbsPos = absolutePos[(object, axis)].get()
-        caput(self.gui.macros[f"{axis}{object}ABSPOS"], currAbsPos)
-        absPos[(object, axis)].setText(str(currAbsPos + offset))
+        self.__dict__[f"PV_{axis}{object}ABSPOS"].put(currAbsPos)
+        absPos.setText(str(currAbsPos + offset))
 
         minLim = self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"] + offset
         maxLim = self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"] + offset
-        hardLimits[(object, axis)].setText(f"{minLim} to {maxLim}")
+        hardLims.setText(f"{minLim} to {maxLim}")
 
         minLim = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] + offset
         maxLim = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] + offset
-        softLimits[(object, axis, 0)].setText(str(minLim))
-        softLimits[(object, axis, 1)].setText(str(maxLim))
+        minSoftLim.setText(str(minLim))
+        maxSoftLim.setText(str(maxLim))
 
-        offsetLabels[(object, axis)].setText(str(offset))
+        offsetLabel.setText(str(offset))
     
     def _change_to_actual(self) -> None:
         """Change display values to actual.
@@ -1324,7 +1209,7 @@ class Controller(object):
                 caput(self.gui.macros[f"{axis}{object}ZERO"], 1)
                 caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
 
-                self.gui.macros[f"{axis}{object}_OFFSET"] = caget(self.gui.macros[f"{axis}{object}OFFSET"])
+                self.gui.macros[f"{axis}{object}_OFFSET"] = self.__dict__[f"PV_{axis}{object}OFFSET"].get()
     
     def _zero(self, object: Literal["S", "O"], axis:
               Literal["X", "Y", "Z"]) -> None:
@@ -1352,7 +1237,7 @@ class Controller(object):
         caput(self.gui.macros[f"{axis}{object}ZERO"], 1)
         caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
 
-        self.gui.macros[f"{axis}{object}_OFFSET"] = caget(self.gui.macros[f"{axis}{object}OFFSET"])
+        self.gui.macros[f"{axis}{object}_OFFSET"] = self.__dict__[f"PV_{axis}{object}OFFSET"].get()
 
         self._append_text(f"Zero'ing the {axis}{object}ABSPOS line edit.")
     
@@ -1373,10 +1258,10 @@ class Controller(object):
             respectively.
         """
 
-        caput(self.gui.macros[f"{axis}{object}OFFSET"], 0)
+        self.__dict__[f"PV_{axis}{object}OFFSET"].put(0)
         self.gui.macros[f"{axis}{object}_OFFSET"] = 0
 
-    def _set_current_position(self, **kwargs: Union[str, int, float]) -> None:
+    def _set_current_position(self, **kwargs: Dict[str, Any]) -> None:
         """Update current position label.
 
         Parameters
@@ -1386,13 +1271,6 @@ class Controller(object):
             documentation for a list of all possible arguments for PV callback
             functions.
         """
-
-        stepLineEdit = {("S", "X"): self.gui.xStepS,
-                        ("S", "Y"): self.gui.yStepS,
-                        ("S", "Z"): self.gui.zStepS,
-                        ("O", "X"): self.gui.xStepO,
-                        ("O", "Y"): self.gui.yStepO,
-                        ("O", "Z"): self.gui.zStepO}
 
         pvname = kwargs["pvname"]
         value = kwargs["value"]
@@ -1410,7 +1288,8 @@ class Controller(object):
         else:
             stepText = f"<b>{round(value, 1)} STEPS</b>"
 
-        stepLineEdit[(object, axis)].setText(stepText)
+        stepLineEdit = self.__dict__["gui"].__dict__[f"{axis.lower()}Step{object}"]
+        stepLineEdit.setText(stepText)
 
     def _append_text(self, text: str, color: QColor=QColor(0, 0, 0)) -> None:
         """Append text to console window.
@@ -1458,17 +1337,10 @@ class Controller(object):
     def _change_units(self) -> None:
         """Changes the current position's display units."""
 
-        currentStep = {("S", "X"): self.gui.xStepS,
-                       ("S", "Y"): self.gui.yStepS,
-                       ("S", "Z"): self.gui.zStepS,
-                       ("O", "X"): self.gui.xStepO,
-                       ("O", "Y"): self.gui.yStepO,
-                       ("O", "Z"): self.gui.zStepO}
-
         for object in ["O", "S"]:
             for axis in ["X", "Y", "Z"]:
 
-                value = caget(self.gui.macros[f"{axis}{object}POS"])
+                value = self.__dict__[f"PV_{axis}{object}POS"].get()
 
                 if self.gui.positionUnits.isChecked():
                     factor = self.gui.macros[f"{axis}{object}_STEP2MICRON"]
@@ -1476,7 +1348,8 @@ class Controller(object):
                 else:
                     stepText = f"<b>{round(value, 1)} STEPS</b>"
 
-                currentStep[(object, axis)].setText(stepText)
+                stepLineEdit = self.__dict__["gui"].__dict__[f"{axis.lower()}Step{object}"]
+                stepLineEdit.setText(stepText)
         
     def _save_position(self):
         """Save the current position to the program."""
@@ -1505,13 +1378,6 @@ class Controller(object):
     def _load_position(self):
         """Load the selected position to the program."""
 
-        offsets = {("S", "X"): self.PV_XSOFFSET,
-                   ("S", "Y"): self.PV_YSOFFSET,
-                   ("S", "Z"): self.PV_ZSOFFSET,
-                   ("O", "X"): self.PV_XOOFFSET,
-                   ("O", "Y"): self.PV_YOOFFSET,
-                   ("O", "Z"): self.PV_ZOOFFSET}
-
         label = self.gui.posSelect.currentText()
 
         if label != "--None--":
@@ -1529,10 +1395,10 @@ class Controller(object):
                     if absPos > PSL or absPos < NSL:
                         self._append_text("ERROR: Position falls outside of soft limits.", QColor(255, 0, 0))
                     else:
-                        offset = offsets[(object, axis)].get()
-                        caput(self.gui.macros[f"{axis}{object}ABSPOS"], absPos + offset)
-                        caput(self.gui.macros[f"{axis}{object}MOVE"], 1)
-                        caput(self.gui.macros[f"{axis}{object}MOVE"], 0)
+                        offset = self.__dict__[f"PV_{axis}{object}OFFSET"].get()
+                        self.__dict__[f"PV_{axis}{object}ABSPOS"].put(absPos + offset)
+                        self.__dict__[f"PV_{axis}{object}MOVE"].put(1)
+                        self.__dict__[f"PV_{axis}{object}MOVE"].put(0)
             
             self._append_text(f"Position loaded: {label}")
 
@@ -1541,6 +1407,7 @@ class Controller(object):
 
         label = self.gui.posSelect.currentText()
         index = self.gui.posSelect.currentIndex()
+
         if index != 0:
             self.gui.posSelect.removeItem(index)
             del self.gui.savedPos[label]
@@ -1553,5 +1420,6 @@ class Controller(object):
         for key in self.gui.savedPos.keys():
             index = self.gui.posSelect.findText(key)
             self.gui.posSelect.removeItem(index)
+
         save_pos_config(path="saved_positions.json", data=self.gui.savedPos)
         self._append_text("All positions cleared.")
