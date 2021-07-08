@@ -181,8 +181,8 @@ class Controller(object):
     _increment(object, axis, direction, step)
         Control sequence to increment sample and objective stage motors.
     _absolute(object, axis, pos)
-        Control sequence to move the sample and objective stage motors to a set
-        point.
+        Control sequence to move the sample and objective stage motors to a
+        set point.
     _continuous(object, axis, type)
         Control sequence for the continuous motion of the sample and objective
         stages.
@@ -240,7 +240,7 @@ class Controller(object):
         self._initialize_PVs()
         self._initialize_GUI()
         self._connect_signals()
-    
+
     def _initialize_PVs(self) -> None:
         """Conigure GUI PV's."""
 
@@ -363,7 +363,7 @@ class Controller(object):
         self.PV_ZOOFFSET = PV(pvname=self.gui.macros["ZOOFFSET"],
                               auto_monitor=True,
                               callback=self._change_display_vals)
-        
+
         # Intialize backlash PV's.
         self.PV_XSB = PV(self.gui.macros["XSB"])
         self.PV_YSB = PV(self.gui.macros["YSB"])
@@ -412,7 +412,7 @@ class Controller(object):
             str(float(self.gui.macros["ZOMIN_SOFT_LIMIT"])))
         self.gui.tab.zOMax.setText(
             str(float(self.gui.macros["ZOMAX_SOFT_LIMIT"])))
-        
+
         # Set all offset PV's to the saved offsets.
         self.PV_XSOFFSET.put(self.gui.macros["XS_OFFSET"])
         self.PV_YSOFFSET.put(self.gui.macros["YS_OFFSET"])
@@ -482,14 +482,18 @@ class Controller(object):
         """
 
         # Mode select functionality.
-        self.gui.tab.RDM1.pressed.connect(
-            partial(self._mode_state, "TRANSMISSION_POSITION", self.modeMotor))
-        self.gui.tab.RDM2.pressed.connect(
-            partial(self._mode_state, "REFLECTION_POSITION", self.modeMotor))
-        self.gui.tab.RDM3.pressed.connect(
-            partial(self._mode_state, "VISIBLE_IMAGE_POSITION", self.modeMotor))
-        self.gui.tab.RDM4.pressed.connect(
-            partial(self._mode_state, "BEAMSPLITTER_POSITION", self.modeMotor))
+        self.gui.tab.RDM1.pressed.connect(partial(self._mode_state,
+                                                  "TRANSMISSION_POSITION",
+                                                  self.modeMotor))
+        self.gui.tab.RDM2.pressed.connect(partial(self._mode_state,
+                                                  "REFLECTION_POSITION",
+                                                  self.modeMotor))
+        self.gui.tab.RDM3.pressed.connect(partial(self._mode_state,
+                                                  "VISIBLE_IMAGE_POSITION",
+                                                  self.modeMotor))
+        self.gui.tab.RDM4.pressed.connect(partial(self._mode_state,
+                                                  "BEAMSPLITTER_POSITION",
+                                                  self.modeMotor))
 
         # THORLABS/mode motor functionality.
         self.gui.tab.enableDisable.clicked.connect(self._enable_thorlabs)
@@ -676,12 +680,15 @@ class Controller(object):
         """Enable or disable the THORLABS motor."""
 
         label = self.gui.tab.enableDisable.text()
+
         if label == "Enable":
             enable(self.modeMotor)
+
             self.gui.tab.enableDisable.setText("Disable")
             self._append_text("THORLABS motor enabled.")
         else:
             disable(self.modeMotor)
+
             self.gui.tab.enableDisable.setText("Enable")
             self._append_text("THORLABS motor disabled.")
 
@@ -699,7 +706,8 @@ class Controller(object):
 
             self._append_text("THORLABS motor homing.")
         except:
-            self._append_text("ERROR: THORLABS motor cannot be homed, ensure the motor is enabled.",
+            self._append_text(("ERROR: THORLABS motor cannot be homed, ",
+                              "ensure the motor is enabled."),
                               QColor(255, 0, 0))
 
     def _increment(self, object: Literal["S", "O"], axis:
@@ -731,7 +739,8 @@ class Controller(object):
         if incPos < 0:
             incPos = -incPos
             step.setText(str(incPos))
-            self._append_text("WARNING: Step must be positive. Step sign has been changed to positive.",
+            self._append_text(("WARNING: Step must be positive. Step sign ",
+                              "has been changed to positive."),
                               QColor(250, 215, 0))
 
         PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
@@ -762,7 +771,8 @@ class Controller(object):
             respectively.
         """
 
-        absPosLineEdit = self.__dict__["gui"].__dict__[f"{axis.lower()}{object}AbsPos"]
+        absPosLineEdit = self.__dict__["gui"].__dict__[
+            f"{axis.lower()}{object}AbsPos"]
         absPos = float(absPosLineEdit.text())
 
         PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
@@ -832,7 +842,8 @@ class Controller(object):
         axis = pvKey[0]
         object = pvKey[1]
 
-        self.__dict__["gui"].__dict__[f"{axis.lower()}{object}AbsPos"].setText(str(value))
+        self.__dict__["gui"].__dict__[
+            f"{axis.lower()}{object}AbsPos"].setText(str(value))
 
     def _update_soft_lim(self, buttonID: Literal[0, 1]) -> None:
         """Update sample and objective soft limits.
@@ -897,24 +908,35 @@ class Controller(object):
                     offset = self.__dict__[f"PV_{axis}{object}OFFSET"].get()
 
                     tabDict = self.__dict__["gui"].__dict__["tab"].__dict__
-                    min = float(tabDict[f"{axis.lower()}{object}Min"].text()) - offset
-                    max = float(tabDict[f"{axis.lower()}{object}Max"].text()) - offset
+
+                    min = float(tabDict[
+                        f"{axis.lower()}{object}Min"].text()) - offset
+                    max = float(tabDict[
+                        f"{axis.lower()}{object}Max"].text()) - offset
 
                     if min > max:
-                        self._append_text(f"WARNING: {axis}{object} soft limits are invalid. Minimum limits must be less then maximum limits.",
-                                          QColor(250, 215, 0))
+                        self._append_text((f"WARNING: {axis}{object} soft ",
+                                          "limits are invalid. Minimum ",
+                                          "limits must be less then maximum ",
+                                          "limits."), QColor(250, 215, 0))
                     else:
                         if min < self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"]:
-                            self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] = float(
-                                self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"])
+                            self.gui.macros[
+                                f"{axis}{object}MIN_SOFT_LIMIT"] = float(
+                                    self.gui.macros[
+                                        f"{axis}{object}MIN_HARD_LIMIT"])
                         else:
-                            self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] = min
+                            self.gui.macros[
+                                f"{axis}{object}MIN_SOFT_LIMIT"] = min
 
                         if max > self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"]:
-                            self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] = float(
-                                self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"])
+                            self.gui.macros[
+                                f"{axis}{object}MAX_SOFT_LIMIT"] = float(
+                                self.gui.macros[
+                                    f"{axis}{object}MAX_HARD_LIMIT"])
                         else:
-                            self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] = max
+                            self.gui.macros[
+                                f"{axis}{object}MAX_SOFT_LIMIT"] = max
 
         # Update soft limit line edits.
         self.gui.tab.xSMin.setText(str(self.gui.macros["XSMIN_SOFT_LIMIT"] +
@@ -941,7 +963,6 @@ class Controller(object):
                                        self.PV_ZOOFFSET.get()))
         self.gui.tab.zOMax.setText(str(self.gui.macros["ZOMAX_SOFT_LIMIT"] +
                                        self.PV_ZOOFFSET.get()))
-
 
         # Move motors to within soft limits.
         self._check_motor_position()
@@ -1061,7 +1082,7 @@ class Controller(object):
                     self.__dict__[f"PV_{axis}{object}MOVE"].put(1)
                     self.__dict__[f"PV_{axis}{object}MOVE"].put(0)
                     self._soft_lim_indicators(object, axis)
-    
+
     def _soft_lim_indicators(self, object: Literal["S", "O"], axis:
                              Literal["X", "Y", "Z"]) -> None:
         """Set soft limit indicators.
@@ -1122,7 +1143,8 @@ class Controller(object):
         object = pvKey[1]
         direction = pvKey[3]
 
-        label = self.__dict__["gui"].__dict__[f"{axis.lower()}{object}H{direction.lower()}"]
+        label = self.__dict__["gui"].__dict__[
+            f"{axis.lower()}{object}H{direction.lower()}"]
 
         if value > 0:
             label.setStyleSheet(
@@ -1177,7 +1199,7 @@ class Controller(object):
         maxSoftLim.setText(str(maxLim))
 
         offsetLabel.setText(str(offset))
-    
+
     def _change_to_actual(self) -> None:
         """Change display values to actual.
 
@@ -1209,8 +1231,9 @@ class Controller(object):
                 caput(self.gui.macros[f"{axis}{object}ZERO"], 1)
                 caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
 
-                self.gui.macros[f"{axis}{object}_OFFSET"] = self.__dict__[f"PV_{axis}{object}OFFSET"].get()
-    
+                self.gui.macros[f"{axis}{object}_OFFSET"] = self.__dict__[
+                    f"PV_{axis}{object}OFFSET"].get()
+
     def _zero(self, object: Literal["S", "O"], axis:
               Literal["X", "Y", "Z"]) -> None:
         """Zero sample or objective axis position.
@@ -1237,12 +1260,13 @@ class Controller(object):
         caput(self.gui.macros[f"{axis}{object}ZERO"], 1)
         caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
 
-        self.gui.macros[f"{axis}{object}_OFFSET"] = self.__dict__[f"PV_{axis}{object}OFFSET"].get()
+        self.gui.macros[f"{axis}{object}_OFFSET"] = self.__dict__[
+            f"PV_{axis}{object}OFFSET"].get()
 
         self._append_text(f"Zero'ing the {axis}{object}ABSPOS line edit.")
-    
+
     def _actual(self, object: Literal["S", "O"], axis:
-              Literal["X", "Y", "Z"]) -> None:
+                Literal["X", "Y", "Z"]) -> None:
         """Convert to relative the sample or objective axis position.
 
         This method converts motor's position defined by 'object' and 'axis' to
@@ -1288,7 +1312,8 @@ class Controller(object):
         else:
             stepText = f"<b>{round(value, 1)} STEPS</b>"
 
-        stepLineEdit = self.__dict__["gui"].__dict__[f"{axis.lower()}Step{object}"]
+        stepLineEdit = self.__dict__["gui"].__dict__[
+            f"{axis.lower()}Step{object}"]
         stepLineEdit.setText(stepText)
 
     def _append_text(self, text: str, color: QColor=QColor(0, 0, 0)) -> None:
@@ -1348,9 +1373,10 @@ class Controller(object):
                 else:
                     stepText = f"<b>{round(value, 1)} STEPS</b>"
 
-                stepLineEdit = self.__dict__["gui"].__dict__[f"{axis.lower()}Step{object}"]
+                stepLineEdit = self.__dict__["gui"].__dict__[
+                    f"{axis.lower()}Step{object}"]
                 stepLineEdit.setText(stepText)
-        
+
     def _save_position(self):
         """Save the current position to the program."""
 
@@ -1367,12 +1393,14 @@ class Controller(object):
 
             self.gui.savedPos[label] = position
             self.gui.posSelect.insertItem(1, label)
-            save_pos_config(path="saved_positions.json", data=self.gui.savedPos)
+            save_pos_config(path="saved_positions.json",
+                            data=self.gui.savedPos)
 
             self._append_text(f"Position saved: {label}")
 
         else:
-            self._append_text("ERROR: Position label already exists, change the position label and try again.",
+            self._append_text(("ERROR: Position label already exists, change ",
+                              "the position label and try again."),
                               QColor(255, 0, 0))
 
     def _load_position(self):
@@ -1393,13 +1421,16 @@ class Controller(object):
                     NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
 
                     if absPos > PSL or absPos < NSL:
-                        self._append_text("ERROR: Position falls outside of soft limits.", QColor(255, 0, 0))
+                        self._append_text(("ERROR: Position falls outside of ",
+                                          "soft limits."), QColor(255, 0, 0))
                     else:
-                        offset = self.__dict__[f"PV_{axis}{object}OFFSET"].get()
-                        self.__dict__[f"PV_{axis}{object}ABSPOS"].put(absPos + offset)
+                        offset = self.__dict__[
+                            f"PV_{axis}{object}OFFSET"].get()
+                        self.__dict__[
+                            f"PV_{axis}{object}ABSPOS"].put(absPos + offset)
                         self.__dict__[f"PV_{axis}{object}MOVE"].put(1)
                         self.__dict__[f"PV_{axis}{object}MOVE"].put(0)
-            
+
             self._append_text(f"Position loaded: {label}")
 
     def _delete_position(self):
@@ -1411,7 +1442,8 @@ class Controller(object):
         if index != 0:
             self.gui.posSelect.removeItem(index)
             del self.gui.savedPos[label]
-            save_pos_config(path="saved_positions.json", data=self.gui.savedPos)
+            save_pos_config(path="saved_positions.json",
+                            data=self.gui.savedPos)
             self._append_text(f"Position deleted: {label}")
 
     def _clear_position(self):

@@ -20,6 +20,7 @@ def get_image() -> np.array:
     np.array
         Multi-dimensional Numpy array encoding the captured image information.
     """
+
     with Camera() as cam:
 
         cam.PixelFormat = "RGB8"

@@ -5,8 +5,8 @@ programs configuration files.
 """
 
 
-import json
 from typing import Tuple
+import json
 
 
 def load_config(path: str) -> Tuple[dict, dict]:
@@ -24,9 +24,11 @@ def load_config(path: str) -> Tuple[dict, dict]:
     dict
         Macro parameters in a dictionary format.
     """
+
     with open(path, "r") as jsonfile:
         data = json.load(jsonfile)
         jsonfile.close()
+
     macros = {}
     init_macros(data, macros)
 
@@ -45,7 +47,9 @@ def save_config(path: str, data: dict, macros: dict) -> None:
     macros : dict
         Macro parameters in macro format.
     """
+
     condense_macros(data, macros)
+
     with open(path, "w") as jsonfile:
         myJSON = json.dumps(data, indent=4)
         jsonfile.write(myJSON)
@@ -64,6 +68,7 @@ def init_macros(baseDict: dict, macroDict: dict) -> None:
     macroDict : dict
         New planar dictionary to add key/value pairs to from `baseDict`.
     """
+
     keys = baseDict.keys()
     for key in keys:
         try:
@@ -85,6 +90,7 @@ def condense_macros(baseDict: dict, macroDict: dict) -> None:
     macroDict : dict
         New planar dictionary to add key/value pairs to from `baseDict`.
     """
+
     keys = baseDict.keys()
     for key in keys:
         try:
@@ -100,13 +106,14 @@ def load_pos_config(path: str) -> dict:
     ----------
     path : str
         Path to the file to load.
-    
+
     Returns
     -------
     dict
         Dictionary with position labels as keys and a dictionary of positions
         as values.
     """
+
     with open(path, "r") as jsonfile:
         data = json.load(jsonfile)
         jsonfile.close()
@@ -126,6 +133,7 @@ def save_pos_config(path: str, data: dict) -> None:
         Dictionary with position labels as keys and a dictionary of positions
         as values.
     """
+
     with open(path, "w") as jsonfile:
         myJSON = json.dumps(data, indent=4)
         jsonfile.write(myJSON)

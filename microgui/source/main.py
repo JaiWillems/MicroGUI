@@ -5,16 +5,16 @@ to run the FAR-IR horizontal microscope.
 """
 
 
-import sys
 from PyQt5.QtWidgets import QApplication
 from epics import PV
 from gui import GUI
 from controller import Controller
 from thorlabs_motor_control import initMotor
 from configuration import load_config, load_pos_config, load_pos_config
+import sys
 
 
-# Define the THORLABS "mode" motor.
+# Define the THORLABS motor.
 modeMotor = initMotor()
 
 
@@ -34,7 +34,9 @@ def program_exit(gui: GUI) -> None:
     gui : GUI
         Gui containing macro information of the STOP PV names.
     """
+
     app.exec_()
+
     for object in ["S", "O"]:
         for axis in ["X", "Y", "Z"]:
             pvStop = PV(gui.macros[f"{axis}{object}STOP"])

@@ -31,7 +31,11 @@ def initMotor() -> apt.Motor:
 
     # Initialize motor if detected.
     modeMotor = apt.Motor(motorSerialNumber)
-    
+
+    # Configure motor settings.
+    modeMotor.set_move_home_parameters(*modeMotor.get_move_home_parameters())
+    modeMotor.set_velocity_parameters(*modeMotor.get_velocity_parameters())
+
     return modeMotor
 
 
@@ -43,8 +47,7 @@ def enable(modeMotor: apt.Motor) -> None:
     modeMotor : Motor
         Motor object representing the modeMotor.
     """
-    modeMotor.set_move_home_parameters(*modeMotor.get_move_home_parameters())
-    modeMotor.set_velocity_parameters(*modeMotor.get_velocity_parameters())
+
     modeMotor.enable()
 
 
@@ -56,6 +59,7 @@ def disable(modeMotor: apt.Motor) -> None:
     modeMotor : Motor
         Motor object representing the modeMotor.
     """
+
     modeMotor.disable()
 
 
@@ -67,6 +71,7 @@ def home(modeMotor: apt.Motor) -> None:
     modeMotor : Motor
         Motor object representing the modeMotor.
     """
+
     modeMotor.move_home()
 
 
@@ -95,6 +100,7 @@ def changeMode(pos: int, modeMotor: apt.Motor) -> float:
     -----
     modeMotor must have been initiated using initMotor().
     """
+
     try:
         modeMotor.move_to(value=pos, blocking=False)
         return pos

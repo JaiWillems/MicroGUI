@@ -818,7 +818,7 @@ class CameraWindow(QMainWindow):
         Image capture push button.
     SHC : QPushButton
         Show Cross Hairs toggle push button.
-    
+
     Methods
     -------
     _camera_window()
@@ -838,7 +838,7 @@ class CameraWindow(QMainWindow):
 
         # Save image functionality.
         self.WCB.clicked.connect(self._save_image)
-    
+
     def _camera_window(self) -> QWidget:
         """Create live feed window.
 
@@ -912,7 +912,7 @@ class CameraWindow(QMainWindow):
         updateData()
 
         return self.cameraWindow
-    
+
     def _save_image(self) -> None:
         """Live stream image capture.
 
@@ -921,7 +921,8 @@ class CameraWindow(QMainWindow):
         """
 
         path, _ = QFileDialog.getSaveFileName(parent=self, caption="Save File",
-            directory="../figures", filter="Image files (*.jpg *.jpeg *.png)")
+                                              directory="../figures",
+                                              filter="Image files (*.jpg *.jpeg)")
 
         plt.figure()
         plt.imshow(np.rot90(self.image, 3))
@@ -929,7 +930,6 @@ class CameraWindow(QMainWindow):
         plt.savefig(path, dpi=500, bbox_inches="tight")
 
         self._append_text(f"Image capture saved to: {path}")
-
 
 
 class MyTableWidget(QWidget):
@@ -1163,7 +1163,9 @@ class MyTableWidget(QWidget):
         self.tab2.layout.addWidget(self.TMBMbutton, 4, 2, 1, 1)
 
         self.tab2.layout.addWidget(QLabel("<b>Motor Control</b>"), 5, 0, 1, 4)
-        self.tab2.layout.addWidget(QLabel("<i>Enable or disable the THORLABS motor and move to home position.</i>"), 6, 0, 1, 4)
+        longLabel = ("<i>Enable or disable the THORLABS motor and move to ",
+                     "home position.</i>")
+        self.tab2.layout.addWidget(QLabel(longLabel), 6, 0, 1, 4)
 
         # THORLABS/mode motor controls.
         self.enableDisable = QPushButton("Disable")
@@ -1301,7 +1303,9 @@ class MyTableWidget(QWidget):
         self.tab4.layout.addWidget(self.SESL, 6, 3, 1, 3)
 
         # Add information labels.
-        softLimLabel = QLabel("<i>The motors will move 'backlash' steps past the low limit before moving back to the lower limit.</i>")
+        longLabel = ("<i>The motors will move 'backlash' steps past the low",
+                     "limit before moving back to the lower limit.</i>")
+        softLimLabel = QLabel(longLabel)
         softLimLabel.setWordWrap(True)
         self.tab4.layout.addWidget(softLimLabel, 7, 0, 1, 6)
 
@@ -1401,12 +1405,10 @@ class MyTableWidget(QWidget):
         # Set tab layout.
         self.tab5.setLayout(self.tab5.layout)
 
-
         # ---------------------------------------------------------------------
         #   Tab 6
         # ---------------------------------------------------------------------
 
-        
         self.tab6.layout = QGridLayout()
 
         # Define interactive sample widgets.
@@ -1451,7 +1453,10 @@ class MyTableWidget(QWidget):
         self.tab6.layout.addWidget(self.SBL, 5, 0, 1, 4)
 
         # Add information labels.
-        backlashLabel = QLabel("<i>Backlash is applied when moving negitively. The motor will move 'backlash' steps past the target position before returning to the target position</i>")
+        longLabel = ("<i>Backlash is applied when moving negitively. ",
+                     "The motor will move 'backlash' steps past the target",
+                     "position before returning to the target position</i>")
+        backlashLabel = QLabel(longLabel)
         backlashLabel.setWordWrap(True)
         self.tab6.layout.addWidget(backlashLabel, 6, 0, 1, 4)
 
