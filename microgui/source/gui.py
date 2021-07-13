@@ -1303,7 +1303,7 @@ class MyTableWidget(QWidget):
         self.tab4.layout.addWidget(self.SESL, 6, 3, 1, 3)
 
         # Add information labels.
-        longLabel = ("<i>The motors will move 'backlash' steps past the low",
+        longLabel = ("<i>The motors will move 'backlash' steps past the low ",
                      "limit before moving back to the lower limit.</i>")
         softLimLabel = QLabel(longLabel)
         softLimLabel.setWordWrap(True)
@@ -1454,7 +1454,7 @@ class MyTableWidget(QWidget):
 
         # Add information labels.
         longLabel = ("<i>Backlash is applied when moving negitively. ",
-                     "The motor will move 'backlash' steps past the target",
+                     "The motor will move 'backlash' steps past the target ",
                      "position before returning to the target position</i>")
         backlashLabel = QLabel(longLabel)
         backlashLabel.setWordWrap(True)
