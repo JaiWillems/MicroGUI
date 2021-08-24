@@ -1,5 +1,7 @@
 # <img width="50" height="50" src="/microgui/source/figures/MicroGUI_logo.png"> MicroGUI
 The MicroGUI project is a user interface and hardware integration project for the FAR-IR beamline of the Canadian Light Source Inc.. The platform integrates with the facilities EPICS distributed control system, FLIR Blackfly camera and THORLABS motor stage to allow for remote control of the FAR-IR infrared horizontal microscope.
+
+![](microgui/source/figures/main_window.png)
     
 # Dependencies
 This section will detail how to set up an environment that supports the operation of the MicroGUI software. More specifically, it will detail how to configure the Python environment, set up the THORLABS motor stage dependencies, and the FLIR/BlackFly camera dependencies.

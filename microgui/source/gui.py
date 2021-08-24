@@ -256,7 +256,7 @@ class GUI(QMainWindow):
         self.macros = macros
         self.savedPos = savedPos
 
-        # Set CLS logo.
+        # Set MicroGUI logo.
         self.setWindowIcon(QIcon("figures/MicroGUI_logo.png"))
 
         # Define main GUI window.
