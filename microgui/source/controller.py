@@ -252,19 +252,19 @@ class Controller(object):
         self.PV_YOSTEP = PV(pvname=self.gui.macros["YOSTEP"])
         self.PV_ZOSTEP = PV(pvname=self.gui.macros["XOSTEP"])
 
-        # Set absolute position PV monitoring and callback.
-        self.PV_XSABSPOS = PV(pvname=self.gui.macros["XSABSPOS"],
-                              auto_monitor=True, callback=self._update_abs_pos)
-        self.PV_YSABSPOS = PV(pvname=self.gui.macros["YSABSPOS"],
-                              auto_monitor=True, callback=self._update_abs_pos)
-        self.PV_ZSABSPOS = PV(pvname=self.gui.macros["ZSABSPOS"],
-                              auto_monitor=True, callback=self._update_abs_pos)
-        self.PV_XOABSPOS = PV(pvname=self.gui.macros["XOABSPOS"],
-                              auto_monitor=True, callback=self._update_abs_pos)
-        self.PV_YOABSPOS = PV(pvname=self.gui.macros["YOABSPOS"],
-                              auto_monitor=True, callback=self._update_abs_pos)
-        self.PV_ZOABSPOS = PV(pvname=self.gui.macros["ZOABSPOS"],
-                              auto_monitor=True, callback=self._update_abs_pos)
+        # # Set absolute position PV monitoring and callback.
+        # self.PV_XSABSPOS = PV(pvname=self.gui.macros["XSABSPOS"],
+        #                       auto_monitor=True, callback=self._update_abs_pos)
+        # self.PV_YSABSPOS = PV(pvname=self.gui.macros["YSABSPOS"],
+        #                       auto_monitor=True, callback=self._update_abs_pos)
+        # self.PV_ZSABSPOS = PV(pvname=self.gui.macros["ZSABSPOS"],
+        #                       auto_monitor=True, callback=self._update_abs_pos)
+        # self.PV_XOABSPOS = PV(pvname=self.gui.macros["XOABSPOS"],
+        #                       auto_monitor=True, callback=self._update_abs_pos)
+        # self.PV_YOABSPOS = PV(pvname=self.gui.macros["YOABSPOS"],
+        #                       auto_monitor=True, callback=self._update_abs_pos)
+        # self.PV_ZOABSPOS = PV(pvname=self.gui.macros["ZOABSPOS"],
+        #                       auto_monitor=True, callback=self._update_abs_pos)
 
         # Set current position PV monitoring and callback.
         self.PV_XSPOS = PV(pvname=self.gui.macros["XSPOS"], auto_monitor=True,
@@ -471,6 +471,9 @@ class Controller(object):
 
         # Enable Thorlabs motor.
         enable(self.modeMotor)
+
+        # Set soft limit indicators.
+        self._soft_lim_indicators()
 
         self._append_text("Display values and macros initialized.")
 
@@ -769,6 +772,7 @@ class Controller(object):
 
         absPosLineEdit = self.__dict__["gui"].__dict__[f"{axis.lower()}{object}AbsPos"]
         absPos = float(absPosLineEdit.text())
+        absPosLineEdit.setText(str(absPos))
 
         PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
         NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
@@ -816,28 +820,28 @@ class Controller(object):
             self.__dict__[f"PV_{axis}{object}STOP"].put(1)
             self.__dict__[f"PV_{axis}{object}STOP"].put(0)
 
-    def _update_abs_pos(self, **kwargs: Dict[str, Any]) -> None:
-        """Update absolute value line edit.
+    # def _update_abs_pos(self, **kwargs: Dict[str, Any]) -> None:
+    #     """Update absolute value line edit.
 
-        Parameters
-        ----------
-        **kwargs : dict
-            Extra arguments to `_update_abs_pos`: refer to PyEpics
-            documentation for a list of all possible arguments for PV callback
-            functions.
-        """
+    #     Parameters
+    #     ----------
+    #     **kwargs : dict
+    #         Extra arguments to `_update_abs_pos`: refer to PyEpics
+    #         documentation for a list of all possible arguments for PV callback
+    #         functions.
+    #     """
 
-        pvname = kwargs["pvname"]
-        value = kwargs["value"]
+    #     pvname = kwargs["pvname"]
+    #     value = kwargs["value"]
 
-        keys = list(self.gui.macros.keys())
-        vals = list(self.gui.macros.values())
-        pvKey = keys[vals.index(pvname)]
+    #     keys = list(self.gui.macros.keys())
+    #     vals = list(self.gui.macros.values())
+    #     pvKey = keys[vals.index(pvname)]
 
-        axis = pvKey[0]
-        object = pvKey[1]
+    #     axis = pvKey[0]
+    #     object = pvKey[1]
 
-        self.__dict__["gui"].__dict__[f"{axis.lower()}{object}AbsPos"].setText(str(value))
+    #     self.__dict__["gui"].__dict__[f"{axis.lower()}{object}AbsPos"].setText(str(value))
 
     def _update_soft_lim(self, buttonID: Literal[0, 1]) -> None:
         """Update sample and objective soft limits.
@@ -962,7 +966,7 @@ class Controller(object):
         self._check_motor_position()
         self._soft_lim_indicators()
 
-        self._append_text(f"Updating soft limits.")
+        self._append_text("Updating soft limits.")
 
     def _update_BL(self) -> None:
         """Update backlash variables."""
