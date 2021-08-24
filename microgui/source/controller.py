@@ -654,25 +654,23 @@ class Controller(object):
         """
 
         if mode == "TRANSMISSION_POSITION":
-            self.gui.macros[mode] = float(self.gui.tab.TMTM.text())
-            self.gui.tab.TMTM.setText(str(self.gui.macros[mode]))
-            if self.gui.tab.RDM1.isChecked():
-                self._mode_state(1, self.modeMotor)
+            pos_line_edit = self.gui.tab.TMTM
+            radio_select = self.gui.tab.RDM1.isChecked()
         elif mode == "REFLECTION_POSITION":
-            self.gui.macros[mode] = float(self.gui.tab.TMRM.text())
-            self.gui.tab.TMRM.setText(str(self.gui.macros[mode]))
-            if self.gui.tab.RDM2.isChecked():
-                self._mode_state(2, self.modeMotor)
+            pos_line_edit = self.gui.tab.TMRM
+            radio_select = self.gui.tab.RDM2.isChecked()
         elif mode == "VISIBLE_IMAGE_POSITION":
-            self.gui.macros[mode] = float(self.gui.tab.TMVM.text())
-            self.gui.tab.TMVM.setText(str(self.gui.macros[mode]))
-            if self.gui.tab.RDM3.isChecked():
-                self._mode_state(3, self.modeMotor)
+            pos_line_edit = self.gui.tab.TMVM
+            radio_select = self.gui.tab.RDM3.isChecked()
         elif mode == "BEAMSPLITTER_POSITION":
-            self.gui.macros[mode] = float(self.gui.tab.TMBM.text())
-            self.gui.tab.TMBM.setText(str(self.gui.macros[mode]))
-            if self.gui.tab.RDM4.isChecked():
-                self._mode_state(4, self.modeMotor)
+            pos_line_edit = self.gui.tab.TMBM
+            radio_select = self.gui.tab.RDM4.isChecked()
+        
+        self.gui.macros[mode] = float(pos_line_edit.text())
+        pos_line_edit.setText(str(self.gui.macros[mode]))
+
+        if radio_select:
+            self._mode_state(mode, self.modeMotor)
 
         self._append_text("Setting new mode position.")
 
@@ -706,8 +704,7 @@ class Controller(object):
 
             self._append_text("THORLABS motor homing.")
         except:
-            self._append_text(("ERROR: THORLABS motor cannot be homed, ",
-                              "ensure the motor is enabled."),
+            self._append_text("ERROR: THORLABS motor cannot be homed, ensure the motor is enabled.",
                               QColor(255, 0, 0))
 
     def _increment(self, object: Literal["S", "O"], axis:
@@ -739,8 +736,7 @@ class Controller(object):
         if incPos < 0:
             incPos = -incPos
             step.setText(str(incPos))
-            self._append_text(("WARNING: Step must be positive. Step sign ",
-                              "has been changed to positive."),
+            self._append_text("WARNING: Step must be positive. Step sign has been changed to positive.",
                               QColor(250, 215, 0))
 
         PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
@@ -771,8 +767,7 @@ class Controller(object):
             respectively.
         """
 
-        absPosLineEdit = self.__dict__["gui"].__dict__[
-            f"{axis.lower()}{object}AbsPos"]
+        absPosLineEdit = self.__dict__["gui"].__dict__[f"{axis.lower()}{object}AbsPos"]
         absPos = float(absPosLineEdit.text())
 
         PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
@@ -842,8 +837,7 @@ class Controller(object):
         axis = pvKey[0]
         object = pvKey[1]
 
-        self.__dict__["gui"].__dict__[
-            f"{axis.lower()}{object}AbsPos"].setText(str(value))
+        self.__dict__["gui"].__dict__[f"{axis.lower()}{object}AbsPos"].setText(str(value))
 
     def _update_soft_lim(self, buttonID: Literal[0, 1]) -> None:
         """Update sample and objective soft limits.
@@ -966,6 +960,7 @@ class Controller(object):
 
         # Move motors to within soft limits.
         self._check_motor_position()
+        self._soft_lim_indicators()
 
         self._append_text(f"Updating soft limits.")
 
@@ -1031,17 +1026,14 @@ class Controller(object):
             label.setText("POWERING")
             label.setStyleSheet(
                 "background-color: #ff4747; border: 1px solid black;")
-            self._soft_lim_indicators(object, axis)
         elif value == 2:
             label.setText("POWERED")
             label.setStyleSheet(
                 "background-color: #ff4747; border: 1px solid black;")
-            self._soft_lim_indicators(object, axis)
         elif value == 3:
             label.setText("RELEASING")
             label.setStyleSheet(
                 "background-color: #edde07; border: 1px solid black;")
-            self._soft_lim_indicators(object, axis)
         elif value == 4:
             label.setText("ACTIVE")
             label.setStyleSheet(
@@ -1050,12 +1042,10 @@ class Controller(object):
             label.setText("APPLYING")
             label.setStyleSheet(
                 "background-color: #edde07; border: 1px solid black;")
-            self._soft_lim_indicators(object, axis)
         else:
             label.setText("UNPOWERING")
             label.setStyleSheet(
                 "background-color: #ff4747; border: 1px solid black;")
-            self._soft_lim_indicators(object, axis)
 
     def _check_motor_position(self) -> None:
         """Moves motors within soft limits.
@@ -1076,12 +1066,10 @@ class Controller(object):
                     self.__dict__[f"PV_{axis}{object}ABSPOS"].put(PSL)
                     self.__dict__[f"PV_{axis}{object}MOVE"].put(1)
                     self.__dict__[f"PV_{axis}{object}MOVE"].put(0)
-                    self._soft_lim_indicators(object, axis)
                 elif currPos <= NSL:
                     self.__dict__[f"PV_{axis}{object}ABSPOS"].put(NSL)
                     self.__dict__[f"PV_{axis}{object}MOVE"].put(1)
                     self.__dict__[f"PV_{axis}{object}MOVE"].put(0)
-                    self._soft_lim_indicators(object, axis)
 
     def _soft_lim_indicators(self, object: Literal["S", "O"], axis:
                              Literal["X", "Y", "Z"]) -> None:

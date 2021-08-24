@@ -1163,8 +1163,7 @@ class MyTableWidget(QWidget):
         self.tab2.layout.addWidget(self.TMBMbutton, 4, 2, 1, 1)
 
         self.tab2.layout.addWidget(QLabel("<b>Motor Control</b>"), 5, 0, 1, 4)
-        longLabel = ("<i>Enable or disable the THORLABS motor and move to ",
-                     "home position.</i>")
+        longLabel = "<i>Enable or disable the THORLABS motor and move to home position.</i>"
         self.tab2.layout.addWidget(QLabel(longLabel), 6, 0, 1, 4)
 
         # THORLABS/mode motor controls.
@@ -1196,13 +1195,15 @@ class MyTableWidget(QWidget):
 
         # Organize sample widgets in the tab layout.
         self.tab3.layout.addWidget(QLabel("<b>Sample</b>"), 0, 0, 1, 2)
-        self.tab3.layout.addWidget(QLabel("<i>Min to Max</i>"), 1, 1, 1, 1)
+        self.tab3.layout.addWidget(QLabel("<i>In, Out</i>"), 1, 1, 1, 1)
         self.tab3.layout.addWidget(QLabel("Horizontal:"), 2, 0, 1, 1)
-        self.tab3.layout.addWidget(QLabel("Vertical:"), 3, 0, 1, 1)
-        self.tab3.layout.addWidget(QLabel("Focus:"), 4, 0, 1, 1)
+        self.tab3.layout.addWidget(QLabel("<i>Up, Down</i>"), 3, 1, 1, 1)
+        self.tab3.layout.addWidget(QLabel("Vertical:"), 4, 0, 1, 1)
+        self.tab3.layout.addWidget(QLabel("<i>Upstream, Downstream</i>"), 5, 1, 1, 1)
+        self.tab3.layout.addWidget(QLabel("Focus:"), 6, 0, 1, 1)
         self.tab3.layout.addWidget(self.xSMM, 2, 1, 1, 1)
-        self.tab3.layout.addWidget(self.ySMM, 3, 1, 1, 1)
-        self.tab3.layout.addWidget(self.zSMM, 4, 1, 1, 1)
+        self.tab3.layout.addWidget(self.ySMM, 4, 1, 1, 1)
+        self.tab3.layout.addWidget(self.zSMM, 6, 1, 1, 1)
 
         # Define interactive objective widgets.
         xHardMin = self.parent.macros["XOMIN_HARD_LIMIT"]
@@ -1217,13 +1218,15 @@ class MyTableWidget(QWidget):
 
         # Organize objective widgets in the tab layout.
         self.tab3.layout.addWidget(QLabel("<b>Objective</b>"), 0, 2, 1, 2)
-        self.tab3.layout.addWidget(QLabel("<i>Min to Max</i>"), 1, 3, 1, 1)
+        self.tab3.layout.addWidget(QLabel("<i>In, Out</i>"), 1, 3, 1, 1)
         self.tab3.layout.addWidget(QLabel("Horizontal:"), 2, 2, 1, 1)
-        self.tab3.layout.addWidget(QLabel("Vertical:"), 3, 2, 1, 1)
-        self.tab3.layout.addWidget(QLabel("Focus:"), 4, 2, 1, 1)
+        self.tab3.layout.addWidget(QLabel("<i>Up, Down</i>"), 3, 3, 1, 1)
+        self.tab3.layout.addWidget(QLabel("Vertical:"), 4, 2, 1, 1)
+        self.tab3.layout.addWidget(QLabel("<i>Upstream, Downstream</i>"), 5, 3, 1, 1)
+        self.tab3.layout.addWidget(QLabel("Focus:"), 6, 2, 1, 1)
         self.tab3.layout.addWidget(self.xOMM, 2, 3, 1, 1)
-        self.tab3.layout.addWidget(self.yOMM, 3, 3, 1, 1)
-        self.tab3.layout.addWidget(self.zOMM, 4, 3, 1, 1)
+        self.tab3.layout.addWidget(self.yOMM, 4, 3, 1, 1)
+        self.tab3.layout.addWidget(self.zOMM, 6, 3, 1, 1)
 
         # Set tab layout.
         self.tab3.setLayout(self.tab3.layout)
@@ -1303,8 +1306,7 @@ class MyTableWidget(QWidget):
         self.tab4.layout.addWidget(self.SESL, 6, 3, 1, 3)
 
         # Add information labels.
-        longLabel = ("<i>The motors will move 'backlash' steps past the low ",
-                     "limit before moving back to the lower limit.</i>")
+        longLabel = "<i>The motors will move 'backlash' steps past the low limit before moving back to the lower limit.</i>"
         softLimLabel = QLabel(longLabel)
         softLimLabel.setWordWrap(True)
         self.tab4.layout.addWidget(softLimLabel, 7, 0, 1, 6)
@@ -1453,9 +1455,7 @@ class MyTableWidget(QWidget):
         self.tab6.layout.addWidget(self.SBL, 5, 0, 1, 4)
 
         # Add information labels.
-        longLabel = ("<i>Backlash is applied when moving negitively. ",
-                     "The motor will move 'backlash' steps past the target ",
-                     "position before returning to the target position</i>")
+        longLabel = "<i>Backlash is applied when moving negitively. The motor will move 'backlash' steps past the target position before returning to the target position</i>"
         backlashLabel = QLabel(longLabel)
         backlashLabel.setWordWrap(True)
         self.tab6.layout.addWidget(backlashLabel, 6, 0, 1, 4)
