@@ -1,32 +1,30 @@
-"""Create widgets interactive nature.
+"""Create widgets' interactive nature.
 
-The controller module brings life to the GUI defined through the gui module by
-connecting widgets up to control sequences that bring about change.
+This module contains the `Controller` class to bring life to the GUI defined
+in the `GUI` class by connecting widgets up to control sequences that bring
+about change.
 """
 
 
-# Import package dependencies.
+from configuration import load_config, save_config, save_pos_config
 from epics import ca, caput, PV
+from gui import GUI
 from functools import partial
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QFileDialog, QLineEdit
 from thorlabs_apt import Motor
-from typing import Any, Dict, Literal
-
-# Import file dependencies.
-from configuration import load_config, save_config, save_pos_config
-from gui import GUI
 from thorlabs_motor_control import changeMode, disable, enable, home
+from typing import Any, Dict, Literal
 
 # Set up epics environment.
 ca.find_libca()
 
 
 class Controller(object):
-    """Connect GUI widgets to control sequences.
+    """Connect widgets to control sequences.
 
-    The Controller class takes interactive widgets such as QPushButton's
-    QLineEdit's, etc. and allows for meaningful engagement with a user.
+    The `Controller` class connects the widgets defined by the `GUI` class to
+    control seuqences allowing for meaningful engagement with program users.
 
     Parameters
     ----------
@@ -41,206 +39,143 @@ class Controller(object):
         User interface to control.
     modeMotor : Motor
         THORLABS motor unit controlling the microscope mode.
-    PV_XSSTEP : PV
-        Step PV for the sample's x dimension.
-    PV_YSSTEP : PV
-        Step PV for the sample's y dimension.
-    PV_ZSSTEP : PV
-        Step PV for the sample's z dimension.
-    PV_XOSTEP : PV
-        Step PV for the objective's x dimension.
-    PV_YOSTEP : PV
-        Step PV for the objective's y dimension.
-    PV_ZOSTEP : PV
-        Step PV for the objective's z dimension.
-    PV_XSABSPOS : PV
-        Absolute position PV for the sample's x dimension.
-    PV_YSABSPOS : PV
-        Absolute position PV for the sample's y dimension.
-    PV_ZSABSPOS : PV
-        Absolute position PV for the sample's z dimension.
-    PV_XOABSPOS : PV
-        Absolute position PV for the objective's x dimension.
-    PV_YOABSPOS : PV
-        Absolute position PV for the objective's y dimension.
-    PV_ZOABSPOS : PV
-        Absolute position PV for the objective's z dimension.
-    PV_XSPOS : PV
-        Current position PV for the sample's x dimension.
-    PV_YSPOS : PV
-        Current position PV for the sample's y dimension.
-    PV_ZSPOS : PV
-        Current position PV for the sample's z dimension.
-    PV_XOPOS : PV
-        Current position PV for the objective's x dimension.
-    PV_YOPOS : PV
-        Current position PV for the objective's y dimension.
-    PV_ZOPOS : PV
-        Current position PV for the objective's z dimension.
-    PV_XSPOS_ABS : PV
-        Absolute current position PV for the sample's x dimension.
-    PV_YSPOS_ABS : PV
-        Absolute current position PV for the sample's y dimension.
-    PV_ZSPOS_ABS : PV
-        Absolute current position PV for the sample's z dimension.
-    PV_XOPOS_ABS : PV
-        Absolute current position PV for the objective's x dimension.
-    PV_YOPOS_ABS : PV
-        Absolute current position PV for the objective's y dimension.
-    PV_ZOPOS_ABS : PV
-        Absolute current position PV for the objective's z dimension.
-    PV_XSMOVE : PV
-        Move PV of the sample's x dimension.
-    PV_YSMOVE : PV
-        Move PV of the sample's y dimension.
-    PV_ZSMOVE : PV
-        Move PV of the sample's z dimension.
-    PV_XOMOVE : PV
-        Move PV of the objective's x dimension.
-    PV_YOMOVE : PV
-        Move PV of the objective's y dimension.
-    PV_ZOMOVE : PV
-        Move PV of the objective's z dimension.
-    PV_XSSTOP : PV
-        Stop PV for the sample's x dimension.
-    PV_YSSTOP : PV
-        Stop PV for the sample's y dimension.
-    PV_ZSSTOP : PV
-        Stop PV for the sample's z dimension.
-    PV_XOSTOP : PV
-        Stop PV for the objective's x dimension.
-    PV_YOSTOP : PV
-        Stop PV for the objective's y dimension.
-    PV_ZOSTOP : PV
-        Stop PV for the objective's z dimension.
-    PV_XSHN : PV
-        Negative hard limit PV for the sample's x dimension.
-    PV_XSHP : PV
-        Positive hard limit PV for the sample's x dimension.
-    PV_YSHN : PV
-        Negative hard limit PV for the sample's y dimension.
-    PV_YSHP : PV
-        Positive hard limit PV for the sample's y dimension.
-    PV_ZSHN : PV
-        Negative hard limit PV for the sample's z dimension.
-    PV_ZSHP : PV
-        Positive hard limit PV for the sample's z dimension.
-    PV_XOHN : PV
-        Negative hard limit PV for the objective's x dimension.
-    PV_XOHP : PV
-        Positive hard limit PV for the objective's x dimension.
-    PV_YOHN : PV
-        Negative hard limit PV for the objective's y dimension.
-    PV_YOHP : PV
-        Positive hard limit PV for the objective's y dimension.
-    PV_ZOHN : PV
-        Negative hard limit PV for the objective's z dimension.
-    PV_ZOHP : PV
-        Positive hard limit PV for the objective's z dimension.
-    PV_XSSTATE : PV
-        State PV of the sample's x dimension.
-    PV_YSSTATE : PV
-        State PV of the sample's y dimension.
-    PV_ZSSTATE : PV
-        State PV of the sample's z dimension.
-    PV_XOSTATE : PV
-        State PV of the objective's x dimension.
-    PV_YOSTATE : PV
-        State PV of the objective's y dimension.
-    PV_ZOSTATE : PV
-        State PV of the objective's z dimension.
-    PV_XSOFFSET : PV
-        Offset PV for the sample's x dimension
-    PV_YSOFFSET : PV
-        Offset PV for the sample's y dimension
-    PV_ZSOFFSET : PV
-        Offset PV for the sample's z dimension
-    PV_XOOFFSET : PV
-        Offset PV for the objective's x dimension
-    PV_YOOFFSET : PV
-        Offset PV for the objective's y dimension
-    PV_ZOOFFSET : PV
-        Offset PV for the objective's z dimension
+    PV_SSTEP, PV_YSSTEP, PV_ZSSTEP : PV
+        Step PV's for the sample's x, y, and z dimensions.
+    PV_XOSTEP, PV_YOSTEP, PV_ZOSTEP : PV
+        Step PV's for the objective's x, y, and z dimensions.
+    PV_XSABSPOS, PV_YSABSPOS, PV_ZSABSPOS : PV
+        Absolute position PV's for the sample's x, y, and z dimensions.
+    PV_XOABSPOS, PV_YOABSPOS, PV_ZOABSPOS : PV
+        Absolute position PV's for the objective's x, y, and z dimensions.
+    PV_XSPOS, PV_YSPOS, PV_ZSPOS : PV
+        Current position PV's for the sample's x, y, and z dimensions.
+    PV_XOPOS, PV_YOPOS, PV_ZOPOS : PV
+        Current position PV's for the objective's x, y, and z dimensions.
+    PV_XSPOS_ABS, PV_YSPOS_ABS, PV_ZSPOS_ABS : PV
+        Absolute current position PV's for the sample's x, y, and z dimensions.
+    PV_XOPOS_ABS, PV_YOPOS_ABS, PV_ZOPOS_ABS : PV
+        Absolute current position PV's for the objective's x, y, and z
+        dimensions.
+    PV_XSMOVE, PV_YSMOVE, PV_ZSMOVE : PV
+        Move PV's of the sample's x, y, and z dimensions.
+    PV_XOMOVE, PV_YOMOVE, PV_ZOMOVE : PV
+        Move PV's of the objective's x, y, and z dimensions.
+    PV_XSSTOP, PV_YSSTOP, PV_ZSSTOP : PV
+        Stop PV's for the sample's x, y, and z dimensions.
+    PV_XOSTOP, PV_YOSTOP, PV_ZOSTOP : PV
+        Stop PV's for the objective's x, y, and z dimensions.
+    PV_XSHN, PV_YSHN, PV_ZSHN : PV
+        Negative hard limit PV's for the sample's x, y, and z dimensions.
+    PV_XSHP, PV_YSHP, PV_ZSHP : PV
+        Positive hard limit PV's for the sample's x, y, and z dimensions.
+    PV_XOHN, PV_YOHN, PV_ZOHN: PV
+        Negative hard limit PV's for the objective's x, y, and z dimensions.
+    PV_XOHP, PV_YOHP, PV_ZOHP : PV
+        Positive hard limit PV's for the objective's x, y, and z dimensions.
+    PV_XSSTATE, PV_YSSTATE, PV_ZSSTATE : PV
+        State PV's of the sample's x, y, and z dimensions.
+    PV_XOSTATE, PV_YOSTATE, PV_ZOSTATE : PV
+        State PV's of the objective's x, y, and z dimensions.
+    PV_XSOFFSET, PV_YSOFFSET, PV_ZSOFFSET : PV
+        Offset PV's for the sample's x, y, and z dimensions.
+    PV_XOOFFSET, PV_YOOFFSET, PV_ZOOFFSET : PV
+        Offset PV's for the objective's x, y, and z dimensions.
 
     Methods
     -------
-    _initialize_PVs()
-        Initialize GUI PVs.
-    _initialize_GUI()
-        Initialize GUI displays.
-    _connect_signals()
-        Connect the widgets to a control sequence.
-    _mode_state(mode, modeMotor)
-        Control sequence to change the microscope mode.
-    _mode_position(mode)
-        Change Mode position settings.
-    _enable_thorlabs()
-        Control sequence to enable the THORLABS motor.
-    _home_thorlabs()
-        Control sequence to home the THORLABS motor.
-    _increment(object, axis, direction, step)
-        Control sequence to increment sample and objective stage motors.
-    _absolute(object, axis, pos)
-        Control sequence to move the sample and objective stage motors to a
-        set point.
-    _continuous(object, axis, type)
-        Control sequence for the continuous motion of the sample and objective
-        stages.
-    _update_soft_lim(buttonID)
-        Control sequence to set soft limits to the inputted soft limits.
-    _update_BL()
-        Control sequence to update backlash values.
-    _motor_status(**kwargs)
-        Control sequence to check and set mode status indicators.
-    _check_motor_position()
-        Control sequence to move motors within soft limits.
-    _soft_lim_indicators(object, axis)
-        Control sequence to set doft limit indicators.
-    _hard_lim_indicators(**kwargs)
-        Control sequence to set hard limit indicators.
-    _change_display_vals()
-        Callback function to switch displayed values between actual and
-        relative values.
-    _change_to_actual()
-        Control sequence to change display values to actual.
-    _change_to_relative()
-        Control sequence to change display values to relative.
-    _zero(object, axis)
-        Control sequence to zero the current motor positions.
-    _actual(object, axis)
-        Control sequence to zero the current motor offset.
-    _set_current_position(**kwargs)
-        Control sequence to update current position labels.
-    _append_text(text, color)
-        Control sequence to append text to the user information display.
-    _load_config()
-        Control sequence to upload a new configuration.
-    _save_config()
-        Control sequence to save the current configuration.
-    _change_units()
-        Control sequence to change the `current position` display's units.
-    _save_position()
-        Control sequence to save the current motor positions.
-    _load_position()
-        Control sequence to load the selected motor position.
-    _delete_position()
-        Control sequence to delete the selected motor position.
-    _clear_position()
-        Control sequence to clear all saved motor positions.
+    initialize_process_variables()
+        Conigure user interface process variables.
+    initialize_gui()
+        Configure user interface display values.
+    connect_signals()
+        Connect widgets to control sequences.
+    mode_state(mode, modeMotor)
+        Change microscope mode.
+    mode_position(mode)
+        Update mode position.
+    enable_thorlabs()
+        Enable or disable the THORLABS motor.
+    home_thorlabs()
+        Home the THORLABS motor.
+    increment(object, axis, direction, step)
+        Increment motor position
+    absolute(object, axis, pos)
+        Move motor to an absolute position.
+    continuous(object, axis, type)
+        Control continuous motion of the motor.
+    update_soft_lim(buttonID)
+        Update sample and objective soft limits.
+    update_backlash()
+        Update backlash variables.
+    motor_status(**kwargs)
+        Set motor status indicators.
+    check_motor_position()
+        Assert motor positions are within soft limits.
+    soft_lim_indicators(object, axis)
+        Set soft limit indicators.
+    hard_lim_indicators(**kwargs)
+        Set hard limit indicators.
+    change_display_vals()
+        Toggle display values between actual and relative.
+    change_to_actual()
+        Change display values to actual values.
+    change_to_relative()
+        Change display values to relative values.
+    zero(object, axis)
+        Zero motor position.
+    actual(object, axis)
+        Un-zero motor position.
+    set_current_position(**kwargs)
+        Update current position label.
+    append_text(text, color)
+        Append text to console window.
+    load_config()
+        Load new configuration.
+    save_config()
+        Save current configuration.
+    change_units()
+        Changes the current position's display units.
+    save_position()
+        Save the current position to a configuration file.
+    load_position()
+        Move motors to the selected position.
+    delete_position()
+        Delete the selected position.
+    clear_position()
+        Clear all saved positions.
     """
 
     def __init__(self, gui: GUI, modeMotor: Motor) -> None:
-        """Initialize the Controller."""
+        """Initialize the Controller.
+
+        This method initializes the `Controller` class by setting two key
+        attributes that will be used significantly thorughout the program in
+        addition to calling several methods to set up the PV's, to initialize
+        values in the GUI widgets, as well as connecting the widgets to
+        control sequences.
+        """
 
         self.gui = gui
         self.modeMotor = modeMotor
 
-        self._initialize_PVs()
-        self._initialize_GUI()
-        self._connect_signals()
+        self.initialize_process_variables()
+        self.initialize_gui()
+        self.connect_signals()
 
-    def _initialize_PVs(self) -> None:
-        """Conigure user interface PV's."""
+    def initialize_process_variables(self) -> None:
+        """Conigure user interface process variables.
+
+        This method initializes all PV's that will need to be called within the
+        program ans also configures auto-monitoring and callback functions for
+        certain process variables.
+
+        Notes
+        -----
+        In some instances, the process variables could not be connected with
+        during the program execution without initialization. Configuring
+        process variables in this section improves the ability to connect with
+        process variables during program execution.
+        """
 
         mac = self.gui.macros
 
@@ -261,7 +196,7 @@ class Controller(object):
         self.PV_ZOABSPOS = PV(pvname=mac["ZOABSPOS"])
 
         # Set current position PV monitoring and callback.
-        cb = self._set_current_position
+        cb = self.set_current_position
         self.PV_XSPOS = PV(pvname=mac["XSPOS"], auto_monitor=True, callback=cb)
         self.PV_YSPOS = PV(pvname=mac["YSPOS"], auto_monitor=True, callback=cb)
         self.PV_ZSPOS = PV(pvname=mac["ZSPOS"], auto_monitor=True, callback=cb)
@@ -294,7 +229,7 @@ class Controller(object):
         self.PV_ZOSTOP = PV(pvname=mac["ZOSTOP"])
 
         # Set hard limit position PV monitoring and callback.
-        cb = self._hard_lim_indicators
+        cb = self.hard_lim_indicators
         self.PV_XSHN = PV(pvname=mac["XSHN"], auto_monitor=True, callback=cb)
         self.PV_XSHP = PV(pvname=mac["XSHP"], auto_monitor=True, callback=cb)
         self.PV_YSHN = PV(pvname=mac["YSHN"], auto_monitor=True, callback=cb)
@@ -309,22 +244,34 @@ class Controller(object):
         self.PV_ZOHP = PV(pvname=mac["ZOHP"], auto_monitor=True, callback=cb)
 
         # Set state PV monitoring and callback.
-        cb = self._motor_status
-        self.PV_XSSTATE = PV(pvname=mac["XSSTATE"], auto_monitor=True, callback=cb)
-        self.PV_YSSTATE = PV(pvname=mac["YSSTATE"], auto_monitor=True, callback=cb)
-        self.PV_ZSSTATE = PV(pvname=mac["ZSSTATE"], auto_monitor=True, callback=cb)
-        self.PV_XOSTATE = PV(pvname=mac["XOSTATE"], auto_monitor=True, callback=cb)
-        self.PV_YOSTATE = PV(pvname=mac["YOSTATE"], auto_monitor=True, callback=cb)
-        self.PV_ZOSTATE = PV(pvname=mac["ZOSTATE"], auto_monitor=True, callback=cb)
+        cb = self.motor_status
+        self.PV_XSSTATE = PV(pvname=mac["XSSTATE"], auto_monitor=True,
+                             callback=cb)
+        self.PV_YSSTATE = PV(pvname=mac["YSSTATE"], auto_monitor=True,
+                             callback=cb)
+        self.PV_ZSSTATE = PV(pvname=mac["ZSSTATE"], auto_monitor=True,
+                             callback=cb)
+        self.PV_XOSTATE = PV(pvname=mac["XOSTATE"], auto_monitor=True,
+                             callback=cb)
+        self.PV_YOSTATE = PV(pvname=mac["YOSTATE"], auto_monitor=True,
+                             callback=cb)
+        self.PV_ZOSTATE = PV(pvname=mac["ZOSTATE"], auto_monitor=True,
+                             callback=cb)
 
         # Initialize offset PV monitoring and callback.
-        cb = self._change_display_vals
-        self.PV_XSOFFSET = PV(pvname=mac["XSOFFSET"], auto_monitor=True, callback=cb)
-        self.PV_YSOFFSET = PV(pvname=mac["YSOFFSET"], auto_monitor=True, callback=cb)
-        self.PV_ZSOFFSET = PV(pvname=mac["ZSOFFSET"], auto_monitor=True, callback=cb)
-        self.PV_XOOFFSET = PV(pvname=mac["XOOFFSET"], auto_monitor=True, callback=cb)
-        self.PV_YOOFFSET = PV(pvname=mac["YOOFFSET"], auto_monitor=True, callback=cb)
-        self.PV_ZOOFFSET = PV(pvname=mac["ZOOFFSET"], auto_monitor=True, callback=cb)
+        cb = self.change_display_vals
+        self.PV_XSOFFSET = PV(pvname=mac["XSOFFSET"], auto_monitor=True,
+                              callback=cb)
+        self.PV_YSOFFSET = PV(pvname=mac["YSOFFSET"], auto_monitor=True,
+                              callback=cb)
+        self.PV_ZSOFFSET = PV(pvname=mac["ZSOFFSET"], auto_monitor=True,
+                              callback=cb)
+        self.PV_XOOFFSET = PV(pvname=mac["XOOFFSET"], auto_monitor=True,
+                              callback=cb)
+        self.PV_YOOFFSET = PV(pvname=mac["YOOFFSET"], auto_monitor=True,
+                              callback=cb)
+        self.PV_ZOOFFSET = PV(pvname=mac["ZOOFFSET"], auto_monitor=True,
+                              callback=cb)
 
         # Intialize backlash PV's.
         self.PV_XSB = PV(mac["XSB"])
@@ -334,13 +281,16 @@ class Controller(object):
         self.PV_YOB = PV(mac["YOB"])
         self.PV_ZOB = PV(mac["ZOB"])
 
-        self._append_text("PVs configured and initialized.")
+        # Print output statement.
+        self.append_text("PVs configured and initialized.")
 
-    def _initialize_GUI(self) -> None:
-        """Configure user interface displays.
-        
-        This method initializes the user interface display by setting all
-        values to the current PV values or configuration settings.
+    def initialize_gui(self) -> None:
+        """Configure user interface display values.
+
+        This method initializes the user interface display by setting widget
+        values to the current process variable values or, where applicable,
+        setting thhe process variables to values from the initial configuration
+        file.
         """
 
         def text_str_val(label: str) -> str:
@@ -420,164 +370,179 @@ class Controller(object):
         # Set soft limit indicators.
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
-                self._soft_lim_indicators(object, axis)
+                self.soft_lim_indicators(object, axis)
 
-        self._append_text("Display values and macros initialized.")
+        # Print output statement.
+        self.append_text("Display values and macros initialized.")
 
-    def _connect_signals(self) -> None:
+    def connect_signals(self) -> None:
         """Connect widgets to control sequences.
 
-        This method connects each user interface widget to a control sequence
-        to allow user control over hardware.
+        This method connects each control widget from the user interface to a
+        control sequence. This allows the program to respond to user inputs to
+        widgets and enact change to local hardware.
         """
 
         # Mode select functionality.
         self.gui.tab.RDM1.pressed.connect(
-            partial(self._mode_state, "TRANSMISSION_POSITION", self.modeMotor))
+            partial(self.mode_state, "TRANSMISSION_POSITION", self.modeMotor))
         self.gui.tab.RDM2.pressed.connect(
-            partial(self._mode_state, "REFLECTION_POSITION", self.modeMotor))
+            partial(self.mode_state, "REFLECTION_POSITION", self.modeMotor))
         self.gui.tab.RDM3.pressed.connect(
-            partial(self._mode_state, "VISIBLE_IMAGE_POSITION", self.modeMotor))
+            partial(self.mode_state, "VISIBLE_IMAGE_POSITION", self.modeMotor))
         self.gui.tab.RDM4.pressed.connect(
-            partial(self._mode_state, "BEAMSPLITTER_POSITION", self.modeMotor))
+            partial(self.mode_state, "BEAMSPLITTER_POSITION", self.modeMotor))
 
         # THORLABS/mode motor functionality.
-        self.gui.tab.enableDisable.clicked.connect(self._enable_thorlabs)
-        self.gui.tab.home.clicked.connect(self._home_thorlabs)
+        self.gui.tab.enableDisable.clicked.connect(self.enable_thorlabs)
+        self.gui.tab.home.clicked.connect(self.home_thorlabs)
 
-        # Mode position customizarion functionality.
+        # Mode position-set functionality.
         self.gui.tab.TMTMbutton.clicked.connect(
-            partial(self._mode_position, "TRANSMISSION_POSITION"))
+            partial(self.mode_position, "TRANSMISSION_POSITION"))
         self.gui.tab.TMRMbutton.clicked.connect(
-            partial(self._mode_position, "REFLECTION_POSITION"))
+            partial(self.mode_position, "REFLECTION_POSITION"))
         self.gui.tab.TMVMbutton.clicked.connect(
-            partial(self._mode_position, "VISIBLE_IMAGE_POSITION"))
+            partial(self.mode_position, "VISIBLE_IMAGE_POSITION"))
         self.gui.tab.TMBMbutton.clicked.connect(
-            partial(self._mode_position, "BEAMSPLITTER_POSITION"))
+            partial(self.mode_position, "BEAMSPLITTER_POSITION"))
 
         # Increment sample and objective stage functionality.
         self.gui.xSN.clicked.connect(
-            partial(self._increment, "S", "X", "N", self.gui.xSStep))
+            partial(self.increment, "S", "X", "N", self.gui.xSStep))
         self.gui.xSP.clicked.connect(
-            partial(self._increment, "S", "X", "P", self.gui.xSStep))
+            partial(self.increment, "S", "X", "P", self.gui.xSStep))
         self.gui.ySN.clicked.connect(
-            partial(self._increment, "S", "Y", "N", self.gui.ySStep))
+            partial(self.increment, "S", "Y", "N", self.gui.ySStep))
         self.gui.ySP.clicked.connect(
-            partial(self._increment, "S", "Y", "P", self.gui.ySStep))
+            partial(self.increment, "S", "Y", "P", self.gui.ySStep))
         self.gui.zSN.clicked.connect(
-            partial(self._increment, "S", "Z", "N", self.gui.zSStep))
+            partial(self.increment, "S", "Z", "N", self.gui.zSStep))
         self.gui.zSP.clicked.connect(
-            partial(self._increment, "S", "Z", "P", self.gui.zSStep))
+            partial(self.increment, "S", "Z", "P", self.gui.zSStep))
         self.gui.xON.clicked.connect(
-            partial(self._increment, "O", "X", "N", self.gui.xOStep))
+            partial(self.increment, "O", "X", "N", self.gui.xOStep))
         self.gui.xOP.clicked.connect(
-            partial(self._increment, "O", "X", "P", self.gui.xOStep))
+            partial(self.increment, "O", "X", "P", self.gui.xOStep))
         self.gui.yON.clicked.connect(
-            partial(self._increment, "O", "Y", "N", self.gui.yOStep))
+            partial(self.increment, "O", "Y", "N", self.gui.yOStep))
         self.gui.yOP.clicked.connect(
-            partial(self._increment, "O", "Y", "P", self.gui.yOStep))
+            partial(self.increment, "O", "Y", "P", self.gui.yOStep))
         self.gui.zON.clicked.connect(
-            partial(self._increment, "O", "Z", "N", self.gui.zOStep))
+            partial(self.increment, "O", "Z", "N", self.gui.zOStep))
         self.gui.zOP.clicked.connect(
-            partial(self._increment, "O", "Z", "P", self.gui.zOStep))
+            partial(self.increment, "O", "Z", "P", self.gui.zOStep))
 
         # Move sample and objective stage to absolute position functionality.
-        self.gui.xSMove.clicked.connect(partial(self._absolute, "S", "X"))
-        self.gui.ySMove.clicked.connect(partial(self._absolute, "S", "Y"))
-        self.gui.zSMove.clicked.connect(partial(self._absolute, "S", "Z"))
-        self.gui.xOMove.clicked.connect(partial(self._absolute, "O", "X"))
-        self.gui.yOMove.clicked.connect(partial(self._absolute, "O", "Y"))
-        self.gui.zOMove.clicked.connect(partial(self._absolute, "O", "Z"))
+        self.gui.xSMove.clicked.connect(partial(self.absolute, "S", "X"))
+        self.gui.ySMove.clicked.connect(partial(self.absolute, "S", "Y"))
+        self.gui.zSMove.clicked.connect(partial(self.absolute, "S", "Z"))
+        self.gui.xOMove.clicked.connect(partial(self.absolute, "O", "X"))
+        self.gui.yOMove.clicked.connect(partial(self.absolute, "O", "Y"))
+        self.gui.zOMove.clicked.connect(partial(self.absolute, "O", "Z"))
 
         # Continuous motion of the sample and objective stages functionality.
         self.gui.xSCn.clicked.connect(
-            partial(self._continuous, "S", "X", "CN"))
+            partial(self.continuous, "S", "X", "CN"))
         self.gui.xSStop.clicked.connect(
-            partial(self._continuous, "S", "X", "STOP"))
+            partial(self.continuous, "S", "X", "STOP"))
         self.gui.xSCp.clicked.connect(
-            partial(self._continuous, "S", "X", "CP"))
+            partial(self.continuous, "S", "X", "CP"))
         self.gui.ySCn.clicked.connect(
-            partial(self._continuous, "S", "Y", "CN"))
+            partial(self.continuous, "S", "Y", "CN"))
         self.gui.ySStop.clicked.connect(
-            partial(self._continuous, "S", "Y", "STOP"))
+            partial(self.continuous, "S", "Y", "STOP"))
         self.gui.ySCp.clicked.connect(
-            partial(self._continuous, "S", "Y", "CP"))
+            partial(self.continuous, "S", "Y", "CP"))
         self.gui.zSCn.clicked.connect(
-            partial(self._continuous, "S", "Z", "CN"))
+            partial(self.continuous, "S", "Z", "CN"))
         self.gui.zSStop.clicked.connect(
-            partial(self._continuous, "S", "Z", "STOP"))
+            partial(self.continuous, "S", "Z", "STOP"))
         self.gui.zSCp.clicked.connect(
-            partial(self._continuous, "S", "Z", "CP"))
+            partial(self.continuous, "S", "Z", "CP"))
         self.gui.xOCn.clicked.connect(
-            partial(self._continuous, "O", "X", "CN"))
+            partial(self.continuous, "O", "X", "CN"))
         self.gui.xOStop.clicked.connect(
-            partial(self._continuous, "O", "X", "STOP"))
+            partial(self.continuous, "O", "X", "STOP"))
         self.gui.xOCp.clicked.connect(
-            partial(self._continuous, "O", "X", "CP"))
+            partial(self.continuous, "O", "X", "CP"))
         self.gui.yOCn.clicked.connect(
-            partial(self._continuous, "O", "Y", "CN"))
+            partial(self.continuous, "O", "Y", "CN"))
         self.gui.yOStop.clicked.connect(
-            partial(self._continuous, "O", "Y", "STOP"))
+            partial(self.continuous, "O", "Y", "STOP"))
         self.gui.yOCp.clicked.connect(
-            partial(self._continuous, "O", "Y", "CP"))
+            partial(self.continuous, "O", "Y", "CP"))
         self.gui.zOCn.clicked.connect(
-            partial(self._continuous, "O", "Z", "CN"))
+            partial(self.continuous, "O", "Z", "CN"))
         self.gui.zOStop.clicked.connect(
-            partial(self._continuous, "O", "Z", "STOP"))
+            partial(self.continuous, "O", "Z", "STOP"))
         self.gui.zOCp.clicked.connect(
-            partial(self._continuous, "O", "Z", "CP"))
+            partial(self.continuous, "O", "Z", "CP"))
 
         # Updating soft limits functionality.
-        self.gui.tab.SSL.clicked.connect(partial(self._update_soft_lim, 0))
-        self.gui.tab.SMSL.clicked.connect(partial(self._update_soft_lim, 1))
-        self.gui.tab.SESL.clicked.connect(partial(self._update_soft_lim, 2))
+        self.gui.tab.SSL.clicked.connect(partial(self.update_soft_lim, 0))
+        self.gui.tab.SMSL.clicked.connect(partial(self.update_soft_lim, 1))
+        self.gui.tab.SESL.clicked.connect(partial(self.update_soft_lim, 2))
 
         # Zero'ing absolute position functionality.
-        self.gui.tab.xSZero.clicked.connect(partial(self._zero, "S", "X"))
-        self.gui.tab.ySZero.clicked.connect(partial(self._zero, "S", "Y"))
-        self.gui.tab.zSZero.clicked.connect(partial(self._zero, "S", "Z"))
-        self.gui.tab.xOZero.clicked.connect(partial(self._zero, "O", "X"))
-        self.gui.tab.yOZero.clicked.connect(partial(self._zero, "O", "Y"))
-        self.gui.tab.zOZero.clicked.connect(partial(self._zero, "O", "Z"))
+        self.gui.tab.xSZero.clicked.connect(partial(self.zero, "S", "X"))
+        self.gui.tab.ySZero.clicked.connect(partial(self.zero, "S", "Y"))
+        self.gui.tab.zSZero.clicked.connect(partial(self.zero, "S", "Z"))
+        self.gui.tab.xOZero.clicked.connect(partial(self.zero, "O", "X"))
+        self.gui.tab.yOZero.clicked.connect(partial(self.zero, "O", "Y"))
+        self.gui.tab.zOZero.clicked.connect(partial(self.zero, "O", "Z"))
 
-        # Zero'ing absolute position functionality.
-        self.gui.tab.xSActual.clicked.connect(partial(self._actual, "S", "X"))
-        self.gui.tab.ySActual.clicked.connect(partial(self._actual, "S", "Y"))
-        self.gui.tab.zSActual.clicked.connect(partial(self._actual, "S", "Z"))
-        self.gui.tab.xOActual.clicked.connect(partial(self._actual, "O", "X"))
-        self.gui.tab.yOActual.clicked.connect(partial(self._actual, "O", "Y"))
-        self.gui.tab.zOActual.clicked.connect(partial(self._actual, "O", "Z"))
+        # Un-zero'ing absolute position functionality.
+        self.gui.tab.xSActual.clicked.connect(partial(self.actual, "S", "X"))
+        self.gui.tab.ySActual.clicked.connect(partial(self.actual, "S", "Y"))
+        self.gui.tab.zSActual.clicked.connect(partial(self.actual, "S", "Z"))
+        self.gui.tab.xOActual.clicked.connect(partial(self.actual, "O", "X"))
+        self.gui.tab.yOActual.clicked.connect(partial(self.actual, "O", "Y"))
+        self.gui.tab.zOActual.clicked.connect(partial(self.actual, "O", "Z"))
 
-        # Other functionality.
-        self.gui.tab.SBL.clicked.connect(self._update_BL)
-        self.gui.tab.allActual.clicked.connect(self._change_to_actual)
-        self.gui.tab.zeroAll.clicked.connect(self._change_to_relative)
-        self.gui.positionUnits.clicked.connect(self._change_units)
+        # Updating backlash functionality.
+        self.gui.tab.SBL.clicked.connect(self.update_backlash)
+
+        # Switching between actual and relative values functionality.
+        self.gui.tab.allActual.clicked.connect(self.change_to_actual)
+        self.gui.tab.zeroAll.clicked.connect(self.change_to_relative)
+
+        # Toggle units between steps and microns.
+        self.gui.positionUnits.clicked.connect(self.change_units)
 
         # Load and save configuration functionality.
-        self.gui.savePos.clicked.connect(self._save_position)
-        self.gui.loadPos.clicked.connect(self._load_position)
-        self.gui.deletePos.clicked.connect(self._delete_position)
-        self.gui.clearPos.clicked.connect(self._clear_position)
+        self.gui.savePos.clicked.connect(self.save_position)
+        self.gui.loadPos.clicked.connect(self.load_position)
+        self.gui.deletePos.clicked.connect(self.delete_position)
+        self.gui.clearPos.clicked.connect(self.clear_position)
 
         # Configuration functionality.
-        self.gui.loadConfig.clicked.connect(self._load_config)
-        self.gui.saveConfig.clicked.connect(self._save_config)
+        self.gui.loadConfig.clicked.connect(self.load_config)
+        self.gui.saveConfig.clicked.connect(self.save_config)
 
-        self._append_text("Widgets connected to control sequences.")
+        # Print output statement.
+        self.append_text("Widgets connected to control sequences.")
 
-    def _mode_state(self, mode: str, modeMotor: Motor) -> None:
+    def mode_state(self, mode: str, modeMotor: Motor) -> None:
         """Change microscope mode.
 
-        This method is called when selecting a mode radio button to update the
-        THORLABS motor to the current position.
+        This method is enacted when a THORLABS mode button is pressed to
+        change the THORLABS motor position.
 
         Parameters
         ----------
         mode : str
-            Mode identerfier string specifying the desired mode.
+            String identifier specifying the pressed mode button. The `mode`
+            parameter can take only the following valid inputs:
+            "TRANSMISSION_POSITION", "REFLECTION_POSITION",
+            "VISIBLE_IMAGE_POSITION", and "BEAMSPLITTER_POSITION".
         modeMotor : Motor
-            Motor controlling the mode stage.
+            `Motor` object controlling the mode stage.
+
+        Notes
+        -----
+        The method will print a status statement when the motor is successfully
+        changing modes, else it will print an error message.
         """
 
         # Set move_to position based on mode.
@@ -585,13 +550,18 @@ class Controller(object):
         status = changeMode(pos=position, modeMotor=modeMotor)
 
         if status == -1:
-            self._append_text("ERROR: Can not change THORLABS motor position.",
-                              QColor(255, 0, 0))
+            message = ("ERROR: Can not change mode.", QColor(255, 0, 0))
         else:
-            self._append_text(f"Changing mode to {mode}.")
+            message = (f"Changing mode to {mode}.",)
 
-    def _mode_position(self, mode: str) -> None:
-        """Change mode position settings.
+        # Print output statement.
+        self.append_text(*message)
+
+    def mode_position(self, mode: str) -> None:
+        """Update mode position.
+
+        This method is enacted when a "Set Position" button on the "Mode" tab
+        is pressed to update the modes positon.
 
         Parameters
         ----------
@@ -599,6 +569,7 @@ class Controller(object):
             The mode identifier specifying the mode position to be updated.
         """
 
+        # Get the line edit object and check if the current mode is selected.
         if mode == "TRANSMISSION_POSITION":
             pos_line_edit = self.gui.tab.TMTM
             radio_select = self.gui.tab.RDM1.isChecked()
@@ -611,45 +582,66 @@ class Controller(object):
         elif mode == "BEAMSPLITTER_POSITION":
             pos_line_edit = self.gui.tab.TMBM
             radio_select = self.gui.tab.RDM4.isChecked()
-        
+
+        # Update the macro mode position variable.
         self.gui.macros[mode] = float(pos_line_edit.text())
         pos_line_edit.setText(str(self.gui.macros[mode]))
 
+        # If the mode is selected, move to the updated position.
         if radio_select:
-            self._mode_state(mode, self.modeMotor)
+            self.mode_state(mode, self.modeMotor)
 
-        self._append_text("Setting new mode position.")
+        # Print output statement.
+        self.append_text("Setting new mode position.")
 
-    def _enable_thorlabs(self) -> None:
-        """Enable or disable the THORLABS motor."""
+    def enable_thorlabs(self) -> None:
+        """Enable or disable the THORLABS motor.
 
+        This method checkes the motor is currently enabled or disabled and
+        applies the opposite operation to change the state of the THORLABS
+        motor.
+        """
+
+        # Get widget text.
         label = self.gui.tab.enableDisable.text()
 
         if label == "Enable":
+            # Enable the motor and change its label.
             enable(self.modeMotor)
-
             self.gui.tab.enableDisable.setText("Disable")
-            self._append_text("THORLABS motor enabled.")
 
-            if self.gui.tab.RDM1.isChecked():
-                self._mode_state("TRANSMISSION_POSITION")
-            elif self.gui.tab.RDM2.isChecked():
-                self._mode_state("REFLECTION_POSITION")
-            elif self.gui.tab.RDM3.isChecked():
-                self._mode_state("VISIBLE_IMAGE_POSITION")
-            elif self.gui.tab.RDM4.isChecked():
-                self._mode_state("BEAMSPLITTER_POSITION")
+            message = "THORLABS motor enabled."
         else:
+            # Disabl the motor and change its label.
             disable(self.modeMotor)
-
             self.gui.tab.enableDisable.setText("Enable")
-            self._append_text("THORLABS motor disabled.")
 
-    def _home_thorlabs(self) -> None:
-        """Home the THORLABS motor."""
+            message = "THORLABS motor disabled."
+
+        # Print output statement.
+        self.append_text(message)
+
+    def home_thorlabs(self) -> None:
+        """Home the THORLABS motor.
+
+        This method homes the THORLABS motor to its zero position. If the
+        motor successfully homes, the mode select buttons will be unchecked and
+        an output statement will be printed or else an error statement will be
+        printed.
+
+        Notes
+        -----
+        The mode select buttons are all unchecked if the motor successfully
+        homes instead of moving to a mode with a 0 position as these values are
+        subject to change is calibration dictates. Thus, there may not always
+        exist a mode with a zero position.
+        """
 
         try:
+            # Home motor.
             home(self.modeMotor)
+
+            # Uncheck all mode select buttons.
             self.gui.tab.group.setExclusive(False)
             self.gui.tab.RDM1.setChecked(False)
             self.gui.tab.RDM2.setChecked(False)
@@ -657,91 +649,115 @@ class Controller(object):
             self.gui.tab.RDM4.setChecked(False)
             self.gui.tab.group.setExclusive(True)
 
-            self._append_text("THORLABS motor homing.")
+            message = ("THORLABS motor homing.")
         except:
-            self._append_text("ERROR: THORLABS motor cannot be homed, ensure the motor is enabled.",
-                              QColor(255, 0, 0))
+            message = ("ERROR: THORLABS motor can not be homed.",
+                       QColor(255, 0, 0))
 
-    def _increment(self, object: Literal["S", "O"], axis:
-                   Literal["X", "Y", "Z"], direction: Literal["N", "P"], step:
-                   QLineEdit) -> None:
+        # Print output statement.
+        self.append_text(*message)
+
+    def increment(self, object: Literal["S", "O"], axis:
+                  Literal["X", "Y", "Z"], direction: Literal["N", "P"], step:
+                  QLineEdit) -> None:
         """Increment motor position.
 
         Increment the motor defined by 'object' and 'axis' in the direction
-        defined by 'direction' by the amount 'step'.
+        defined by 'direction' by the amount 'step.text()'.
 
         Parameters
         ----------
         object : {"S", "O"}
-            Defines the stage as either sample or orbjective using "S" and "O",
-            respectively.
+            Defines the stage as either sample ("S") or orbjective ("O").
         axis : {"X", "Y", "Z"}
-            Defines the motor axis as x, y, or z using "X", "Y", "Z",
-            respectively.
+            Defines the motor axis as x, y, or z.
         direction : {"N", "P"}
-            Defines increment direction as either negative or positibe using
-            "N" and "P", respectively.
+            Defines increment direction as either negative ("N") or positive
+            ("P").
         step : QLineEdit
-            float(QLineEdit.text()) defines the stepsize to use.
+            The step line edit for the specific stage.
+
+        Notes
+        -----
+        The step value can be found from the `step` parameter as
+        `float(step.text())`.
+
+        The step value must be positive to keep motion consistency with the
+        programs diagram.
+
+        If a step size takes the motor beyond a soft limit then the step size
+        will be updated to take the motor to the soft limit.
         """
 
+        # Get current absolute position and step size.
         absPos = self.__dict__[f"PV_{axis}{object}POS_ABS"].get()
         incPos = float(step.text())
 
+        # If the step size is negative, make it possitive.
         if incPos < 0:
             incPos = -incPos
             step.setText(str(incPos))
-            self._append_text("WARNING: Step must be positive. Step sign has been changed to positive.",
-                              QColor(250, 215, 0))
+            message = ("WARNING: Step must be positive.", QColor(250, 215, 0))
+            self.append_text(*message)
 
+        # Get soft limits.
         PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
         NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
 
+        # Change step size if it breaches soft limits.
         if direction == "P" and absPos + incPos > PSL:
             incPos = PSL - absPos
         elif direction == "N" and absPos - incPos < NSL:
             incPos = absPos - NSL
 
+        # Write to process variables.
         self.__dict__[f"PV_{axis}{object}STEP"].put(incPos)
         caput(self.gui.macros[f"{axis}{object}{direction}"], 1)
 
-    def _absolute(self, object: Literal["S", "O"], axis:
-                  Literal["X", "Y", "Z"]) -> None:
-        """Move sample or objective motor to specified position.
+    def absolute(self, object: Literal["S", "O"], axis:
+                 Literal["X", "Y", "Z"]) -> None:
+        """Move motor to an absolute position.
 
         This method moves the motor defined by 'object' and 'axis' to the
-        absolute position defined by 'pos'.
+        absolute position types into the corresponding line edit.
 
         Parameters
         ----------
         object : {"S", "O"}
-            Defines the stage as either sample or orbjective using "S" and "O",
-            respectively.
+            Defines the stage as either sample ("S") or orbjective ("O").
         axis : {"X", "Y", "Z"}
-            Defines the motor axis as x, y, or z using "X", "Y", "Z",
-            respectively.
+            Defines the motor axis as x, y, or z.
+
+        Notes
+        -----
+        If the absolute position lays outside of the soft limits, the program
+        will move the motor to the soft limit.
         """
 
+        # Get absolute position.
         absPosLineEdit = self.__dict__["gui"].__dict__[f"{axis.lower()}{object}AbsPos"]
         absPos = float(absPosLineEdit.text())
         absPosLineEdit.setText(str(absPos))
 
+        # Get spft limits.
         PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
         NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
 
+        # Change absolute position if it breaches soft limits.
         if absPos > PSL:
             absPos = PSL
         elif absPos < NSL:
             absPos = NSL
 
+        # Write to process variables.
         self.__dict__[f"PV_{axis}{object}ABSPOS"].put(absPos)
         self.__dict__[f"PV_{axis}{object}MOVE"].put(1)
         self.__dict__[f"PV_{axis}{object}MOVE"].put(0)
 
-    def _continuous(self, object: Literal["S", "O"], axis:
-                    Literal["X", "Y", "Z"], type:
-                    Literal["CN", "STOP", "CP"]) -> None:
-        """Control continuous motion of the sample and objective stages.
+    def continuous(self, object: Literal["S", "O"], axis:
+                   Literal["X", "Y", "Z"], type:
+                   Literal["CN", "STOP", "CP"]) -> None:
+        """Control continuous motion of the motor.
 
         This method allows for the continuous motion functionality of the
         sample and objective stages. It will invoke continuous positive motion,
@@ -751,15 +767,18 @@ class Controller(object):
         Parameters
         ----------
         object : {"S", "O"}
-            Defines the stage as either sample or orbjective using "S" and "O",
-            respectively.
+            Defines the stage as either sample ("S") or orbjective ("O").
         axis : {"X", "Y", "Z"}
-            Defines the motor axis as x, y, or z using "X", "Y", "Z",
-            respectively.
-            Defines the motor axis as x, y, or z using 0, 1, 2, respectively.
+            Defines the motor axis as x, y, or z.
         type : {"CN", "STOP", "CP"}
-            Defines button type as either "continuous negative", "stop", or
-            "continuous positive" using "CN", "STOP" and "CP", respectively.
+            Defines motion as continuous negative ("CN"), stop ("STOP"), or
+            continuous positive ("CP").
+
+        Notes
+        -----
+        The program will write the inbound soft limit to the continuous motion
+        proces variables so that it will stop at the soft limit if "STOP" is
+        not pressed.
         """
 
         if type == "CN":
@@ -772,17 +791,27 @@ class Controller(object):
             self.__dict__[f"PV_{axis}{object}STOP"].put(1)
             self.__dict__[f"PV_{axis}{object}STOP"].put(0)
 
-    def _update_soft_lim(self, buttonID: Literal[0, 1]) -> None:
+    def update_soft_lim(self, buttonID: Literal[0, 1, 2]) -> None:
         """Update sample and objective soft limits.
 
-        This method updates the programs soft limits to the inputted amounts or
-        extreme limits dependent on 'buttonID'.
+        This method is called when one of the three update soft limit buttons
+        are pressed. The method will set the soft limits to either the inputted
+        values, zero, or to the hard limits.
 
         Parameters
         ----------
-        buttonID : {0, 1}
-            Integer representing the button pressed as being either SSL or SESL
-            using a 0 or 1, respectively.
+        buttonID : {0, 1, 2}
+            Defines the method of soft limit updating. If `buttonID==0`, the
+            soft limits will be set to the input values. If `buttonID==1`, the
+            soft limits will be set to zero. If `buttonID==2`, the soft limits
+            will be set to the hard limits.
+
+        Notes
+        -----
+        In the case that `buttonID==2` and an input soft limit lay beyond the
+        hard limit values, the soft limit will be set to the hard limit. If the
+        lower soft limit is greater than the higher soft limit, the program
+        will not update the soft limit.
         """
 
         if buttonID == 2:
@@ -828,7 +857,7 @@ class Controller(object):
             self.gui.macros["ZOMAX_SOFT_LIMIT"] = float(0)
 
         else:
-            # Set soft limits to inputted values
+            # Set soft limits to input values
             for object in ["S", "O"]:
                 for axis in ["X", "Y", "Z"]:
 
@@ -836,75 +865,72 @@ class Controller(object):
 
                     tabDict = self.__dict__["gui"].__dict__["tab"].__dict__
 
+                    # Get the input limits.
                     min = float(tabDict[
                         f"{axis.lower()}{object}Min"].text()) - offset
                     max = float(tabDict[
                         f"{axis.lower()}{object}Max"].text()) - offset
 
+                    # Check if the minimum limit is greater than the upper.
                     if min > max:
-                        self._append_text(f"WARNING: {axis}{object} soft limits are invalid. Minimum limits must be less then maximum limits.",
-                                          QColor(250, 215, 0))
-                    else:
-                        if min < self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"]:
-                            self.gui.macros[
-                                f"{axis}{object}MIN_SOFT_LIMIT"] = float(
-                                    self.gui.macros[
-                                        f"{axis}{object}MIN_HARD_LIMIT"])
-                        else:
-                            self.gui.macros[
-                                f"{axis}{object}MIN_SOFT_LIMIT"] = min
+                        message = (f"WARNING: Invalid limit. Minimum limits must be less then maximum limits.",
+                                   QColor(250, 215, 0))
+                        self.append_text(*message)
 
-                        if max > self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"]:
-                            self.gui.macros[
-                                f"{axis}{object}MAX_SOFT_LIMIT"] = float(
-                                self.gui.macros[
-                                    f"{axis}{object}MAX_HARD_LIMIT"])
-                        else:
-                            self.gui.macros[
-                                f"{axis}{object}MAX_SOFT_LIMIT"] = max
+                    else:
+                        min_soft_ind = f"{axis}{object}MIN_SOFT_LIMIT"
+                        max_soft_ind = f"{axis}{object}MAX_SOFT_LIMIT"
+
+                        min_hard = self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"]
+                        max_hard = self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"]
+
+                        # Check that the new limit is within the hard limits.
+                        val = min_hard if min < min_hard else min
+                        self.gui.macros[min_soft_ind] = val
+
+                        # Check that the new limit is within the hard limits.
+                        val = max_hard if max > max_hard else max
+                        self.gui.macros[max_soft_ind] = val
+
+        # Create heler function to generate soft limit text.
+        def set(label: str, offset: PV) -> str:
+            return str(self.gu.macros[label] + offset.get())
 
         # Update soft limit line edits.
-        self.gui.tab.xSMin.setText(str(self.gui.macros["XSMIN_SOFT_LIMIT"] +
-                                       self.PV_XSOFFSET.get()))
-        self.gui.tab.xSMax.setText(str(self.gui.macros["XSMAX_SOFT_LIMIT"] +
-                                       self.PV_XSOFFSET.get()))
-        self.gui.tab.ySMin.setText(str(self.gui.macros["YSMIN_SOFT_LIMIT"] +
-                                       self.PV_YSOFFSET.get()))
-        self.gui.tab.ySMax.setText(str(self.gui.macros["YSMAX_SOFT_LIMIT"] +
-                                       self.PV_YSOFFSET.get()))
-        self.gui.tab.zSMin.setText(str(self.gui.macros["ZSMIN_SOFT_LIMIT"] +
-                                       self.PV_ZSOFFSET.get()))
-        self.gui.tab.zSMax.setText(str(self.gui.macros["ZSMAX_SOFT_LIMIT"] +
-                                       self.PV_ZSOFFSET.get()))
-        self.gui.tab.xOMin.setText(str(self.gui.macros["XOMIN_SOFT_LIMIT"] +
-                                       self.PV_XOOFFSET.get()))
-        self.gui.tab.xOMax.setText(str(self.gui.macros["XOMAX_SOFT_LIMIT"] +
-                                       self.PV_XOOFFSET.get()))
-        self.gui.tab.yOMin.setText(str(self.gui.macros["YOMIN_SOFT_LIMIT"] +
-                                       self.PV_YOOFFSET.get()))
-        self.gui.tab.yOMax.setText(str(self.gui.macros["YOMAX_SOFT_LIMIT"] +
-                                       self.PV_YOOFFSET.get()))
-        self.gui.tab.zOMin.setText(str(self.gui.macros["ZOMIN_SOFT_LIMIT"] +
-                                       self.PV_ZOOFFSET.get()))
-        self.gui.tab.zOMax.setText(str(self.gui.macros["ZOMAX_SOFT_LIMIT"] +
-                                       self.PV_ZOOFFSET.get()))
+        self.gui.tab.xSMin.setText(set("XSMIN_SOFT_LIMIT", self.PV_XSOFFSET))
+        self.gui.tab.xSMax.setText(set("XSMAX_SOFT_LIMIT", self.PV_XSOFFSET))
+        self.gui.tab.ySMin.setText(set("YSMIN_SOFT_LIMIT", self.PV_YSOFFSET))
+        self.gui.tab.ySMax.setText(set("YSMAX_SOFT_LIMIT", self.PV_YSOFFSET))
+        self.gui.tab.zSMin.setText(set("ZSMIN_SOFT_LIMIT", self.PV_ZSOFFSET))
+        self.gui.tab.zSMax.setText(set("ZSMAX_SOFT_LIMIT", self.PV_ZSOFFSET))
+        self.gui.tab.xOMin.setText(set("XOMIN_SOFT_LIMIT", self.PV_XOOFFSET))
+        self.gui.tab.xOMax.setText(set("XOMAX_SOFT_LIMIT", self.PV_XOOFFSET))
+        self.gui.tab.yOMin.setText(set("YOMIN_SOFT_LIMIT", self.PV_YOOFFSET))
+        self.gui.tab.yOMax.setText(set("YOMAX_SOFT_LIMIT", self.PV_YOOFFSET))
+        self.gui.tab.zOMin.setText(set("ZOMIN_SOFT_LIMIT", self.PV_ZOOFFSET))
+        self.gui.tab.zOMax.setText(set("ZOMAX_SOFT_LIMIT", self.PV_ZOOFFSET))
 
         # Move motors to within soft limits.
-        self._check_motor_position()
-        
+        self.check_motor_position()
+
         # Set soft limit indicators.
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
-                self._soft_lim_indicators(object, axis)
+                self.soft_lim_indicators(object, axis)
 
-        self._append_text("Updating soft limits.")
+        # Print output statement.
+        self.append_text("Updating soft limits.")
 
-    def _update_BL(self) -> None:
-        """Update backlash variables."""
+    def update_backlash(self) -> None:
+        """Update backlash variables.
+
+        This method takes the input backlash values and writes them to the
+        backlash process variables and saves them to macro variables.
+        """
 
         tabDict = self.__dict__["gui"].__dict__["tab"].__dict__
 
-        # Set global backlash variables.
+        # Set global backlash variables (used to save configuration files).
         self.gui.macros["XS_BACKLASH"] = abs(int(float(tabDict["xSB"].text())))
         self.gui.macros["YS_BACKLASH"] = abs(int(float(tabDict["ySB"].text())))
         self.gui.macros["ZS_BACKLASH"] = abs(int(float(tabDict["zSB"].text())))
@@ -912,7 +938,7 @@ class Controller(object):
         self.gui.macros["YO_BACKLASH"] = abs(int(float(tabDict["yOB"].text())))
         self.gui.macros["ZO_BACKLASH"] = abs(int(float(tabDict["zOB"].text())))
 
-        # Set backlash PV's.
+        # Set backlash process variables.
         self.PV_XSB.put(self.gui.macros["XS_BACKLASH"])
         self.PV_YSB.put(self.gui.macros["YS_BACKLASH"])
         self.PV_ZSB.put(self.gui.macros["ZS_BACKLASH"])
@@ -928,65 +954,81 @@ class Controller(object):
         self.gui.tab.yOB.setText(str(float(self.gui.macros["YO_BACKLASH"])))
         self.gui.tab.zOB.setText(str(float(self.gui.macros["ZO_BACKLASH"])))
 
-        self._append_text("Updating backlash values.")
+        # Print output statement
+        self.append_text("Updating backlash values.")
 
-    def _motor_status(self, **kwargs: Dict[str, Any]) -> None:
-        """Check and set motor status indicators.
+    def motor_status(self, **kwargs: Dict[str, Any]) -> None:
+        """Set motor status indicators.
+
+        This method takes the current motor status to update the motor status
+        indicators.
 
         Parameters
         ----------
         **kwargs : dict
-            Extra arguments to `_motor_status`: refer to PyEpics documentation
+            Extra arguments to `motor_status`: refer to PyEpics documentation
             for a list of all possible arguments for PV callback functions.
+
+        Notes
+        -----
+        The `soft_lim_indicators` method is called within to approximate
+        live soft limit updating by polling.
         """
 
+        # Get process variable information.
         pvname = kwargs["pvname"]
         value = kwargs["value"]
 
+        # Get the process variable name.
         keys = list(self.gui.macros.keys())
         vals = list(self.gui.macros.values())
         pvKey = keys[vals.index(pvname)]
 
+        # Get the motor stage information.
         axis = pvKey[0]
         object = pvKey[1]
 
         label = self.__dict__["gui"].__dict__[f"{axis.lower()}Idle{object}"]
 
         if value == 0:
-            label.setText("IDLE")
-            label.setStyleSheet(
-                "background-color: lightgrey; border: 1px solid black;")
-            self._soft_lim_indicators(object, axis)
+            text = "IDLE"
+            style = "background-color: lightgrey; border: 1px solid black;"
+
+            # Poll soft limit checks for "live" limit indicator updates.
+            self.soft_lim_indicators(object, axis)
         elif value == 1:
-            label.setText("POWERING")
-            label.setStyleSheet(
-                "background-color: #ff4747; border: 1px solid black;")
+            text = "POWERING"
+            style = "background-color: #ff4747; border: 1px solid black;"
         elif value == 2:
-            label.setText("POWERED")
-            label.setStyleSheet(
-                "background-color: #ff4747; border: 1px solid black;")
+            text = "POWERED"
+            style = "background-color: #ff4747; border: 1px solid black;"
         elif value == 3:
-            label.setText("RELEASING")
-            label.setStyleSheet(
-                "background-color: #edde07; border: 1px solid black;")
+            text = "RELEASING"
+            style = "background-color: #edde07; border: 1px solid black;"
         elif value == 4:
-            label.setText("ACTIVE")
-            label.setStyleSheet(
-                "background-color: #3ac200; border: 1px solid black;")
+            text = "ACTIVE"
+            style = "background-color: #3ac200; border: 1px solid black;"
         elif value == 5:
-            label.setText("APPLYING")
-            label.setStyleSheet(
-                "background-color: #edde07; border: 1px solid black;")
+            text = "APPLYING"
+            style = "background-color: #edde07; border: 1px solid black;"
         else:
-            label.setText("UNPOWERING")
-            label.setStyleSheet(
-                "background-color: #ff4747; border: 1px solid black;")
+            text = "UNPOWERING"
+            style = "background-color: #ff4747; border: 1px solid black;"
 
-    def _check_motor_position(self) -> None:
-        """Moves motors within soft limits.
+        label.setText(text)
+        label.setStyleSheet(style)
 
-        This method checkes each motors position. If a motor is out of the soft
-        limits, it will be moved to the closes limit.
+    def check_motor_position(self) -> None:
+        """Assert motor positions are within soft limits.
+
+        This method checkes each motors position to see if it lays within
+        soft limits. If a motor is out of the soft limits, it will be moved to
+        the closest limit.
+
+        Notes
+        -----
+        This method was inspired by the need to ensure the motors stay within
+        soft limits even when more constraining limits are set.
         """
 
         for object in ["S", "O"]:
@@ -997,6 +1039,7 @@ class Controller(object):
 
                 currPos = self.__dict__[f"PV_{axis}{object}POS_ABS"].get()
 
+                # If position breaches a limit, move to that limit.
                 if currPos >= PSL:
                     self.__dict__[f"PV_{axis}{object}ABSPOS"].put(PSL)
                     self.__dict__[f"PV_{axis}{object}MOVE"].put(1)
@@ -1006,18 +1049,20 @@ class Controller(object):
                     self.__dict__[f"PV_{axis}{object}MOVE"].put(1)
                     self.__dict__[f"PV_{axis}{object}MOVE"].put(0)
 
-    def _soft_lim_indicators(self, object: Literal["S", "O"], axis:
-                             Literal["X", "Y", "Z"]) -> None:
+    def soft_lim_indicators(self, object: Literal["S", "O"], axis:
+                            Literal["X", "Y", "Z"]) -> None:
         """Set soft limit indicators.
+
+        This method checks the motor stage specified by `object` and `axis` to
+        see if it has reached a soft limit. If a soft limit is reached,
+        illuminate the soft limit indicator.
 
         Parameters
         ----------
         object : {"S", "O"}
-            Defines the stage as either sample or orbjective using "S" and "O",
-            respectively.
+            Defines the stage as either sample ("S") or orbjective ("O").
         axis : {"X", "Y", "Z"}
-            Defines the motor axis as x, y, or z using "X", "Y", "Z",
-            respectively.
+            Defines the motor axis as x, y, or z.
         """
 
         value = self.__dict__[f"PV_{axis}{object}POS"].get()
@@ -1028,69 +1073,71 @@ class Controller(object):
         minSoftLim = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
         maxSoftLim = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
 
-        # Set maximum soft limit indicator.
-        if maxSoftLim <= value:
-            posLim.setStyleSheet(
-                "background-color: #3ac200; border: 1px solid black;")
-        else:
-            posLim.setStyleSheet(
-                "background-color: lightgrey; border: 1px solid black;")
+        # Define style sheets.
+        grey = "background-color: lightgrey; border: 1px solid black;"
+        green = "background-color: #3ac200; border: 1px solid black;"
 
-        # Set minimum soft limit indicator.
-        if value <= minSoftLim:
-            negLim.setStyleSheet(
-                "background-color: #3ac200; border: 1px solid black;")
-        else:
-            negLim.setStyleSheet(
-                "background-color: lightgrey; border: 1px solid black;")
+        # Set minimum and maximum soft limit indicators.
+        negLim.setStyleSheet(green if value <= minSoftLim else grey)
+        posLim.setStyleSheet(green if maxSoftLim <= value else grey)
 
-    def _hard_lim_indicators(self, **kwargs: Dict[str, Any]) -> None:
+    def hard_lim_indicators(self, **kwargs: Dict[str, Any]) -> None:
         """Set hard limit indicators.
+
+        This method is called when a hard limit process variable value changes
+        to check if a limit has activated or deactivated such that the
+        indicator can be updated.
 
         Parameters
         ----------
         **kwargs : dict
-            Extra arguments to `_hard_lim_indicators`: refer to PyEpics
+            Extra arguments to `hard_lim_indicators`: refer to PyEpics
             documentation for a list of all possible arguments for PV callback
             functions.
         """
 
+        # Get process variable information.
         pvname = kwargs["pvname"]
         value = kwargs["value"]
 
+        # Get the process variable name.
         keys = list(self.gui.macros.keys())
         vals = list(self.gui.macros.values())
         pvKey = keys[vals.index(pvname)]
 
+        # Get the motor stage information.
         axis = pvKey[0]
         object = pvKey[1]
         direction = pvKey[3]
 
+        # Get the hard limit label.
         label = self.__dict__["gui"].__dict__[
             f"{axis.lower()}{object}H{direction.lower()}"]
 
-        if value > 0:
-            label.setStyleSheet(
-                "background-color: #3ac200; border: 1px solid black;")
-        else:
-            label.setStyleSheet(
-                "background-color: lightgrey; border: 1px solid black;")
+        # Set style sheets.
+        green = "background-color: #3ac200; border: 1px solid black;"
+        grey = "background-color: lightgrey; border: 1px solid black;"
 
-    def _change_display_vals(self, **kwargs: Dict[str, Any]) -> None:
-        """Switch displayed values between actual and relative values.
+        # Set hard limit indicator.
+        label.setStyleSheet(green if value > 0 else grey)
+
+    def change_display_vals(self, **kwargs: Dict[str, Any]) -> None:
+        """Toggle display values between actual and relative.
 
         This method changes all position based line edits and labels between
-        actual values and relative values where relative values are taken with
-        reference to the zeroed position.
+        actual values and relative values. Relative values are taken with
+        reference to the zeroed datum whereas actual values are measured with
+        respect to the original datum.
 
         Parameters
         ----------
         **kwargs : dict
-            Extra arguments to `_change_display_vals`: refer to PyEpics
+            Extra arguments to `change_display_vals`: refer to PyEpics
             documentation for a list of all possible arguments for PV callback
             functions.
         """
 
+        # Get process variable and motor stage information.
         pvname = kwargs["pvname"]
         keys = list(self.gui.macros.keys())
         vals = list(self.gui.macros.values())
@@ -1100,7 +1147,7 @@ class Controller(object):
 
         guiDict = self.__dict__["gui"].__dict__
 
-        absPos = guiDict[f"{axis.lower()}{object}AbsPos"]
+        # Get display labels that need to be updated.
         hardLims = guiDict["tab"].__dict__[f"{axis.lower()}{object}MM"]
         minSoftLim = guiDict["tab"].__dict__[f"{axis.lower()}{object}Min"]
         maxSoftLim = guiDict["tab"].__dict__[f"{axis.lower()}{object}Max"]
@@ -1109,75 +1156,84 @@ class Controller(object):
         offset = self.__dict__[f"PV_{axis}{object}OFFSET"].get()
         currAbsPos = self.__dict__[f"PV_{axis}{object}POS_ABS"].get()
 
+        # Update the absolute position line edit.
         self.__dict__[f"PV_{axis}{object}ABSPOS"].put(currAbsPos)
-        absPos.setText(str(currAbsPos + offset))
 
+        # Update the hard limit indicators.
         minLim = self.gui.macros[f"{axis}{object}MIN_HARD_LIMIT"] + offset
         maxLim = self.gui.macros[f"{axis}{object}MAX_HARD_LIMIT"] + offset
         hardLims.setText(f"{minLim} to {maxLim}")
 
+        # Update the soft limit indicators.
         minLim = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"] + offset
         maxLim = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"] + offset
         minSoftLim.setText(str(minLim))
         maxSoftLim.setText(str(maxLim))
 
+        # Update the offset label.
         offsetLabel.setText(str(offset))
 
-    def _change_to_actual(self) -> None:
-        """Change display values to actual.
+    def change_to_actual(self) -> None:
+        """Change display values to actual values.
 
-        This method sets all offsets to zero.
+        This method changes all display values to actual values by setting all
+        offsets to zero.
+
+        Notes
+        -----
+        The `change_display_vals` method serves as a callback function to the
+        offset process variables. By setting each offset to zero will cause the
+        `change_display_vals` method will be called to update the display
+        values.
         """
 
-        self.PV_XSOFFSET.put(0)
-        self.PV_YSOFFSET.put(0)
-        self.PV_ZSOFFSET.put(0)
-        self.PV_XOOFFSET.put(0)
-        self.PV_YOOFFSET.put(0)
-        self.PV_ZOOFFSET.put(0)
-
-        self.gui.macros["XS_OFFSET"] = 0
-        self.gui.macros["YS_OFFSET"] = 0
-        self.gui.macros["ZS_OFFSET"] = 0
-        self.gui.macros["XO_OFFSET"] = 0
-        self.gui.macros["YO_OFFSET"] = 0
-        self.gui.macros["ZO_OFFSET"] = 0
-
-    def _change_to_relative(self) -> None:
-        """Change display values to relative.
-
-        This method zeros all motor stages.
-        """
-
+        # Un-zero each motor stage.
         for object in ["S", "O"]:
             for axis in ["X", "Y", "Z"]:
-                caput(self.gui.macros[f"{axis}{object}ZERO"], 1)
-                caput(self.gui.macros[f"{axis}{object}ZERO"], 0)
+                self.actual(object, axis)
 
-                self.gui.macros[f"{axis}{object}_OFFSET"] = self.__dict__[
-                    f"PV_{axis}{object}OFFSET"].get()
+    def change_to_relative(self) -> None:
+        """Change display values to relative values.
 
-    def _zero(self, object: Literal["S", "O"], axis:
-              Literal["X", "Y", "Z"]) -> None:
-        """Zero sample or objective axis position.
+        This method changes all display values to relative values by zeroing
+        all motor stages.
 
-        This method zeros the absolute position line edit of the motor defined
-        by 'object' and 'axis'.
+        Notes
+        -----
+        The `change_display_vals` method serves as a callback function to the
+        offset process variables. By zeroing each stage a change in the offset
+        process variable will be made causing the `change_display_vals` method
+        to be called to update the display values.
+        """
+
+        # Zero each motor stage.
+        for object in ["S", "O"]:
+            for axis in ["X", "Y", "Z"]:
+                self.zero(object, axis)
+
+    def zero(self, object: Literal["S", "O"], axis:
+             Literal["X", "Y", "Z"]) -> None:
+        """Zero motor position.
+
+        This method zeros the motor defined by 'object' and 'axis'.
 
         Parameters
         ----------
         object : {"S", "O"}
-            Defines the stage as either sample or orbjective using "S" and "O",
-            respectively.
+            Defines the stage as either sample ("S") or orbjective ("O").
         axis : {"X", "Y", "Z"}
-            Defines the motor axis as x, y, or z using "X", "Y", "Z",
-            respectively.
+            Defines the motor axis as x, y, or z.
 
         Notes
         -----
-        Inputed values are relative if `offset!=0` and are absolute if
-        `offset==0`. A relative value can be attained by adding the offset
-        value to the corresponding absolute value.
+        Values iput into the program are relative if `offset!=0` and are
+        absolute if `offset==0`. A relative value can be attained by adding the
+        offset value to the corresponding absolute value.
+
+        The `change_display_vals` method serves as a callback function to the
+        offset process variables. By zeroing a stage, a change in the offset
+        process variable will be made causing the `change_display_vals` method
+        to be called to update the display values.
         """
 
         caput(self.gui.macros[f"{axis}{object}ZERO"], 1)
@@ -1186,64 +1242,78 @@ class Controller(object):
         self.gui.macros[f"{axis}{object}_OFFSET"] = self.__dict__[
             f"PV_{axis}{object}OFFSET"].get()
 
-        self._append_text(f"Zero'ing the {axis}{object}ABSPOS line edit.")
+        # Print output statement.
+        self.append_text(f"Zero'ing the {axis}{object}ABSPOS line edit.")
 
-    def _actual(self, object: Literal["S", "O"], axis:
-                Literal["X", "Y", "Z"]) -> None:
-        """Convert to relative the sample or objective axis position.
+    def actual(self, object: Literal["S", "O"], axis:
+               Literal["X", "Y", "Z"]) -> None:
+        """Un-zero motor position.
 
         This method converts motor's position defined by 'object' and 'axis' to
-        relative positions.
+        a relative position by setting the offset to zero.
 
         Parameters
         ----------
         object : {"S", "O"}
-            Defines the stage as either sample or orbjective using "S" and "O",
-            respectively.
+            Defines the stage as either sample ("S") or orbjective ("O").
         axis : {"X", "Y", "Z"}
-            Defines the motor axis as x, y, or z using "X", "Y", "Z",
-            respectively.
+            Defines the motor axis as x, y, or z.
+
+        Notes
+        -----
+        The `change_display_vals` method serves as a callback function to the
+        offset process variables. Setting the offset to zero will cause the
+        `change_display_vals` method to be called to update the display
+        values.
         """
 
+        # Set offset value to zero.
         self.__dict__[f"PV_{axis}{object}OFFSET"].put(0)
         self.gui.macros[f"{axis}{object}_OFFSET"] = 0
 
-    def _set_current_position(self, **kwargs: Dict[str, Any]) -> None:
+    def set_current_position(self, **kwargs: Dict[str, Any]) -> None:
         """Update current position label.
+
+        This method is called at each change of the current position process
+        variable to update current position label.
 
         Parameters
         ----------
         **kwargs : dict
-            Extra arguments to `_hard_lim_indicators`: refer to PyEpics
+            Extra arguments to `set_current_position`: refer to PyEpics
             documentation for a list of all possible arguments for PV callback
             functions.
         """
 
+        # Get process variable information.
         pvname = kwargs["pvname"]
         value = kwargs["value"]
 
+        # Get process variable name.
         keys = list(self.gui.macros.keys())
         vals = list(self.gui.macros.values())
         pvKey = keys[vals.index(pvname)]
 
+        # Get motor information.
         axis = pvKey[0]
         object = pvKey[1]
 
+        # Generate label text.
         if self.gui.positionUnits.isChecked():
             factor = self.gui.macros[f"{axis}{object}_STEP2MICRON"]
             stepText = f"<b>{round(factor * value, 1)} MICRONS</b>"
         else:
             stepText = f"<b>{round(value, 1)} STEPS</b>"
 
-        stepLineEdit = self.__dict__["gui"].__dict__[
-            f"{axis.lower()}Step{object}"]
-        stepLineEdit.setText(stepText)
+        # Update the step label text.
+        stepLabel = self.__dict__["gui"].__dict__[f"{axis.lower()}Step{object}"]
+        stepLabel.setText(stepText)
 
-    def _append_text(self, text: str, color: QColor=QColor(0, 0, 0)) -> None:
+    def append_text(self, text: str, color: QColor=QColor(0, 0, 0)) -> None:
         """Append text to console window.
 
-        This method adds `text` of color `color` to the main GUI console
-        window.
+        This method adds `text` of color `color` to the interface's program
+        status window.
 
         Parameters
         ----------
@@ -1251,6 +1321,21 @@ class Controller(object):
             String of text to be appended to the console window.
         color : QColor, optional
             RGB color specification for the appended text.
+
+        Notes
+        -----
+        Regular text is used to communicate information about what the program
+        is doing. Regular text should use the default text color (i.e.
+        `QColor=QColor(0, 0, 0)`).
+
+        Warning labels are provided when the program will execute a request but
+        with slight modifications (e.g. correcting a negative step size before
+        incrementing a motor position). Warning labels should have a yellow
+        text color, `QColor=QColor(250, 215, 0)`.
+
+        Error labels are provided when the program can not execute a request
+        (e.g. changing modes when the THORLABS motor is disabled). Error labels
+        should have a red text color, `QColor=QColor(255, 0, 0)`.
         """
 
         self.gui.textWindow.setTextColor(color)
@@ -1258,123 +1343,223 @@ class Controller(object):
         maxVal = self.gui.textWindow.verticalScrollBar().maximum()
         self.gui.textWindow.verticalScrollBar().setValue(maxVal)
 
-    def _load_config(self) -> None:
-        """Load new configuration"""
+    def load_config(self) -> None:
+        """Load new configuration.
 
-        self._append_text("Loading new program configuration.")
-        path, _ = QFileDialog.getOpenFileName(parent=self.gui,
-                                              caption="Open File",
-                                              directory="../configuration files",
-                                              filter="configuration files (*.json)")
+        This method will open a window to allow a user to select a
+        configuration file to upload.
+
+        Notes
+        -----
+        Once the file is loaded, the macro variables will be overwritten and
+        a call to the `initialize_gui` method will be called to change process
+        variable and display values.
+        """
+
+        params = {"parent": self.gui,
+                  "caption": "Open File",
+                  "directory": "../configuration files",
+                  "filter": "configuration files (*.json)"}
+        path, _ = QFileDialog.getOpenFileName(**params)
+
+        # Print output statement.
+        self.append_text(f"Loading configuration from {path}")
+
         data, macros = load_config(path)
         self.gui.data = data
         self.gui.macros = macros
-        self._initialize_GUI()
+        self.initialize_gui()
 
-    def _save_config(self) -> None:
-        """Save current configuration."""
+    def save_config(self) -> None:
+        """Save current configuration.
 
-        path, _ = QFileDialog.getSaveFileName(parent=self.gui,
-                                              caption="Save File",
-                                              directory="../configuration files",
-                                              filter="configuration files (*.json)")
+        This method will open a window to allow a user to select a location
+        and file name to save to.
+
+        Notes
+        -----
+        Once the path and file name is attained, the macro variables will be
+        restructured into a non-linear dictionary and then saved to a
+        configuration file.
+        """
+
+        params = {"parent": self.gui,
+                  "caption": "Save File",
+                  "directory": "../configuration files",
+                  "filter": "configuration files (*.json)"}
+        path, _ = QFileDialog.getSaveFileName(**params)
+
         save_config(path, self.gui.data, self.gui.macros)
 
-        self._append_text(f"Configuration saved to {path}")
+        # Print output statement.
+        self.append_text(f"Configuration saved to {path}")
 
-    def _change_units(self) -> None:
-        """Changes the current position's display units."""
+    def change_units(self) -> None:
+        """Changes the current position's display units.
+
+        This method toggles the current step labels between displaying units of
+        steps or microns.
+        """
 
         for object in ["O", "S"]:
             for axis in ["X", "Y", "Z"]:
 
+                # Get the current position.
                 value = self.__dict__[f"PV_{axis}{object}POS"].get()
 
+                # Generate the step text.
                 if self.gui.positionUnits.isChecked():
                     factor = self.gui.macros[f"{axis}{object}_STEP2MICRON"]
                     stepText = f"<b>{round(factor * value, 1)} MICRONS</b>"
                 else:
                     stepText = f"<b>{round(value, 1)} STEPS</b>"
 
-                stepLineEdit = self.__dict__["gui"].__dict__[
-                    f"{axis.lower()}Step{object}"]
-                stepLineEdit.setText(stepText)
+                # Update the current position label text.
+                stepLabel = self.__dict__["gui"].__dict__[f"{axis.lower()}Step{object}"]
+                stepLabel.setText(stepText)
 
-    def _save_position(self):
-        """Save the current position to the program."""
+    def save_position(self):
+        """Save the current position to a configuration file.
 
+        This method takes the current absolute positions of all motors and
+        saves them to a configuration file.
+
+        Notes
+        -----
+        Once the positions are gained from each motor, they will be organized
+        into a dictionary where the keys define the motor and the values are
+        the corresponding positions. This position dictionary is then saved
+        into the gui's `savedPos` attribute (which is a dictionary) with the
+        key being the position label and the values being the dictionary of
+        position.
+
+        Once the position is saved in dynamic memory, the program updates the
+        `saved_positions.json` file to keep the saved positions in memory even
+        if the program crashes.
+        """
+
+        # Get position label.
         label = self.gui.posLabel.text()
-        position = {}
-        position["XS"] = self.PV_XSPOS_ABS.get()
-        position["YS"] = self.PV_YSPOS_ABS.get()
-        position["ZS"] = self.PV_ZSPOS_ABS.get()
-        position["XO"] = self.PV_XOPOS_ABS.get()
-        position["YO"] = self.PV_YOPOS_ABS.get()
-        position["ZO"] = self.PV_ZOPOS_ABS.get()
 
+        # Check that the label is unique
         if self.gui.posSelect.findText(label) == -1:
 
+            # Generate position dictionary.
+            position = {}
+            position["XS"] = self.PV_XSPOS_ABS.get()
+            position["YS"] = self.PV_YSPOS_ABS.get()
+            position["ZS"] = self.PV_ZSPOS_ABS.get()
+            position["XO"] = self.PV_XOPOS_ABS.get()
+            position["YO"] = self.PV_YOPOS_ABS.get()
+            position["ZO"] = self.PV_ZOPOS_ABS.get()
+
+            # Save position into dynamic memory.
             self.gui.savedPos[label] = position
+
+            # Update the position select drop down menu.
             self.gui.posSelect.insertItem(1, label)
+
+            # Update the saved positions file.
             save_pos_config(path="saved_positions.json",
                             data=self.gui.savedPos)
 
-            self._append_text(f"Position saved: {label}")
+            # Print output statement.
+            self.append_text(f"Position saved: {label}")
 
         else:
-            self._append_text(("ERROR: Position label already exists, change ",
-                              "the position label and try again."),
-                              QColor(255, 0, 0))
+            # Print output statement.
+            self.append_text("ERROR: Position label already exists, change the position label and try again.",
+                             QColor(255, 0, 0))
 
-    def _load_position(self):
-        """Load the selected position to the program."""
+    def load_position(self):
+        """Move motors to the selected position.
 
+        This method takes the selected position and moves each motor to their
+        saved position.
+
+        Notes
+        -----
+        This method takes the selected label to use as the key to the
+        `GUI.savedPos` dictionary to get the dictionary of positions. Each
+        position is then loaded into the corresponding motor. The motor is then
+        moved to the loaded position.
+        """
+
+        # Get position label.
         label = self.gui.posSelect.currentText()
 
-        if label != "--None--":
+        # Exit the method if the selected position is the "--None--" statement.
+        if label == "--None--":
+            return None
 
-            position = self.gui.savedPos[label]
+        # Get the positions corresponding to the label.
+        position = self.gui.savedPos[label]
 
-            for object in ["S", "O"]:
-                for axis in ["X", "Y", "Z"]:
+        for object in ["S", "O"]:
+            for axis in ["X", "Y", "Z"]:
 
-                    absPos = position[f"{axis}{object}"]
+                # Get the position for the current motor.
+                absPos = position[f"{axis}{object}"]
 
-                    PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
-                    NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
+                # Get the soft limits.
+                PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
+                NSL = self.gui.macros[f"{axis}{object}MIN_SOFT_LIMIT"]
 
-                    if absPos > PSL or absPos < NSL:
-                        self._append_text(("ERROR: Position falls outside of ",
-                                          "soft limits."), QColor(255, 0, 0))
-                    else:
-                        offset = self.__dict__[
-                            f"PV_{axis}{object}OFFSET"].get()
-                        self.__dict__[
-                            f"PV_{axis}{object}ABSPOS"].put(absPos + offset)
-                        self.__dict__[f"PV_{axis}{object}MOVE"].put(1)
-                        self.__dict__[f"PV_{axis}{object}MOVE"].put(0)
+                # Check if the loaded position falls within the soft limits.
+                if absPos > PSL or absPos < NSL:
+                    self.append_text("ERROR: Position falls outside of soft limits.", QColor(255, 0, 0))
+                else:
+                    # Load and move to position.
+                    offset = self.__dict__[f"PV_{axis}{object}OFFSET"].get()
+                    self.__dict__[f"PV_{axis}{object}ABSPOS"].put(absPos + offset)
+                    self.__dict__[f"PV_{axis}{object}MOVE"].put(1)
+                    self.__dict__[f"PV_{axis}{object}MOVE"].put(0)
 
-            self._append_text(f"Position loaded: {label}")
+        # Print output statement.
+        self.append_text(f"Position loaded: {label}")
 
-    def _delete_position(self):
-        """Delete the selected position from the program."""
+    def delete_position(self):
+        """Delete the selected position.
 
+        Notes
+        -----
+        This method deletes the current position from the program by removing
+        its position from the `GUI.savedPos` dictionary and the positions
+        drop down menu before updating the saved positions configuration file.
+        """
+
+        # Get information on the selected position
         label = self.gui.posSelect.currentText()
         index = self.gui.posSelect.currentIndex()
 
-        if index != 0:
-            self.gui.posSelect.removeItem(index)
-            del self.gui.savedPos[label]
-            save_pos_config(path="saved_positions.json",
-                            data=self.gui.savedPos)
-            self._append_text(f"Position deleted: {label}")
+        # Check if the selected position is the "--None--" label.
+        if index == 0:
+            return None
 
-    def _clear_position(self):
-        """Clear all saved positions from the program."""
+        self.gui.posSelect.removeItem(index)
+        del self.gui.savedPos[label]
+        save_pos_config(path="saved_positions.json", data=self.gui.savedPos)
 
+        # Print output statement.
+        self.append_text(f"Position deleted: {label}")
+
+    def clear_position(self):
+        """Clear all saved positions.
+
+        Notes
+        -----
+        This method removes all items from the positions drop down menu and
+        `GUI.savedPos` dictionary before updating the saved positions
+        configuration file.
+        """
+
+        # Remove each item from the drop down menu and positions dictionary.
         for key in self.gui.savedPos.keys():
             index = self.gui.posSelect.findText(key)
             self.gui.posSelect.removeItem(index)
+            del self.gui.savedPos[key]
 
         save_pos_config(path="saved_positions.json", data=self.gui.savedPos)
-        self._append_text("All positions cleared.")
+
+        # Print output statement.
+        self.append_text("All positions cleared.")
