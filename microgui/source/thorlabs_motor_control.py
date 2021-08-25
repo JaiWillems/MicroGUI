@@ -1,7 +1,7 @@
 """THORLAB motor integration.
 
-This script allows a user to interface with the THORLAB motor that defines the
-horizontal microscope mode.
+This module contains a series of functions to allow the program to interface
+with the THORLAB motor that defines the microscope's mode.
 """
 
 
@@ -9,12 +9,11 @@ import thorlabs_apt as apt
 
 
 def initMotor() -> apt.Motor:
-    """
-    Defines and instantiates the mode motor.
+    """Defines and instantiate the THORLABS motor.
 
-    This function finds a THORLABS motor connected to the computer and
-    initiates the velocity and acceleration constraints. Additionally, the
-    motor will be moved to the homing position.
+    This function finds the THORLABS motor connected to the local computer and
+    initializes it by setting the velocity and acceleration constraints and
+    moving the motor to its homed position.
 
     Returns
     -------
@@ -22,14 +21,16 @@ def initMotor() -> apt.Motor:
         Motor object defined by thorlabs_apt.
     """
 
+    # Find devices connected to the computer.
     devices = apt.list_available_devices()
 
+    # Check a motor is found.
     try:
         motorSerialNumber = devices[0][1]
     except:
         raise Exception("No motor detected. Ensure the device is connected.")
 
-    # Initialize motor if detected.
+    # Initialize detected motor.
     modeMotor = apt.Motor(motorSerialNumber)
 
     # Configure motor settings.
@@ -45,19 +46,27 @@ def enable(modeMotor: apt.Motor) -> None:
     Parameters
     ----------
     modeMotor : Motor
-        Motor object representing the modeMotor.
+        THORLABS mode motor.
+    
+    Notes
+    -----
+    The THORLABS motor must be enabled before motion control is available.
     """
 
     modeMotor.enable()
 
 
 def disable(modeMotor: apt.Motor) -> None:
-    """Enable THORLABS motor.
+    """Disable THORLABS motor.
 
     Parameters
     ----------
     modeMotor : Motor
-        Motor object representing the modeMotor.
+        THORLABS mode motor.
+    
+    Notes
+    -----
+    The THORLABS motor must be enabled before motion control is available.
     """
 
     modeMotor.disable()
@@ -70,37 +79,40 @@ def home(modeMotor: apt.Motor) -> None:
     ----------
     modeMotor : Motor
         Motor object representing the modeMotor.
+    
+    Notes
+    -----
+    The THORLABS motor must be enabled before motor homing is available.
     """
 
     modeMotor.move_home()
 
 
 def changeMode(pos: int, modeMotor: apt.Motor) -> float:
-    """
-    Change THORLAB motor position by pre-set ammount.
+    """Set the THORLABBS motor position.
 
     This function allows users to change the microscopes mode of operation by
-    altering THORLAB motor placement.
+    altering the THORLABs motor placement.
 
     Parameters
     ----------
     pos : int
-        The position to move to corresponding to one of the four modes:
-        transmission, reflection, visible image, and the beamsplitter mode.
+        The position to set the motor to.
     modeMotor : Motor
-        Motor object to change the mode of.
+        THORLABS mode motor.
 
     Returns
     -------
     float
-        A positive value signifies the positon moved to whereas `-1` indicates
+        A positive value signifies the positon set whereas `-1` indicates an
         error in changing modes.
 
     Notes
     -----
-    modeMotor must have been initiated using initMotor().
+    The THORLABS motor must be enabled before motion control is available.
     """
 
+    # Try changing motor positions.
     try:
         modeMotor.move_to(value=pos, blocking=False)
         return pos
