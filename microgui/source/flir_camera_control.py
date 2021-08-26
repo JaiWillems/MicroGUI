@@ -1,7 +1,7 @@
 """FLIR (Point Grey) camera integration.
 
-The flir_camera_control module allows the user to interface with the Blackfly
-USB3 camera located within the main GUI display.
+This module contains a function which allows the program to interface with the
+Blackfly USB3 camera located within the main GUI display.
 """
 
 
@@ -20,10 +20,13 @@ def get_image() -> np.array:
     np.array
         Multi-dimensional Numpy array encoding the captured image information.
     """
+
     with Camera() as cam:
 
+        # Set camera settings.
         cam.PixelFormat = "RGB8"
 
+        # Capture image.
         cam.start()
         image = cam.get_array()
         cam.stop()
