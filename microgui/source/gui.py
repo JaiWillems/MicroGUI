@@ -859,8 +859,6 @@ class CameraWindow(QMainWindow):
         plt.axis("off")
         plt.savefig(path, dpi=500, bbox_inches="tight")
 
-        self._append_text(f"Image capture saved to: {path}")
-
 
 class MyTableWidget(QWidget):
     """GUI table window.
@@ -1047,7 +1045,7 @@ class MyTableWidget(QWidget):
         self.tab2.layout.addWidget(self.TMVMbutton, 3, 2, 1, 1)
         self.tab2.layout.addWidget(self.TMBMbutton, 4, 2, 1, 1)
 
-        self.tab2ayout.addWidget(QLabel("<b>Motor Control</b>"), 5, 0, 1, 4)
+        self.tab2.layout.addWidget(QLabel("<b>Motor Control</b>"), 5, 0, 1, 4)
         longLabel = "<i>Enable or disable the THORLABS motor and move to home position.</i>"
         self.tab2.layout.addWidget(QLabel(longLabel), 6, 0, 1, 4)
 

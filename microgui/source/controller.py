@@ -550,12 +550,11 @@ class Controller(object):
         status = changeMode(pos=position, modeMotor=modeMotor)
 
         if status == -1:
-            message = ("ERROR: Can not change mode.", QColor(255, 0, 0))
+            # Print output statement.
+            self.append_text("ERROR: Can not change mode.", QColor(255, 0, 0))
         else:
-            message = (f"Changing mode to {mode}.",)
-
-        # Print output statement.
-        self.append_text(*message)
+            # Print output statement.
+            self.append_text(f"Changing mode to {mode}.")
 
     def mode_position(self, mode: str) -> None:
         """Update mode position.
@@ -649,13 +648,13 @@ class Controller(object):
             self.gui.tab.RDM4.setChecked(False)
             self.gui.tab.group.setExclusive(True)
 
-            message = ("THORLABS motor homing.")
+            # Print output statement.
+            self.append_text("THORLABS motor homing.")
         except:
-            message = ("ERROR: THORLABS motor can not be homed.",
-                       QColor(255, 0, 0))
+            # Print output statement.
+            self.append_text("ERROR: THORLABS motor can not be homed.",
+                             QColor(255, 0, 0))
 
-        # Print output statement.
-        self.append_text(*message)
 
     def increment(self, object: Literal["S", "O"], axis:
                   Literal["X", "Y", "Z"], direction: Literal["N", "P"], step:
@@ -697,8 +696,8 @@ class Controller(object):
         if incPos < 0:
             incPos = -incPos
             step.setText(str(incPos))
-            message = ("WARNING: Step must be positive.", QColor(250, 215, 0))
-            self.append_text(*message)
+            self.append_text("WARNING: Step must be positive.",
+                             QColor(250, 215, 0))
 
         # Get soft limits.
         PSL = self.gui.macros[f"{axis}{object}MAX_SOFT_LIMIT"]
@@ -873,9 +872,8 @@ class Controller(object):
 
                     # Check if the minimum limit is greater than the upper.
                     if min > max:
-                        message = (f"WARNING: Invalid limit. Minimum limits must be less then maximum limits.",
-                                   QColor(250, 215, 0))
-                        self.append_text(*message)
+                        self.append_text(f"WARNING: Invalid limit. Minimum limits must be less then maximum limits.",
+                                         QColor(250, 215, 0))
 
                     else:
                         min_soft_ind = f"{axis}{object}MIN_SOFT_LIMIT"
@@ -894,7 +892,7 @@ class Controller(object):
 
         # Create heler function to generate soft limit text.
         def set(label: str, offset: PV) -> str:
-            return str(self.gu.macros[label] + offset.get())
+            return str(self.gui.macros[label] + offset.get())
 
         # Update soft limit line edits.
         self.gui.tab.xSMin.setText(set("XSMIN_SOFT_LIMIT", self.PV_XSOFFSET))
@@ -1507,7 +1505,8 @@ class Controller(object):
 
                 # Check if the loaded position falls within the soft limits.
                 if absPos > PSL or absPos < NSL:
-                    self.append_text("ERROR: Position falls outside of soft limits.", QColor(255, 0, 0))
+                    self.append_text("ERROR: Position falls outside of soft limits.",
+                                     QColor(255, 0, 0))
                 else:
                     # Load and move to position.
                     offset = self.__dict__[f"PV_{axis}{object}OFFSET"].get()
