@@ -47,7 +47,7 @@ def enable(modeMotor: apt.Motor) -> None:
     ----------
     modeMotor : Motor
         THORLABS mode motor.
-    
+
     Notes
     -----
     The THORLABS motor must be enabled before motion control is available.
@@ -63,7 +63,7 @@ def disable(modeMotor: apt.Motor) -> None:
     ----------
     modeMotor : Motor
         THORLABS mode motor.
-    
+
     Notes
     -----
     The THORLABS motor must be enabled before motion control is available.
@@ -79,7 +79,7 @@ def home(modeMotor: apt.Motor) -> None:
     ----------
     modeMotor : Motor
         Motor object representing the modeMotor.
-    
+
     Notes
     -----
     The THORLABS motor must be enabled before motor homing is available.

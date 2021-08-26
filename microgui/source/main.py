@@ -1,16 +1,16 @@
-"""Instantiate the main GUI.
+"""Create the interactive user interface.
 
-The main module is responsible for calling the required files and dependencies
+This module is responsible for calling the required files and dependencies
 to run the FAR-IR horizontal microscope.
 """
 
 
-from PyQt5.QtWidgets import QApplication
+from configuration import load_config, load_pos_config, load_pos_config
+from controller import Controller
 from epics import PV
 from gui import GUI
-from controller import Controller
+from PyQt5.QtWidgets import QApplication
 from thorlabs_motor_control import initMotor
-from configuration import load_config, load_pos_config, load_pos_config
 import sys
 
 
@@ -24,19 +24,25 @@ savedPos = load_pos_config("saved_positions.json")
 
 
 def program_exit(gui: GUI) -> None:
-    """Exit the MicroGUI project.
+    """Exit the MicroGUI program.
 
-    This program exits the MicroGUI projects and stops all sample and objective
-    stage motors in the case that the program is closed during operation.
+    This function exits the MicroGUI program and stops all sample and objective
+    stage motors in the case that the program is closed during motion.
 
     Parameters
     ----------
     gui : GUI
-        Gui containing macro information of the STOP PV names.
+        Gui containing macro information of the STOP process variable names.
+    
+    Notes
+    -----
+    This exit function is not called when the program crashes in which case,
+    the motors will move to the soft limits.
     """
 
     app.exec_()
 
+    # Stop each motor.
     for object in ["S", "O"]:
         for axis in ["X", "Y", "Z"]:
             pvStop = PV(gui.macros[f"{axis}{object}STOP"])

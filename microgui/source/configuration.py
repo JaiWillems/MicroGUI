@@ -1,7 +1,7 @@
 """JSON file handling.
 
-The configuration module handles the load and save functionality of the
-programs configuration files.
+This module contains a series of functions to handle the load and save
+functionality of program configuration files.
 """
 
 
@@ -15,7 +15,7 @@ def load_config(path: str) -> Tuple[dict, dict]:
     Parameters
     ----------
     path : str
-        Path to configuration file to upload.
+        Path to the configuration file to upload.
 
     Returns
     -------
@@ -23,12 +23,20 @@ def load_config(path: str) -> Tuple[dict, dict]:
         Configuration data in nested dictionary format.
     dict
         Macro parameters in a dictionary format.
+    
+    Notes
+    -----
+    This function uploads the data from a `.json` configuration file in a
+    nested dictionary format. It then transforms the data into a linear
+    dictionary which it returns.
     """
 
+    # Load configuration file data.
     with open(path, "r") as jsonfile:
         data = json.load(jsonfile)
         jsonfile.close()
 
+    # Convert dictionary from nested to linear.
     macros = {}
     init_macros(data, macros)
 
@@ -36,20 +44,27 @@ def load_config(path: str) -> Tuple[dict, dict]:
 
 
 def save_config(path: str, data: dict, macros: dict) -> None:
-    """Save configuration file data.
+    """Save data to a configuration file.
 
     Parameters
     ----------
     path : str
-        Path to saved configuration file.
+        Path defining where to save the configuration file.
     data : dict
         Imported data in nested dictionary format.
     macros : dict
-        Macro parameters in macro format.
+        Macro parameters in linear format.
+
+    Notes
+    -----
+    This functions takes a linear dictionary and a nested dictionary to update
+    the nested dictionary values before saving the configuration file.
     """
 
+    # Convert linear dictionary to a nested dictionary.
     condense_macros(data, macros)
 
+    # Save data as a configuration file.
     with open(path, "w") as jsonfile:
         myJSON = json.dumps(data, indent=4)
         jsonfile.write(myJSON)
@@ -58,8 +73,8 @@ def save_config(path: str, data: dict, macros: dict) -> None:
 def init_macros(baseDict: dict, macroDict: dict) -> None:
     """Initialize macro variables.
 
-    This function transforms, in place, a nested dictionary into a planar
-    dictionary.
+    This function transforms a nested dictionary into a planar dictionary for
+    macro return.
 
     Parameters
     ----------
@@ -80,8 +95,8 @@ def init_macros(baseDict: dict, macroDict: dict) -> None:
 def condense_macros(baseDict: dict, macroDict: dict) -> None:
     """Save macro variables.
 
-    This function updates the values of a nested dictionary from the a planar
-    dictionary with common keys.
+    This function updates the values of a nested dictionary from the values of
+    a planar dictionary with common keys.
 
     Parameters
     ----------
@@ -110,8 +125,8 @@ def load_pos_config(path: str) -> dict:
     Returns
     -------
     dict
-        Dictionary with position labels as keys and a dictionary of positions
-        as values.
+        Dictionary with position labels as the keys and a dictionary of the
+        corresponding positions as values.
     """
 
     with open(path, "r") as jsonfile:
@@ -122,16 +137,15 @@ def load_pos_config(path: str) -> dict:
 
 
 def save_pos_config(path: str, data: dict) -> None:
-    """Save the current saved positions to the saved positions configuration
-    file.
+    """Save positions to the saved positions configuration file.
 
     Parameters
     ----------
     path : str
         Path to save the file to.
     dict
-        Dictionary with position labels as keys and a dictionary of positions
-        as values.
+        Dictionary with position labels as the keys and a dictionary of the
+        positions positions as values.
     """
 
     with open(path, "w") as jsonfile:
