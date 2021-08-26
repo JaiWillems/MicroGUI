@@ -1562,3 +1562,5 @@ class Controller(object):
 
         # Print output statement.
         self.append_text("All positions cleared.")
+
+# Jai Willems was here!
